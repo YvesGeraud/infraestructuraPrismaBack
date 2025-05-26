@@ -18,7 +18,7 @@ export class ctInfraestructuraArea {
   async obtenerArea() {
     try {
       const area = await Area.findAll({
-        attributes: ["id_area", "descripcion"],
+        attributes: ["id_area", "nombre"],
       });
       if (area.length === 0) {
         throw new Error("No hay áreas");
