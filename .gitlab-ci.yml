@@ -51,7 +51,7 @@ publish_dev:
         files:
           - package.json
       paths:
-        - node_modules  
+        - node_modules
     - key: cache-$CI_COMMIT_REF_SLUG
       paths:
         - dist
@@ -64,12 +64,73 @@ publish_dev:
     - mkdir -p $DEPLOY/$FOLDER/tmp/
     - touch $DEPLOY/$FOLDER/tmp/restart.txt
 
+dependences_uat:
+  stage: dependences
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /UAT/
+  tags:
+    - uat
+  cache:
+    key:
+      files:
+        - package.json
+    paths:
+      - node_modules
+  script:
+    - npm install
+
+build_uat:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /UAT/
+  tags:
+    - uat
+  cache:
+    - key:
+        files:
+          - package.json
+      paths:
+        - node_modules
+    - key: cache-$CI_COMMIT_REF_SLUG
+      paths:
+        - dist
+  script:
+    - npx tsc
+    - cp -f .env dist/
+
+publish_uat:
+  variables:
+    DEPLOY: "/var/www/api-uat"
+    FOLDER: "infraestructura"
+  stage: publish
+  rules:
+    - if: $CI_COMMIT_BRANCH =~ /UAT/
+  tags:
+    - uat
+  cache:
+    - key:
+        files:
+          - package.json
+      paths:
+        - node_modules
+    - key: cache-$CI_COMMIT_REF_SLUG
+      paths:
+        - dist
+  script:
+    - echo "Desplegando a uat"
+    - mkdir -p $DEPLOY/$FOLDER/
+    - rm -rf $DEPLOY/$FOLDER/*
+    - cp -rf $CI_PROJECT_DIR/node_modules/ $DEPLOY/$FOLDER/
+    - cp -r $CI_PROJECT_DIR/dist/. $DEPLOY/$FOLDER/
+    - mkdir -p $DEPLOY/$FOLDER/tmp/
+    - touch $DEPLOY/$FOLDER/tmp/restart.txt
+
 dependences_prod:
   stage: dependences
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-funhi
+    - prod-apps
   cache:
     key:
       files:
@@ -84,7 +145,7 @@ build_prod:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-funhi
+    - prod-apps
   cache:
     - key:
         files:
@@ -96,19 +157,17 @@ build_prod:
         - dist
   script:
     - npx tsc
-    - cp -rf public dist/
-    - cp -rf mails dist/
     - cp -f .env dist/
 
 publish_prod:
   variables:
-    DEPLOY: "/var/www/api"
-    FOLDER: "registro"
+    DEPLOY: "/var/www/api-apps/"
+    FOLDER: "infraestructura"
   stage: publish
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-funhi
+    - prod-apps
   cache:
     - key:
         files:
