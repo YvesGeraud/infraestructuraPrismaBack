@@ -5,17 +5,17 @@ import type { rl_infraestructura_unidad_construccion_inmueble, rl_infraestructur
 
 export interface ct_infraestructura_construccion_inmuebleAttributes {
   id_construccion: number;
-  descripcion: string;
+  descripcion?: string;
 }
 
 export type ct_infraestructura_construccion_inmueblePk = "id_construccion";
 export type ct_infraestructura_construccion_inmuebleId = ct_infraestructura_construccion_inmueble[ct_infraestructura_construccion_inmueblePk];
-export type ct_infraestructura_construccion_inmuebleOptionalAttributes = "id_construccion";
+export type ct_infraestructura_construccion_inmuebleOptionalAttributes = "id_construccion" | "descripcion";
 export type ct_infraestructura_construccion_inmuebleCreationAttributes = Optional<ct_infraestructura_construccion_inmuebleAttributes, ct_infraestructura_construccion_inmuebleOptionalAttributes>;
 
 export class ct_infraestructura_construccion_inmueble extends Model<ct_infraestructura_construccion_inmuebleAttributes, ct_infraestructura_construccion_inmuebleCreationAttributes> implements ct_infraestructura_construccion_inmuebleAttributes {
   id_construccion!: number;
-  descripcion!: string;
+  descripcion?: string;
 
   // ct_infraestructura_construccion_inmueble belongsToMany ct_infraestructura_unidad via id_construccion and id_unidad
   id_unidad_ct_infraestructura_unidad_rl_infraestructura_unidad_construccion_inmuebles!: ct_infraestructura_unidad[];
@@ -52,7 +52,7 @@ export class ct_infraestructura_construccion_inmueble extends Model<ct_infraestr
     },
     descripcion: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,

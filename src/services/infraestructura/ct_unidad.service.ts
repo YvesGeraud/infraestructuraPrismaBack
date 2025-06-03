@@ -54,7 +54,7 @@ export class ctInfraestructuraUnidadService {
   //* Buscar unidades por nombre
   async buscarPorNombre(termino: string, limit = 10) {
     try {
-      return await Unidad.findAll({
+      const unidades = await Unidad.findAll({
         attributes: ["id_unidad", "nombre_unidad", "cct", "ubicacion"],
         where: {
           [Op.or]: [
@@ -88,6 +88,43 @@ export class ctInfraestructuraUnidadService {
         ],
         limit,
       });
+      if (unidades) {
+        return unidades.map((unidad) => ({
+          id_unidad: unidad.id_unidad,
+          nombre_unidad: unidad.nombre_unidad,
+          cct: unidad.cct,
+          ubicacion: unidad.ubicacion,
+          sostenimiento: {
+            id_sostenimiento:
+              unidad.id_sostenimiento_ct_infraestructura_sostenimiento
+                .id_sostenimiento,
+            sostenimiento:
+              unidad.id_sostenimiento_ct_infraestructura_sostenimiento
+                .sostenimiento,
+          },
+          tipo_escuela: {
+            id_tipo_escuela:
+              unidad.id_tipo_escuela_ct_infraestructura_tipo_escuela
+                .id_tipo_escuela,
+            tipo_escuela:
+              unidad.id_tipo_escuela_ct_infraestructura_tipo_escuela
+                .tipo_escuela,
+          },
+          localidad: {
+            id_localidad: unidad.id_localidad_ct_localidad.id_localidad,
+            localidad: unidad.id_localidad_ct_localidad.localidad,
+            id_municipio_ct_municipio: {
+              id_municipio:
+                unidad.id_localidad_ct_localidad.id_municipio_ct_municipio
+                  .id_municipio,
+              nombre:
+                unidad.id_localidad_ct_localidad.id_municipio_ct_municipio
+                  .nombre,
+            },
+          },
+        }));
+      }
+      return null;
     } catch (error) {
       console.error("Error al buscar unidades por nombre service:", error);
       throw new Error("Error al buscar unidades por nombre service");

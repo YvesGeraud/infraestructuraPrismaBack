@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import CtAreaService from "../../services/infraestructura/ct_area.service";
 
 export class CtAreaController {
+  //* Obtener todas las áreas
   async obtenerArea(req: Request, res: Response) {
     try {
       const area = await CtAreaService.obtenerArea();
@@ -12,6 +13,7 @@ export class CtAreaController {
     }
   }
 
+  //* Obtener una área por su id
   async obtenerAreaById(req: Request, res: Response) {
     const { id } = req.params;
     try {

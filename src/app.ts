@@ -32,6 +32,11 @@ import tipoConstruccionRoutes from "./routes/infraestructura/ct_tipo_construccio
 import frecuenciaLimpiezaRoutes from "./routes/infraestructura/ct_frecuencia_limpieza.routes";
 import pautaSeguridadRoutes from "./routes/infraestructura/ct_pauta_de_seguridad.routes";
 import construccionInmuebleRoutes from "./routes/infraestructura/ct_construccion_inmueble.routes";
+import areaDeServicioRoutes from "./routes/infraestructura/ct_area_de_servicio.routes";
+import adecuacionDiscapacidadRoutes from "./routes/infraestructura/ct_adecuacion_discapacidad.routes";
+import senalamientoDiscapacidadRoutes from "./routes/infraestructura/ct_senalamiento_discapacidad.routes";
+import inventarioRoutes from "./routes/inventario/ct_inventario.routes";
+import authRoutes from "./routes/auth.routes";
 import "./models";
 
 // Configurar variables de entorno
@@ -145,6 +150,28 @@ app.use(
   `${process.env.HOST}api/construccionInmueble`,
   /*authenticateJWT,*/ construccionInmuebleRoutes
 );
+
+app.use(
+  `${process.env.HOST}api/areaDeServicio`,
+  /*authenticateJWT,*/ areaDeServicioRoutes
+);
+
+app.use(
+  `${process.env.HOST}api/adecuacionDiscapacidad`,
+  /*authenticateJWT,*/ adecuacionDiscapacidadRoutes
+);
+
+app.use(
+  `${process.env.HOST}api/senalamientoDiscapacidad`,
+  /*authenticateJWT,*/ senalamientoDiscapacidadRoutes
+);
+
+app.use(
+  `${process.env.HOST}api/inventario`,
+  /*authenticateJWT,*/ inventarioRoutes
+);
+
+app.use(`${process.env.HOST}api/auth`, authRoutes);
 
 // Mostrar información de configuración de la base de datos
 console.log("📝 Configuración de la base de datos:");

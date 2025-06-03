@@ -1,12 +1,16 @@
 import type { Sequelize } from "sequelize";
 import { ct_accion as _ct_accion } from "./ct_accion";
 import type { ct_accionAttributes, ct_accionCreationAttributes } from "./ct_accion";
+import { ct_infraestructura_adecuacion_discapacidad as _ct_infraestructura_adecuacion_discapacidad } from "./ct_infraestructura_adecuacion_discapacidad";
+import type { ct_infraestructura_adecuacion_discapacidadAttributes, ct_infraestructura_adecuacion_discapacidadCreationAttributes } from "./ct_infraestructura_adecuacion_discapacidad";
 import { ct_infraestructura_almacenamiento_agua as _ct_infraestructura_almacenamiento_agua } from "./ct_infraestructura_almacenamiento_agua";
 import type { ct_infraestructura_almacenamiento_aguaAttributes, ct_infraestructura_almacenamiento_aguaCreationAttributes } from "./ct_infraestructura_almacenamiento_agua";
 import { ct_infraestructura_antiguedad_inmueble as _ct_infraestructura_antiguedad_inmueble } from "./ct_infraestructura_antiguedad_inmueble";
 import type { ct_infraestructura_antiguedad_inmuebleAttributes, ct_infraestructura_antiguedad_inmuebleCreationAttributes } from "./ct_infraestructura_antiguedad_inmueble";
 import { ct_infraestructura_area as _ct_infraestructura_area } from "./ct_infraestructura_area";
 import type { ct_infraestructura_areaAttributes, ct_infraestructura_areaCreationAttributes } from "./ct_infraestructura_area";
+import { ct_infraestructura_area_de_servicio as _ct_infraestructura_area_de_servicio } from "./ct_infraestructura_area_de_servicio";
+import type { ct_infraestructura_area_de_servicioAttributes, ct_infraestructura_area_de_servicioCreationAttributes } from "./ct_infraestructura_area_de_servicio";
 import { ct_infraestructura_construccion_inmueble as _ct_infraestructura_construccion_inmueble } from "./ct_infraestructura_construccion_inmueble";
 import type { ct_infraestructura_construccion_inmuebleAttributes, ct_infraestructura_construccion_inmuebleCreationAttributes } from "./ct_infraestructura_construccion_inmueble";
 import { ct_infraestructura_departamento as _ct_infraestructura_departamento } from "./ct_infraestructura_departamento";
@@ -45,6 +49,8 @@ import { ct_infraestructura_problema_edificio as _ct_infraestructura_problema_ed
 import type { ct_infraestructura_problema_edificioAttributes, ct_infraestructura_problema_edificioCreationAttributes } from "./ct_infraestructura_problema_edificio";
 import { ct_infraestructura_razon_no_construccion as _ct_infraestructura_razon_no_construccion } from "./ct_infraestructura_razon_no_construccion";
 import type { ct_infraestructura_razon_no_construccionAttributes, ct_infraestructura_razon_no_construccionCreationAttributes } from "./ct_infraestructura_razon_no_construccion";
+import { ct_infraestructura_senalamiento_discapacidad as _ct_infraestructura_senalamiento_discapacidad } from "./ct_infraestructura_senalamiento_discapacidad";
+import type { ct_infraestructura_senalamiento_discapacidadAttributes, ct_infraestructura_senalamiento_discapacidadCreationAttributes } from "./ct_infraestructura_senalamiento_discapacidad";
 import { ct_infraestructura_sostenimiento as _ct_infraestructura_sostenimiento } from "./ct_infraestructura_sostenimiento";
 import type { ct_infraestructura_sostenimientoAttributes, ct_infraestructura_sostenimientoCreationAttributes } from "./ct_infraestructura_sostenimiento";
 import { ct_infraestructura_suministro_agua as _ct_infraestructura_suministro_agua } from "./ct_infraestructura_suministro_agua";
@@ -120,9 +126,11 @@ import type { rl_infraestructura_unidad_suministro_aguaAttributes, rl_infraestru
 
 export {
   _ct_accion as ct_accion,
+  _ct_infraestructura_adecuacion_discapacidad as ct_infraestructura_adecuacion_discapacidad,
   _ct_infraestructura_almacenamiento_agua as ct_infraestructura_almacenamiento_agua,
   _ct_infraestructura_antiguedad_inmueble as ct_infraestructura_antiguedad_inmueble,
   _ct_infraestructura_area as ct_infraestructura_area,
+  _ct_infraestructura_area_de_servicio as ct_infraestructura_area_de_servicio,
   _ct_infraestructura_construccion_inmueble as ct_infraestructura_construccion_inmueble,
   _ct_infraestructura_departamento as ct_infraestructura_departamento,
   _ct_infraestructura_dimension_terreno as ct_infraestructura_dimension_terreno,
@@ -142,6 +150,7 @@ export {
   _ct_infraestructura_pauta_de_seguridad as ct_infraestructura_pauta_de_seguridad,
   _ct_infraestructura_problema_edificio as ct_infraestructura_problema_edificio,
   _ct_infraestructura_razon_no_construccion as ct_infraestructura_razon_no_construccion,
+  _ct_infraestructura_senalamiento_discapacidad as ct_infraestructura_senalamiento_discapacidad,
   _ct_infraestructura_sostenimiento as ct_infraestructura_sostenimiento,
   _ct_infraestructura_suministro_agua as ct_infraestructura_suministro_agua,
   _ct_infraestructura_suministro_energia as ct_infraestructura_suministro_energia,
@@ -183,12 +192,16 @@ export {
 export type {
   ct_accionAttributes,
   ct_accionCreationAttributes,
+  ct_infraestructura_adecuacion_discapacidadAttributes,
+  ct_infraestructura_adecuacion_discapacidadCreationAttributes,
   ct_infraestructura_almacenamiento_aguaAttributes,
   ct_infraestructura_almacenamiento_aguaCreationAttributes,
   ct_infraestructura_antiguedad_inmuebleAttributes,
   ct_infraestructura_antiguedad_inmuebleCreationAttributes,
   ct_infraestructura_areaAttributes,
   ct_infraestructura_areaCreationAttributes,
+  ct_infraestructura_area_de_servicioAttributes,
+  ct_infraestructura_area_de_servicioCreationAttributes,
   ct_infraestructura_construccion_inmuebleAttributes,
   ct_infraestructura_construccion_inmuebleCreationAttributes,
   ct_infraestructura_departamentoAttributes,
@@ -227,6 +240,8 @@ export type {
   ct_infraestructura_problema_edificioCreationAttributes,
   ct_infraestructura_razon_no_construccionAttributes,
   ct_infraestructura_razon_no_construccionCreationAttributes,
+  ct_infraestructura_senalamiento_discapacidadAttributes,
+  ct_infraestructura_senalamiento_discapacidadCreationAttributes,
   ct_infraestructura_sostenimientoAttributes,
   ct_infraestructura_sostenimientoCreationAttributes,
   ct_infraestructura_suministro_aguaAttributes,
@@ -303,9 +318,11 @@ export type {
 
 export function initModels(sequelize: Sequelize) {
   const ct_accion = _ct_accion.initModel(sequelize);
+  const ct_infraestructura_adecuacion_discapacidad = _ct_infraestructura_adecuacion_discapacidad.initModel(sequelize);
   const ct_infraestructura_almacenamiento_agua = _ct_infraestructura_almacenamiento_agua.initModel(sequelize);
   const ct_infraestructura_antiguedad_inmueble = _ct_infraestructura_antiguedad_inmueble.initModel(sequelize);
   const ct_infraestructura_area = _ct_infraestructura_area.initModel(sequelize);
+  const ct_infraestructura_area_de_servicio = _ct_infraestructura_area_de_servicio.initModel(sequelize);
   const ct_infraestructura_construccion_inmueble = _ct_infraestructura_construccion_inmueble.initModel(sequelize);
   const ct_infraestructura_departamento = _ct_infraestructura_departamento.initModel(sequelize);
   const ct_infraestructura_dimension_terreno = _ct_infraestructura_dimension_terreno.initModel(sequelize);
@@ -325,6 +342,7 @@ export function initModels(sequelize: Sequelize) {
   const ct_infraestructura_pauta_de_seguridad = _ct_infraestructura_pauta_de_seguridad.initModel(sequelize);
   const ct_infraestructura_problema_edificio = _ct_infraestructura_problema_edificio.initModel(sequelize);
   const ct_infraestructura_razon_no_construccion = _ct_infraestructura_razon_no_construccion.initModel(sequelize);
+  const ct_infraestructura_senalamiento_discapacidad = _ct_infraestructura_senalamiento_discapacidad.initModel(sequelize);
   const ct_infraestructura_sostenimiento = _ct_infraestructura_sostenimiento.initModel(sequelize);
   const ct_infraestructura_suministro_agua = _ct_infraestructura_suministro_agua.initModel(sequelize);
   const ct_infraestructura_suministro_energia = _ct_infraestructura_suministro_energia.initModel(sequelize);
@@ -491,9 +509,11 @@ export function initModels(sequelize: Sequelize) {
 
   return {
     ct_accion: ct_accion,
+    ct_infraestructura_adecuacion_discapacidad: ct_infraestructura_adecuacion_discapacidad,
     ct_infraestructura_almacenamiento_agua: ct_infraestructura_almacenamiento_agua,
     ct_infraestructura_antiguedad_inmueble: ct_infraestructura_antiguedad_inmueble,
     ct_infraestructura_area: ct_infraestructura_area,
+    ct_infraestructura_area_de_servicio: ct_infraestructura_area_de_servicio,
     ct_infraestructura_construccion_inmueble: ct_infraestructura_construccion_inmueble,
     ct_infraestructura_departamento: ct_infraestructura_departamento,
     ct_infraestructura_dimension_terreno: ct_infraestructura_dimension_terreno,
@@ -513,6 +533,7 @@ export function initModels(sequelize: Sequelize) {
     ct_infraestructura_pauta_de_seguridad: ct_infraestructura_pauta_de_seguridad,
     ct_infraestructura_problema_edificio: ct_infraestructura_problema_edificio,
     ct_infraestructura_razon_no_construccion: ct_infraestructura_razon_no_construccion,
+    ct_infraestructura_senalamiento_discapacidad: ct_infraestructura_senalamiento_discapacidad,
     ct_infraestructura_sostenimiento: ct_infraestructura_sostenimiento,
     ct_infraestructura_suministro_agua: ct_infraestructura_suministro_agua,
     ct_infraestructura_suministro_energia: ct_infraestructura_suministro_energia,

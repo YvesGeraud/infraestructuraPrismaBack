@@ -13,11 +13,11 @@ class CtUsuarioController {
         contrasena,
         estatus,
       });
-      console.log("Usuario creado exitosamente:", nuevoUsuario);
+      console.log("Usuario creado exitosamente controller:", nuevoUsuario);
       res.status(201).json(nuevoUsuario);
     } catch (error) {
-      console.error("Error al crear usuario:", error);
-      res.status(500).json({ error: "Error al crear usuario" });
+      console.error("Error al crear usuario controller:", error);
+      res.status(500).json({ error: "Error al crear usuario controller" });
     }
   }
 

@@ -6,8 +6,8 @@ export interface ct_usuarioAttributes {
   usuario: string;
   contrasena: string;
   estatus: number;
-  fecha_registro: Date;
-  fecha_modificacion: Date;
+  fecha_registro?: Date;
+  fecha_modificacion?: Date;
 }
 
 export type ct_usuarioPk = "id_usuario";
@@ -20,8 +20,8 @@ export class ct_usuario extends Model<ct_usuarioAttributes, ct_usuarioCreationAt
   usuario!: string;
   contrasena!: string;
   estatus!: number;
-  fecha_registro!: Date;
-  fecha_modificacion!: Date;
+  fecha_registro?: Date;
+  fecha_modificacion?: Date;
 
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ct_usuario {
@@ -48,13 +48,12 @@ export class ct_usuario extends Model<ct_usuarioAttributes, ct_usuarioCreationAt
     },
     fecha_registro: {
       type: DataTypes.DATE(6),
-      allowNull: false,
+      allowNull: true,
       defaultValue: "current_timestamp(6)"
     },
     fecha_modificacion: {
       type: DataTypes.DATE(6),
-      allowNull: false,
-      defaultValue: "current_timestamp(6)"
+      allowNull: true
     }
   }, {
     sequelize,

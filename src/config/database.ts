@@ -40,20 +40,24 @@ const sequelize = new Sequelize(
         /SequelizeConnectionTimedOutError/,
         /TimeoutError/,
       ],
-    }
+    },
   }
 );
 
 // Función para ejecutar consultas con el pool
-const executeQuery = async (query: string, params: any[] = [], type: QueryTypes = QueryTypes.SELECT) => {
+const executeQuery = async (
+  query: string,
+  params: any[] = [],
+  type: QueryTypes = QueryTypes.SELECT
+) => {
   try {
     const result = await sequelize.query(query, {
       replacements: params,
-      type: type
+      type: type,
     });
     return result;
   } catch (error) {
-    console.error('❌ Error en la consulta:', error);
+    console.error("❌ Error en la consulta:", error);
     throw error;
   }
 };
@@ -64,7 +68,7 @@ const checkConnection = async () => {
     await sequelize.authenticate();
     return true;
   } catch (error) {
-    console.error('❌ Error al verificar conexión:', error);
+    console.error("❌ Error al verificar conexión:", error);
     return false;
   }
 };
@@ -73,16 +77,11 @@ const checkConnection = async () => {
 const closeAllConnections = async () => {
   try {
     await sequelize.close();
-    console.log('✅ Todas las conexiones cerradas');
+    console.log("✅ Todas las conexiones cerradas");
   } catch (error) {
-    console.error('❌ Error al cerrar conexiones:', error);
+    console.error("❌ Error al cerrar conexiones:", error);
     throw error;
   }
 };
 
-export {
-  sequelize,
-  executeQuery,
-  checkConnection,
-  closeAllConnections
-};
+export { sequelize, executeQuery, checkConnection, closeAllConnections };
