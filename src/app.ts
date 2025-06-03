@@ -36,6 +36,13 @@ import areaDeServicioRoutes from "./routes/infraestructura/ct_area_de_servicio.r
 import adecuacionDiscapacidadRoutes from "./routes/infraestructura/ct_adecuacion_discapacidad.routes";
 import senalamientoDiscapacidadRoutes from "./routes/infraestructura/ct_senalamiento_discapacidad.routes";
 import inventarioRoutes from "./routes/inventario/ct_inventario.routes";
+import inventarioProveedoresRoutes from "./routes/inventario/ct_inventario_proveedor.routes";
+import inventarioColoresRoutes from "./routes/inventario/ct_inventario_color.routes";
+import inventarioMarcasRoutes from "./routes/inventario/ct_inventario_marcas.routes";
+import inventarioMaterialesRoutes from "./routes/inventario/ct_inventario_materiales.routes";
+import inventarioEstadoFisicoRoutes from "./routes/inventario/ct_inventario_estado_fisico.routes";
+import inventarioClasesRoutes from "./routes/inventario/ct_inventario_clases.routes";
+import inventarioSubclasesRoutes from "./routes/inventario/ct_inventario_subclase.routes";
 import authRoutes from "./routes/auth.routes";
 import "./models";
 
@@ -169,6 +176,34 @@ app.use(
 app.use(
   `${process.env.HOST}api/inventario`,
   /*authenticateJWT,*/ inventarioRoutes
+);
+app.use(
+  `${process.env.HOST}api/proveedores`,
+  /*authenticateJWT,*/ inventarioProveedoresRoutes
+);
+app.use(
+  `${process.env.HOST}api/colores`,
+  /*authenticateJWT,*/ inventarioColoresRoutes
+);
+app.use(
+  `${process.env.HOST}api/marcas`,
+  /*authenticateJWT,*/ inventarioMarcasRoutes
+);
+app.use(
+  `${process.env.HOST}api/materiales`,
+  /*authenticateJWT,*/ inventarioMaterialesRoutes
+);
+app.use(
+  `${process.env.HOST}api/estadoFisico`,
+  /*authenticateJWT,*/ inventarioEstadoFisicoRoutes
+);
+app.use(
+  `${process.env.HOST}api/clases`,
+  /*authenticateJWT,*/ inventarioClasesRoutes
+);
+app.use(
+  `${process.env.HOST}api/subclases`,
+  /*authenticateJWT,*/ inventarioSubclasesRoutes
 );
 
 app.use(`${process.env.HOST}api/auth`, authRoutes);
