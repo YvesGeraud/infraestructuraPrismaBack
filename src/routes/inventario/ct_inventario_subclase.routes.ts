@@ -6,4 +6,6 @@ const router= Router();
 //* Obtener las subclases
 router.get("/", CtInventarioSubClaseController.obtenerSubclases);
 
+//* Obtener la subclase por su id
+router.get("/:id", CtInventarioSubClaseController.obtenerSubclasePorId);
 export default router;

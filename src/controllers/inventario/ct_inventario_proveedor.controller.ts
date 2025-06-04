@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ctInventarioProveedorService from "../../services/inventario/ct_inventario_proveedor.service";
 
-export class ctInventarioProveedorController{
+ class ctInventarioProveedorController{
     //* Obtener todos los proveedores
     async obtenerProveedores(req: Request, res: Response){
         try{

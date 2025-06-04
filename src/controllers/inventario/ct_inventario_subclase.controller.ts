@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import CtInventarioSubclaseService from "../../services/inventario/ct_inventario_subclase.service";
 
-export class CtInventarioSubClaseController{
+ class CtInventarioSubClaseController{
     //* Obtener las subclases
     async obtenerSubclases(req: Request, res: Response){
         try{
@@ -12,6 +12,13 @@ export class CtInventarioSubClaseController{
             console.error("Error al obtener las subclases controller 2:", error);
         }
     }
+ //* Obtener la subclase por su id 
+ async obtenerSubclasePorId(req:Request, res:Response){
+    const subclaseId= await CtInventarioSubclaseService.obtenerSubclasePorId(
+        parseInt(req.params.id));
+    res.status(200).json(subclaseId);
+ }
+
 }
 
 export default new CtInventarioSubClaseController();

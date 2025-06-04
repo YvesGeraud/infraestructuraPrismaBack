@@ -23,6 +23,21 @@ class CtInventarioSubclaseService{
             throw new Error("Error al obtener las subclases");
         }
     }
+    //* Obtener la subclase por su id 
+async obtenerSubclasePorId(id: number){
+    try{
+        const subclase=await Subclase.findByPk(id);
+        if(!subclase){
+            throw new Error("No se encontró la subclase");
+        }
+        return subclase;
+    }catch(error){
+        console.error("Error al obtener la subclase por id:", error);
+        throw new Error("Error al obtener la subclase por id");
+    }
 }
+}
+
+
 
 export default new CtInventarioSubclaseService();

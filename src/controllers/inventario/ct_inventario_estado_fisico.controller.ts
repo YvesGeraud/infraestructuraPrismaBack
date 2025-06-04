@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ctInventarioEstadoFisicoService from "../../services/inventario/ct_inventario_estado_fisico.service";
 
-export class ctInventarioEstadoFisicoController{
+ class ctInventarioEstadoFisicoController{
     //* Obtener los estados fisicos 
     async obtenerEstadoFisico(req: Request, res: Response){
         try{

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import ctInventarioMarcaService from "../../services/inventario/ct_inventario_marcas.service";
 import { CtInventarioService } from "../../services/inventario/ct_inventario.service";
 
-export class ctInventarioMarcaController{
+ class ctInventarioMarcaController{
     //* Obtener todas las marcas
     async obtenerMarcas(req: Request, res: Response){
         try{
