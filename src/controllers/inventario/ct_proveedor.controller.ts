@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import ctInventarioProveedorService from "../../services/inventario/ct_inventario_proveedor.service";
+import CtProveedorService from "../../services/inventario/ct_proveedor.service";
 
- class ctInventarioProveedorController{
+ class CtProveedorController{
     //* Obtener todos los proveedores
     async obtenerProveedores(req: Request, res: Response){
         try{
-            const proveedores = await ctInventarioProveedorService.obtenerProveedores();
+            const proveedores = await CtProveedorService.obtenerProveedores();
             res.status(200).json(proveedores);
         }catch(error){
             res.status(500).json({message: "Error al obtener los proveedores controller 1", error: error});
@@ -13,4 +13,4 @@ import ctInventarioProveedorService from "../../services/inventario/ct_inventari
         }
     }
 }
-export default new ctInventarioProveedorController();
+export default new CtProveedorController();

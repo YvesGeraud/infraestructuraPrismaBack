@@ -161,8 +161,8 @@ build_prod:
 
 publish_prod:
   variables:
-    DEPLOY: "/var/www/api-apps/"
-    FOLDER: "infraestructura"
+    DEPLOY: "/var/www"
+    FOLDER: "api-infraestructura"
   stage: publish
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/

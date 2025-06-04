@@ -1,8 +1,9 @@
 import { Router } from "express";
-import ctInventarioEstadoFisicoController from "../../controllers/inventario/ct_inventario_estado_fisico.controller";
+import CtEstadoFisicoController from "../../controllers/inventario/ct_estado_fisico.controller";
 
 const router=Router();
 
-router.get("/", ctInventarioEstadoFisicoController.obtenerEstadoFisico);
+//*Obtener todos los estados físicos
+router.get("/", CtEstadoFisicoController.obtenerEstadoFisico);
 
 export default router; 

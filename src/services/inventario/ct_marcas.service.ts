@@ -1,17 +1,18 @@
 import { initModels } from "../../models/init-models";
 import { sequelize } from "../../config/database";
+import { Op } from "sequelize";
 
 //! Inicializar los modelos
 const models = initModels(sequelize);
 
 //! Desestructurar los modelos que necesitamos
-const { ct_inventario_marcas: InventarioMarcas } = models;
+const { ct_inventario_marcas: Marca } = models;
 
-class ctInventarioMarcaService{
+class CtMarcaService{
     //* Obtener todas las marcas
     async obtenerMarcas(){
         try{
-            const marcas = await InventarioMarcas.findAll({
+            const marcas = await Marca.findAll({
                 attributes: ["id_marca","nombre_marca"],
             });
             if(marcas.length === 0){
@@ -25,4 +26,4 @@ class ctInventarioMarcaService{
     }
 
 }
-export default new ctInventarioMarcaService();
+export default new CtMarcaService();

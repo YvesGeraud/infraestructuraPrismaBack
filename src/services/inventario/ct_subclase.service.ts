@@ -1,5 +1,6 @@
 import { initModels } from "../../models";
 import { sequelize } from "../../models";
+import { Op } from "sequelize";
 
 //!Inicializar los modelos 
 const models= initModels(sequelize);
@@ -7,7 +8,7 @@ const models= initModels(sequelize);
 //! Desestructurar el modelo que necesitamos 
 const {ct_inventario_subclases: Subclase}=models;
 
-class CtInventarioSubclaseService{
+class CtSubClaseService{
     //*Obtener todas las subclases
     async obtenerTodasLasSubclases(){
         try{
@@ -40,4 +41,4 @@ async obtenerSubclasePorId(id: number){
 
 
 
-export default new CtInventarioSubclaseService();
+export default new CtSubClaseService();

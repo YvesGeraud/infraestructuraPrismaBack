@@ -1,18 +1,18 @@
 import { initModels } from "../../models/init-models";
 import { sequelize } from "../../config/database";
-import { ct_inventario_material } from '../../models/ct_inventario_material';
+import { Op } from "sequelize";
 
 //! Inicializar los modelos
 const models= initModels(sequelize);
 
 //! Desestructurar los modelos que necesitamos
-const { ct_inventario_material:InventarioMaterial} = models;
+const { ct_inventario_material:Material} = models;
 
-class ctInventarioMaterialService{
+class CtMaterialService{
     //* Obtener todos los materiales
     async obtenerMateriales(){
         try{
-            const materiales = await InventarioMaterial.findAll({
+            const materiales = await Material.findAll({
                 attributes: ["id_material","nombre_material"],
         });
         if(materiales.length === 0){
@@ -26,4 +26,4 @@ class ctInventarioMaterialService{
 }
 }
 
-export default new ctInventarioMaterialService();
+export default new CtMaterialService();

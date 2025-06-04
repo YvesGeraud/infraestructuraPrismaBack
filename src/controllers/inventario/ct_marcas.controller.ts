@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import ctInventarioMarcaService from "../../services/inventario/ct_inventario_marcas.service";
-import { CtInventarioService } from "../../services/inventario/ct_inventario.service";
+import CtMarcaService from "../../services/inventario/ct_marcas.service";
 
- class ctInventarioMarcaController{
+ class CtMarcaController{
     //* Obtener todas las marcas
     async obtenerMarcas(req: Request, res: Response){
         try{
-            const marcas = await ctInventarioMarcaService.obtenerMarcas();
+            const marcas = await CtMarcaService.obtenerMarcas();
             res.status(200).json(marcas);
         }catch(error){
             res.status(500).json({message: "Error al obtener las marcas controller 1", error: error});
@@ -15,4 +14,4 @@ import { CtInventarioService } from "../../services/inventario/ct_inventario.ser
     }
 }
 
-export default new ctInventarioMarcaController();
+export default new CtMarcaController();

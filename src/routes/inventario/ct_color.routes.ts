@@ -1,8 +1,8 @@
 import { Router } from "express";
-import ctInventarioColorController from "../../controllers/inventario/ct_inventario_color.controller";
+import CtColorController from "../../controllers/inventario/ct_color.controller";
 
 const router = Router();
 //* Obtener todos los colores
-router.get("/", ctInventarioColorController.obtenerColores);
+router.get("/", CtColorController.obtenerColores);
 
 export default router;

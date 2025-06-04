@@ -1,6 +1,6 @@
 import { initModels } from "../../models";
 import { sequelize } from "../../models";
-import { ct_inventario_clases } from '../../models/ct_inventario_clases';
+import { Op } from "sequelize";
 
 //!Inicializar los modelos 
 const models= initModels(sequelize);
@@ -9,7 +9,7 @@ const models= initModels(sequelize);
 const {ct_inventario_clases: Clase}=models;
 
 
-class CtInventarioClaseService{
+class CtClaseService{
     //*Obtener todas las clases
     async obtenerTodasLasClases(){
         try{
@@ -27,4 +27,4 @@ class CtInventarioClaseService{
     }
 }
 
-export default new CtInventarioClaseService();
+export default new CtClaseService();

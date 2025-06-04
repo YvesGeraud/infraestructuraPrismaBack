@@ -1,17 +1,18 @@
 import { initModels } from "../../models/init-models";
 import { sequelize } from "../../config/database";
+import { Op } from "sequelize";
 
 //! Inicializar los modelos
 const models = initModels(sequelize);
 
 //! Desestructurar los modelos que necesitamos
-const { ct_inventario_proveedor: InventarioProveedor } = models;
+const { ct_inventario_proveedor: Proveedor } = models;
 
-class ctInventarioProveedorService{
+class CtProveedorService{
     //* Obtener todos los proveedores
     async obtenerProveedores(){
         try{
-            const proveedores = await InventarioProveedor.findAll({
+            const proveedores = await Proveedor.findAll({
                 attributes: ["id_proveedor","nombre_proveedor"],
             });
             if(proveedores.length === 0){
@@ -25,4 +26,4 @@ class ctInventarioProveedorService{
     }
 }
 
-export default new ctInventarioProveedorService();
+export default new CtProveedorService();

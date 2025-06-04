@@ -1,8 +1,8 @@
 import { Router } from "express";
-import ctInventarioProveedorController from "../../controllers/inventario/ct_inventario_proveedor.controller";
+import ctProveedorController from "../../controllers/inventario/ct_proveedor.controller";
 
 const router = Router();
 //* Obtener todos los proveedores
-router.get("/", ctInventarioProveedorController.obtenerProveedores);
+router.get("/", ctProveedorController.obtenerProveedores);
 
 export default router;

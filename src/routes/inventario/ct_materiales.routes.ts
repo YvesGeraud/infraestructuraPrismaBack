@@ -1,8 +1,8 @@
 import { Router } from "express";
-import ctInventarioMaterialController from "../../controllers/inventario/ct_inventario_materiales.controller";
+import ctMaterialController from "../../controllers/inventario/ct_materiales.controller";
 
 const router= Router();
 //*Obtener todos los materiales
-router.get("/", ctInventarioMaterialController.obtenerMateriales);
+router.get("/", ctMaterialController.obtenerMateriales);
 
 export default router; 

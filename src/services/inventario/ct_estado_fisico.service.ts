@@ -1,19 +1,19 @@
 import { initModels } from "../../models";
 import { sequelize } from "../../models";
-import { ct_inventario_estado_fisico } from '../../models/ct_inventario_estado_fisico';
+import { Op } from "sequelize";
 
 
 //! Inicializa los modelos 
 const models=initModels(sequelize);
 
 //! Desestructurar los modelos que necesitamos 
-const {ct_inventario_estado_fisico: InventarioEstadoFisico}=models;
+const {ct_inventario_estado_fisico: EstadoFisico}=models;
 
-class CtInventarioEstadoFisicoService{
+class CtEstadoFisicoService{
     //* obtener los estados fisicos 
     async obtenerEstadosFisicos(){
         try{
-            const estadoFisico=await InventarioEstadoFisico.findAll({
+            const estadoFisico=await EstadoFisico.findAll({
                 attributes:["id_estadoFisico", "descripcion"],
             });
             if(estadoFisico.length === 0){
@@ -26,4 +26,4 @@ class CtInventarioEstadoFisicoService{
         }
     }
 }
-export default new CtInventarioEstadoFisicoService();
+export default new CtEstadoFisicoService();

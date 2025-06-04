@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import ctInventarioColorService from "../../services/inventario/ct_inventario_color.service";
+import CtColorService from "../../services/inventario/ct_color.service";
 
-export class ctInventarioColorController{
+export class CtColorController{
     //* Obtener todos los colores
     async obtenerColores(req: Request, res: Response  ){
         try{
-            const colores = await ctInventarioColorService.obtenerColores();
+            const colores = await CtColorService.obtenerColores();
             res.status(200).json(colores);
         }catch(error){
             res.status(500).json({message: "Error al obtener los colores controller 1", error: error});
@@ -13,4 +13,4 @@ export class ctInventarioColorController{
         }
     }
 }
-export default new ctInventarioColorController();
+export default new CtColorController();

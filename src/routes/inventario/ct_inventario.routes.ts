@@ -3,6 +3,7 @@ import CtInventarioController from "../../controllers/inventario/ct_inventario.c
 
 const router = Router();
 
+//*Obtener todos los inventarios
 router.get("/", CtInventarioController.obtenerInventario);
 
 export default router;
