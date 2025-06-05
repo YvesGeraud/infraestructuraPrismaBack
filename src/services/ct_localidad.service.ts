@@ -12,7 +12,7 @@ class ctLocalidadService {
   async obtenerLocalidades() {
     try {
       const localidades = await Localidad.findAll({
-        attributes: ["id_localidad", "descripcion"],
+        attributes: ["id_localidad", "localidad"],
       });
       if (localidades.length === 0) {
         throw new Error("No hay localidades");
