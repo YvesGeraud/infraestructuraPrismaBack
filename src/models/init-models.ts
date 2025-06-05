@@ -412,10 +412,6 @@ export function initModels(sequelize: Sequelize) {
   ct_infraestructura_construccion_inmueble.hasMany(rl_infraestructura_unidad_construccion_inmueble, { as: "rl_infraestructura_unidad_construccion_inmuebles", foreignKey: "id_construccion"});
   ct_infraestructura_area.belongsTo(ct_infraestructura_departamento, { as: "id_departamento_ct_infraestructura_departamento", foreignKey: "id_departamento"});
   ct_infraestructura_departamento.hasMany(ct_infraestructura_area, { as: "ct_infraestructura_areas", foreignKey: "id_departamento"});
-  ct_infraestructura_jefe_sector.belongsTo(ct_infraestructura_departamento, { as: "id_departamento_ct_infraestructura_departamento", foreignKey: "id_departamento"});
-  ct_infraestructura_departamento.hasMany(ct_infraestructura_jefe_sector, { as: "ct_infraestructura_jefe_sectors", foreignKey: "id_departamento"});
-  ct_infraestructura_supervisor.belongsTo(ct_infraestructura_departamento, { as: "id_departamento_ct_infraestructura_departamento", foreignKey: "id_departamento"});
-  ct_infraestructura_departamento.hasMany(ct_infraestructura_supervisor, { as: "ct_infraestructura_supervisors", foreignKey: "id_departamento"});
   rl_infraestructura_edificios.belongsTo(ct_infraestructura_departamento, { as: "id_departamento_ct_infraestructura_departamento", foreignKey: "id_departamento"});
   ct_infraestructura_departamento.hasMany(rl_infraestructura_edificios, { as: "rl_infraestructura_edificios", foreignKey: "id_departamento"});
   ct_infraestructura_unidad.belongsTo(ct_infraestructura_dimension_terreno, { as: "id_dimension_terreno_ct_infraestructura_dimension_terreno", foreignKey: "id_dimension_terreno"});
@@ -500,6 +496,10 @@ export function initModels(sequelize: Sequelize) {
   ct_inventario_proveedor.hasMany(ct_inventario, { as: "ct_inventarios", foreignKey: "id_proveedor"});
   ct_inventario.belongsTo(ct_inventario_subclases, { as: "id_subclase_ct_inventario_subclase", foreignKey: "id_subclase"});
   ct_inventario_subclases.hasMany(ct_inventario, { as: "ct_inventarios", foreignKey: "id_subclase"});
+  ct_infraestructura_jefe_sector.belongsTo(ct_localidad, { as: "id_localidad_ct_localidad", foreignKey: "id_localidad"});
+  ct_localidad.hasMany(ct_infraestructura_jefe_sector, { as: "ct_infraestructura_jefe_sectors", foreignKey: "id_localidad"});
+  ct_infraestructura_supervisor.belongsTo(ct_localidad, { as: "id_localidad_ct_localidad", foreignKey: "id_localidad"});
+  ct_localidad.hasMany(ct_infraestructura_supervisor, { as: "ct_infraestructura_supervisors", foreignKey: "id_localidad"});
   ct_infraestructura_unidad.belongsTo(ct_localidad, { as: "id_localidad_ct_localidad", foreignKey: "id_localidad"});
   ct_localidad.hasMany(ct_infraestructura_unidad, { as: "ct_infraestructura_unidads", foreignKey: "id_localidad"});
   ct_localidad.belongsTo(ct_municipio, { as: "id_municipio_ct_municipio", foreignKey: "id_municipio"});

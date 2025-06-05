@@ -2,8 +2,6 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { ct_infraestructura_area, ct_infraestructura_areaId } from './ct_infraestructura_area';
 import type { ct_infraestructura_direccion, ct_infraestructura_direccionId } from './ct_infraestructura_direccion';
-import type { ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId } from './ct_infraestructura_jefe_sector';
-import type { ct_infraestructura_supervisor, ct_infraestructura_supervisorId } from './ct_infraestructura_supervisor';
 import type { rl_infraestructura_edificios, rl_infraestructura_edificiosId } from './rl_infraestructura_edificios';
 
 export interface ct_infraestructura_departamentoAttributes {
@@ -42,30 +40,6 @@ export class ct_infraestructura_departamento extends Model<ct_infraestructura_de
   hasCt_infraestructura_area!: Sequelize.HasManyHasAssociationMixin<ct_infraestructura_area, ct_infraestructura_areaId>;
   hasCt_infraestructura_areas!: Sequelize.HasManyHasAssociationsMixin<ct_infraestructura_area, ct_infraestructura_areaId>;
   countCt_infraestructura_areas!: Sequelize.HasManyCountAssociationsMixin;
-  // ct_infraestructura_departamento hasMany ct_infraestructura_jefe_sector via id_departamento
-  ct_infraestructura_jefe_sectors!: ct_infraestructura_jefe_sector[];
-  getCt_infraestructura_jefe_sectors!: Sequelize.HasManyGetAssociationsMixin<ct_infraestructura_jefe_sector>;
-  setCt_infraestructura_jefe_sectors!: Sequelize.HasManySetAssociationsMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  addCt_infraestructura_jefe_sector!: Sequelize.HasManyAddAssociationMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  addCt_infraestructura_jefe_sectors!: Sequelize.HasManyAddAssociationsMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  createCt_infraestructura_jefe_sector!: Sequelize.HasManyCreateAssociationMixin<ct_infraestructura_jefe_sector>;
-  removeCt_infraestructura_jefe_sector!: Sequelize.HasManyRemoveAssociationMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  removeCt_infraestructura_jefe_sectors!: Sequelize.HasManyRemoveAssociationsMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  hasCt_infraestructura_jefe_sector!: Sequelize.HasManyHasAssociationMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  hasCt_infraestructura_jefe_sectors!: Sequelize.HasManyHasAssociationsMixin<ct_infraestructura_jefe_sector, ct_infraestructura_jefe_sectorId>;
-  countCt_infraestructura_jefe_sectors!: Sequelize.HasManyCountAssociationsMixin;
-  // ct_infraestructura_departamento hasMany ct_infraestructura_supervisor via id_departamento
-  ct_infraestructura_supervisors!: ct_infraestructura_supervisor[];
-  getCt_infraestructura_supervisors!: Sequelize.HasManyGetAssociationsMixin<ct_infraestructura_supervisor>;
-  setCt_infraestructura_supervisors!: Sequelize.HasManySetAssociationsMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  addCt_infraestructura_supervisor!: Sequelize.HasManyAddAssociationMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  addCt_infraestructura_supervisors!: Sequelize.HasManyAddAssociationsMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  createCt_infraestructura_supervisor!: Sequelize.HasManyCreateAssociationMixin<ct_infraestructura_supervisor>;
-  removeCt_infraestructura_supervisor!: Sequelize.HasManyRemoveAssociationMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  removeCt_infraestructura_supervisors!: Sequelize.HasManyRemoveAssociationsMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  hasCt_infraestructura_supervisor!: Sequelize.HasManyHasAssociationMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  hasCt_infraestructura_supervisors!: Sequelize.HasManyHasAssociationsMixin<ct_infraestructura_supervisor, ct_infraestructura_supervisorId>;
-  countCt_infraestructura_supervisors!: Sequelize.HasManyCountAssociationsMixin;
   // ct_infraestructura_departamento hasMany rl_infraestructura_edificios via id_departamento
   rl_infraestructura_edificios!: rl_infraestructura_edificios[];
   getRl_infraestructura_edificios!: Sequelize.HasManyGetAssociationsMixin<rl_infraestructura_edificios>;

@@ -1,31 +1,40 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
-import type { ct_infraestructura_departamento, ct_infraestructura_departamentoId } from './ct_infraestructura_departamento';
+import type { ct_localidad, ct_localidadId } from './ct_localidad';
 import type { rl_infraestructura_edificios, rl_infraestructura_edificiosId } from './rl_infraestructura_edificios';
 
 export interface ct_infraestructura_supervisorAttributes {
   id_supervisor: number;
-  nombre?: string;
-  id_puesto?: number;
-  id_departamento?: number;
+  nombre_unidad?: string;
+  cct?: string;
+  calle?: string;
+  numero_exterior?: string;
+  id_localidad?: number;
+  colonia?: string;
+  codigo_postal?: number;
+  ubicacion?: any;
+  vigente?: number;
+  id_rupet_info?: number;
 }
 
 export type ct_infraestructura_supervisorPk = "id_supervisor";
 export type ct_infraestructura_supervisorId = ct_infraestructura_supervisor[ct_infraestructura_supervisorPk];
-export type ct_infraestructura_supervisorOptionalAttributes = "id_supervisor" | "nombre" | "id_puesto" | "id_departamento";
+export type ct_infraestructura_supervisorOptionalAttributes = "id_supervisor" | "nombre_unidad" | "cct" | "calle" | "numero_exterior" | "id_localidad" | "colonia" | "codigo_postal" | "ubicacion" | "vigente" | "id_rupet_info";
 export type ct_infraestructura_supervisorCreationAttributes = Optional<ct_infraestructura_supervisorAttributes, ct_infraestructura_supervisorOptionalAttributes>;
 
 export class ct_infraestructura_supervisor extends Model<ct_infraestructura_supervisorAttributes, ct_infraestructura_supervisorCreationAttributes> implements ct_infraestructura_supervisorAttributes {
   id_supervisor!: number;
-  nombre?: string;
-  id_puesto?: number;
-  id_departamento?: number;
+  nombre_unidad?: string;
+  cct?: string;
+  calle?: string;
+  numero_exterior?: string;
+  id_localidad?: number;
+  colonia?: string;
+  codigo_postal?: number;
+  ubicacion?: any;
+  vigente?: number;
+  id_rupet_info?: number;
 
-  // ct_infraestructura_supervisor belongsTo ct_infraestructura_departamento via id_departamento
-  id_departamento_ct_infraestructura_departamento!: ct_infraestructura_departamento;
-  getId_departamento_ct_infraestructura_departamento!: Sequelize.BelongsToGetAssociationMixin<ct_infraestructura_departamento>;
-  setId_departamento_ct_infraestructura_departamento!: Sequelize.BelongsToSetAssociationMixin<ct_infraestructura_departamento, ct_infraestructura_departamentoId>;
-  createId_departamento_ct_infraestructura_departamento!: Sequelize.BelongsToCreateAssociationMixin<ct_infraestructura_departamento>;
   // ct_infraestructura_supervisor hasMany rl_infraestructura_edificios via id_supervisor
   rl_infraestructura_edificios!: rl_infraestructura_edificios[];
   getRl_infraestructura_edificios!: Sequelize.HasManyGetAssociationsMixin<rl_infraestructura_edificios>;
@@ -38,6 +47,11 @@ export class ct_infraestructura_supervisor extends Model<ct_infraestructura_supe
   hasRl_infraestructura_edificio!: Sequelize.HasManyHasAssociationMixin<rl_infraestructura_edificios, rl_infraestructura_edificiosId>;
   hasRl_infraestructura_edificios!: Sequelize.HasManyHasAssociationsMixin<rl_infraestructura_edificios, rl_infraestructura_edificiosId>;
   countRl_infraestructura_edificios!: Sequelize.HasManyCountAssociationsMixin;
+  // ct_infraestructura_supervisor belongsTo ct_localidad via id_localidad
+  id_localidad_ct_localidad!: ct_localidad;
+  getId_localidad_ct_localidad!: Sequelize.BelongsToGetAssociationMixin<ct_localidad>;
+  setId_localidad_ct_localidad!: Sequelize.BelongsToSetAssociationMixin<ct_localidad, ct_localidadId>;
+  createId_localidad_ct_localidad!: Sequelize.BelongsToCreateAssociationMixin<ct_localidad>;
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ct_infraestructura_supervisor {
     return ct_infraestructura_supervisor.init({
@@ -47,21 +61,49 @@ export class ct_infraestructura_supervisor extends Model<ct_infraestructura_supe
       allowNull: false,
       primaryKey: true
     },
-    nombre: {
+    nombre_unidad: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    id_puesto: {
-      type: DataTypes.INTEGER,
+    cct: {
+      type: DataTypes.STRING(11),
       allowNull: true
     },
-    id_departamento: {
+    calle: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    numero_exterior: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    id_localidad: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'ct_infraestructura_departamento',
-        key: 'id_departamento'
+        model: 'ct_localidad',
+        key: 'id_localidad'
       }
+    },
+    colonia: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    codigo_postal: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    ubicacion: {
+      type: "POINT",
+      allowNull: true
+    },
+    vigente: {
+      type: DataTypes.TINYINT,
+      allowNull: true
+    },
+    id_rupet_info: {
+      type: DataTypes.INTEGER,
+      allowNull: true
     }
   }, {
     sequelize,
@@ -77,10 +119,17 @@ export class ct_infraestructura_supervisor extends Model<ct_infraestructura_supe
         ]
       },
       {
-        name: "id_jefe_sector",
+        name: "id_localidad",
         using: "BTREE",
         fields: [
-          { name: "id_departamento" },
+          { name: "id_localidad" },
+        ]
+      },
+      {
+        name: "id_rupet_info",
+        using: "BTREE",
+        fields: [
+          { name: "id_rupet_info" },
         ]
       },
     ]

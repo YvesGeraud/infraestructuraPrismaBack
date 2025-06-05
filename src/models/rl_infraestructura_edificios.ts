@@ -14,12 +14,12 @@ export interface rl_infraestructura_edificiosAttributes {
   id_jefe_sector?: number;
   id_supervisor?: number;
   id_unidad?: number;
-  descripcion: string;
+  descripcion?: string;
 }
 
 export type rl_infraestructura_edificiosPk = "id_edificios";
 export type rl_infraestructura_edificiosId = rl_infraestructura_edificios[rl_infraestructura_edificiosPk];
-export type rl_infraestructura_edificiosOptionalAttributes = "id_edificios" | "id_direccion" | "id_departamento" | "id_jefe_sector" | "id_supervisor" | "id_unidad";
+export type rl_infraestructura_edificiosOptionalAttributes = "id_edificios" | "id_direccion" | "id_departamento" | "id_jefe_sector" | "id_supervisor" | "id_unidad" | "descripcion";
 export type rl_infraestructura_edificiosCreationAttributes = Optional<rl_infraestructura_edificiosAttributes, rl_infraestructura_edificiosOptionalAttributes>;
 
 export class rl_infraestructura_edificios extends Model<rl_infraestructura_edificiosAttributes, rl_infraestructura_edificiosCreationAttributes> implements rl_infraestructura_edificiosAttributes {
@@ -29,7 +29,7 @@ export class rl_infraestructura_edificios extends Model<rl_infraestructura_edifi
   id_jefe_sector?: number;
   id_supervisor?: number;
   id_unidad?: number;
-  descripcion!: string;
+  descripcion?: string;
 
   // rl_infraestructura_edificios belongsTo ct_infraestructura_departamento via id_departamento
   id_departamento_ct_infraestructura_departamento!: ct_infraestructura_departamento;
@@ -119,7 +119,7 @@ export class rl_infraestructura_edificios extends Model<rl_infraestructura_edifi
     },
     descripcion: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     }
   }, {
     sequelize,
