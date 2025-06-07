@@ -3,6 +3,8 @@ import CtAreaController from "../../controllers/infraestructura/ct_area.controll
 
 const router = Router();
 
+router.get("/conRelaciones", CtAreaController.obtenerAreasConRelaciones);
+
 router.get("/", CtAreaController.obtenerArea);
 
 router.get("/:id", CtAreaController.obtenerAreaById);

@@ -43,6 +43,7 @@ import inventarioMaterialesRoutes from "./routes/inventario/ct_materiales.routes
 import inventarioEstadoFisicoRoutes from "./routes/inventario/ct_estado_fisico.routes";
 import inventarioClasesRoutes from "./routes/inventario/ct_clases.routes";
 import inventarioSubclasesRoutes from "./routes/inventario/ct_subclase.routes";
+import ctCodigoPostalRoutes from "./routes/ct_codigo_postal.routes";
 import authRoutes from "./routes/auth.routes";
 import "./models";
 
@@ -204,6 +205,11 @@ app.use(
 app.use(
   `${process.env.HOST}api/subclases`,
   /*authenticateJWT,*/ inventarioSubclasesRoutes
+);
+
+app.use(
+  `${process.env.HOST}api/codigoPostal`,
+  /*authenticateJWT,*/ ctCodigoPostalRoutes
 );
 
 app.use(`${process.env.HOST}api/auth`, authRoutes);

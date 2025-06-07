@@ -1,6 +1,10 @@
 import type { Sequelize } from "sequelize";
 import { ct_accion as _ct_accion } from "./ct_accion";
 import type { ct_accionAttributes, ct_accionCreationAttributes } from "./ct_accion";
+import { ct_codigo_postal as _ct_codigo_postal } from "./ct_codigo_postal";
+import type { ct_codigo_postalAttributes, ct_codigo_postalCreationAttributes } from "./ct_codigo_postal";
+import { ct_entidad as _ct_entidad } from "./ct_entidad";
+import type { ct_entidadAttributes, ct_entidadCreationAttributes } from "./ct_entidad";
 import { ct_infraestructura_adecuacion_discapacidad as _ct_infraestructura_adecuacion_discapacidad } from "./ct_infraestructura_adecuacion_discapacidad";
 import type { ct_infraestructura_adecuacion_discapacidadAttributes, ct_infraestructura_adecuacion_discapacidadCreationAttributes } from "./ct_infraestructura_adecuacion_discapacidad";
 import { ct_infraestructura_almacenamiento_agua as _ct_infraestructura_almacenamiento_agua } from "./ct_infraestructura_almacenamiento_agua";
@@ -126,6 +130,8 @@ import type { rl_infraestructura_unidad_suministro_aguaAttributes, rl_infraestru
 
 export {
   _ct_accion as ct_accion,
+  _ct_codigo_postal as ct_codigo_postal,
+  _ct_entidad as ct_entidad,
   _ct_infraestructura_adecuacion_discapacidad as ct_infraestructura_adecuacion_discapacidad,
   _ct_infraestructura_almacenamiento_agua as ct_infraestructura_almacenamiento_agua,
   _ct_infraestructura_antiguedad_inmueble as ct_infraestructura_antiguedad_inmueble,
@@ -192,6 +198,10 @@ export {
 export type {
   ct_accionAttributes,
   ct_accionCreationAttributes,
+  ct_codigo_postalAttributes,
+  ct_codigo_postalCreationAttributes,
+  ct_entidadAttributes,
+  ct_entidadCreationAttributes,
   ct_infraestructura_adecuacion_discapacidadAttributes,
   ct_infraestructura_adecuacion_discapacidadCreationAttributes,
   ct_infraestructura_almacenamiento_aguaAttributes,
@@ -318,6 +328,8 @@ export type {
 
 export function initModels(sequelize: Sequelize) {
   const ct_accion = _ct_accion.initModel(sequelize);
+  const ct_codigo_postal = _ct_codigo_postal.initModel(sequelize);
+  const ct_entidad = _ct_entidad.initModel(sequelize);
   const ct_infraestructura_adecuacion_discapacidad = _ct_infraestructura_adecuacion_discapacidad.initModel(sequelize);
   const ct_infraestructura_almacenamiento_agua = _ct_infraestructura_almacenamiento_agua.initModel(sequelize);
   const ct_infraestructura_antiguedad_inmueble = _ct_infraestructura_antiguedad_inmueble.initModel(sequelize);
@@ -404,6 +416,8 @@ export function initModels(sequelize: Sequelize) {
   ct_infraestructura_unidad.belongsToMany(ct_infraestructura_tipo_construccion, { as: 'id_construccion_ct_infraestructura_tipo_construccions', through: rl_infraestructura_unidad_construccion, foreignKey: "id_unidad", otherKey: "id_construccion" });
   ct_inventario.belongsTo(ct_accion, { as: "id_accion_ct_accion", foreignKey: "id_accion"});
   ct_accion.hasMany(ct_inventario, { as: "ct_inventarios", foreignKey: "id_accion"});
+  ct_municipio.belongsTo(ct_entidad, { as: "id_entidad_ct_entidad", foreignKey: "id_entidad"});
+  ct_entidad.hasMany(ct_municipio, { as: "ct_municipios", foreignKey: "id_entidad"});
   rl_infraestructura_unidad_almacenamiento_agua.belongsTo(ct_infraestructura_almacenamiento_agua, { as: "id_almacenamiento_ct_infraestructura_almacenamiento_agua", foreignKey: "id_almacenamiento"});
   ct_infraestructura_almacenamiento_agua.hasMany(rl_infraestructura_unidad_almacenamiento_agua, { as: "rl_infraestructura_unidad_almacenamiento_aguas", foreignKey: "id_almacenamiento"});
   ct_infraestructura_unidad.belongsTo(ct_infraestructura_antiguedad_inmueble, { as: "id_antiguedad_inmueble_ct_infraestructura_antiguedad_inmueble", foreignKey: "id_antiguedad_inmueble"});
@@ -509,6 +523,8 @@ export function initModels(sequelize: Sequelize) {
 
   return {
     ct_accion: ct_accion,
+    ct_codigo_postal: ct_codigo_postal,
+    ct_entidad: ct_entidad,
     ct_infraestructura_adecuacion_discapacidad: ct_infraestructura_adecuacion_discapacidad,
     ct_infraestructura_almacenamiento_agua: ct_infraestructura_almacenamiento_agua,
     ct_infraestructura_antiguedad_inmueble: ct_infraestructura_antiguedad_inmueble,

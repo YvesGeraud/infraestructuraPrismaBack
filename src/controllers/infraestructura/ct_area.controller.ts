@@ -24,6 +24,22 @@ export class CtAreaController {
       console.error("Error al obtener la área controller:", error);
     }
   }
+
+  //* Obtener todas las áreas con relaciones
+  async obtenerAreasConRelaciones(req: Request, res: Response) {
+    try {
+      const areas = await CtAreaService.obtenerAreasConRelaciones();
+      res.json(areas);
+    } catch (error) {
+      res.status(500).json({
+        error: "Error al obtener las áreas con relaciones controller",
+      });
+      console.error(
+        "Error al obtener las áreas con relaciones controller:",
+        error
+      );
+    }
+  }
 }
 
 export default new CtAreaController();

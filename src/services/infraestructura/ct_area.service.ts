@@ -12,7 +12,11 @@ interface IArea {
 const models = initModels(sequelize);
 
 //! Desestructurar los modelos que necesitamos
-const { ct_infraestructura_area: Area } = models;
+const {
+  ct_infraestructura_area: Area,
+  ct_infraestructura_departamento: Departamento,
+  ct_infraestructura_direccion: Direccion,
+} = models;
 
 export class ctInfraestructuraArea {
   async obtenerArea() {
@@ -40,6 +44,38 @@ export class ctInfraestructuraArea {
     } catch (error) {
       console.error("Error al obtener la área service:", error);
       throw new Error("Error al obtener la área service");
+    }
+  }
+
+  async obtenerAreasConRelaciones() {
+    try {
+      const areas = await Area.findAll({
+        attributes: ["id_area", "nombre"],
+        include: [
+          {
+            model: Departamento,
+            as: "id_departamento_ct_infraestructura_departamento",
+            attributes: ["id_departamento", "nombre"],
+            include: [
+              {
+                model: Direccion,
+                as: "id_direccion_ct_infraestructura_direccion",
+                attributes: ["id_direccion", "nombre"],
+              },
+            ],
+          },
+        ],
+      });
+      if (areas.length === 0) {
+        throw new Error("No hay áreas");
+      }
+      return areas;
+    } catch (error) {
+      console.error(
+        "Error al obtener las áreas con relaciones service:",
+        error
+      );
+      throw new Error("Error al obtener las áreas con relaciones service");
     }
   }
 

@@ -9,4 +9,10 @@ router.get("/", ctLocalidadController.obtenerLocalidades);
 //* Obtener una localidad por su ID
 router.get("/:id", ctLocalidadController.obtenerLocalidadPorId);
 
+//* Obtener todas las localidades con municipio
+router.get(
+  "/conMunicipio/:id",
+  ctLocalidadController.obtenerLocalidadesConMunicipio
+);
+
 export default router;
