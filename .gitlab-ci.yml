@@ -3,10 +3,13 @@ stages:
   - build
   - publish
 
+
+
+
 dependences_dev:
   stage: dependences
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /DEV/
+    - if: $CI_COMMIT_BRANCH =~ /dev/
   tags:
     - dev
   cache:
@@ -21,7 +24,7 @@ dependences_dev:
 build_dev:
   stage: build
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /DEV/
+    - if: $CI_COMMIT_BRANCH =~ /dev/
   tags:
     - dev
   cache:
@@ -43,7 +46,7 @@ publish_dev:
     FOLDER: "infraestructura"
   stage: publish
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /DEV/
+    - if: $CI_COMMIT_BRANCH =~ /dev/
   tags:
     - dev
   cache:
@@ -64,10 +67,18 @@ publish_dev:
     - mkdir -p $DEPLOY/$FOLDER/tmp/
     - touch $DEPLOY/$FOLDER/tmp/restart.txt
 
+
+
+
+
+
+
+
+
 dependences_uat:
   stage: dependences
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /UAT/
+    - if: $CI_COMMIT_BRANCH =~ /uat/
   tags:
     - uat
   cache:
@@ -82,7 +93,7 @@ dependences_uat:
 build_uat:
   stage: build
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /UAT/
+    - if: $CI_COMMIT_BRANCH =~ /uat/
   tags:
     - uat
   cache:
@@ -104,7 +115,7 @@ publish_uat:
     FOLDER: "infraestructura"
   stage: publish
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /UAT/
+    - if: $CI_COMMIT_BRANCH =~ /uat/
   tags:
     - uat
   cache:
@@ -125,12 +136,20 @@ publish_uat:
     - mkdir -p $DEPLOY/$FOLDER/tmp/
     - touch $DEPLOY/$FOLDER/tmp/restart.txt
 
+
+
+
+
+
+
+
+
 dependences_prod:
   stage: dependences
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-apps
+    - prod-infraestructura
   cache:
     key:
       files:
@@ -145,7 +164,7 @@ build_prod:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-apps
+    - prod-infraestructura
   cache:
     - key:
         files:
@@ -167,7 +186,7 @@ publish_prod:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-apps
+    - prod-infraestructura
   cache:
     - key:
         files:
@@ -178,7 +197,7 @@ publish_prod:
       paths:
         - dist
   script:
-    - echo "Desplegando a prod"
+    - echo "Desplegando infraestructura a prod"
     - mkdir -p $DEPLOY/$FOLDER/
     - rm -rf $DEPLOY/$FOLDER/*
     - cp -rf $CI_PROJECT_DIR/node_modules/ $DEPLOY/$FOLDER/
