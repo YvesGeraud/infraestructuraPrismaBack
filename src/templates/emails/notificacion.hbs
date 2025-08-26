@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} - Cedex</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .notification {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+        .notification.info {
+            background-color: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+        .notification.success {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+        .notification.warning {
+            background-color: #fff3e0;
+            border-left-color: #ff9800;
+        }
+        .notification.error {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+        .notification-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .message {
+            font-size: 16px;
+            margin: 20px 0;
+            color: #555;
+        }
+        .timestamp {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+        .action-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 15px 0;
+            transition: transform 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+            .header {
+                padding: 20px 15px;
+            }
+            .content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Notificación del Sistema</h1>
+            <p>Cedex - Plataforma de Gestión</p>
+        </div>
+        
+        <div class="content">
+            <div class="notification {{tipo}}">
+                <div style="display: flex; align-items: center;">
+                    <span class="notification-icon">
+                        {{#if (eq tipo "info")}}ℹ️{{/if}}
+                        {{#if (eq tipo "success")}}✅{{/if}}
+                        {{#if (eq tipo "warning")}}⚠️{{/if}}
+                        {{#if (eq tipo "error")}}❌{{/if}}
+                    </span>
+                    <h2 style="margin: 0; color: #333;">{{titulo}}</h2>
+                </div>
+            </div>
+
+            <div class="message">
+                <p>{{mensaje}}</p>
+            </div>
+
+            <div class="timestamp">
+                <strong>📅 Fecha y hora:</strong> {{fecha}}
+            </div>
+
+            {{#if urlAccion}}
+            <div style="text-align: center;">
+                <a href="{{urlAccion}}" class="action-button">Ver detalles</a>
+            </div>
+            {{/if}}
+
+            {{#if detalles}}
+            <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #667eea;">📋 Detalles adicionales</h3>
+                <p style="margin: 0; color: #555;">{{detalles}}</p>
+            </div>
+            {{/if}}
+
+            {{#if acciones}}
+            <div style="background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #1976d2;">🛠️ Acciones recomendadas</h3>
+                <ul style="color: #555;">
+                    {{#each acciones}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/if}}
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Cedex. Todos los derechos reservados.</p>
+            <p>Este es un mensaje automático del sistema. No respondas a este email.</p>
+            <p>Para soporte técnico: <a href="mailto:soporte@cedex.com">soporte@cedex.com</a></p>
+        </div>
+    </div>
+</body>
+</html>
