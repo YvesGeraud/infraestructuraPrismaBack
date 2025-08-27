@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { EmailController } from "../controllers/emailController";
 import { asyncHandler } from "../middleware/errorHandler";
-import { verificarAutenticacion, verificarAdmin } from "../middleware/authMiddleware";
+/*import { verificarAutenticacion, verificarAdmin } from "../middleware/authMiddleware";*/
 
 const router = Router();
 const emailController = new EmailController();
@@ -13,8 +13,8 @@ const emailController = new EmailController();
  */
 router.get(
   "/estado",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.obtenerEstado.bind(emailController))
 );
 
@@ -25,8 +25,8 @@ router.get(
  */
 router.get(
   "/estadisticas",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.obtenerEstadisticas.bind(emailController))
 );
 
@@ -37,8 +37,8 @@ router.get(
  */
 router.get(
   "/plantillas",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.obtenerPlantillas.bind(emailController))
 );
 
@@ -49,8 +49,8 @@ router.get(
  */
 router.get(
   "/configuracion",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.obtenerConfiguracion.bind(emailController))
 );
 
@@ -61,8 +61,8 @@ router.get(
  */
 router.post(
   "/enviar",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmail.bind(emailController))
 );
 
@@ -73,8 +73,8 @@ router.post(
  */
 router.post(
   "/enviar-plantilla",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmailConPlantilla.bind(emailController))
 );
 
@@ -85,8 +85,8 @@ router.post(
  */
 router.post(
   "/bienvenida",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmailBienvenida.bind(emailController))
 );
 
@@ -97,8 +97,8 @@ router.post(
  */
 router.post(
   "/confirmacion",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmailConfirmacion.bind(emailController))
 );
 
@@ -109,8 +109,8 @@ router.post(
  */
 router.post(
   "/reset-password",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmailResetPassword.bind(emailController))
 );
 
@@ -121,8 +121,8 @@ router.post(
  */
 router.post(
   "/notificacion",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmailNotificacion.bind(emailController))
 );
 
@@ -133,8 +133,8 @@ router.post(
  */
 router.post(
   "/masivo",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.enviarEmailMasivo.bind(emailController))
 );
 
@@ -145,8 +145,8 @@ router.post(
  */
 router.post(
   "/probar-conexion",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.probarConexion.bind(emailController))
 );
 
@@ -157,8 +157,8 @@ router.post(
  */
 router.post(
   "/reinicializar",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(emailController.reinicializarServicio.bind(emailController))
 );
 

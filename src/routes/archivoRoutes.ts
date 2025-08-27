@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { ArchivoController } from "../controllers/archivoController";
 import { asyncHandler } from "../middleware/errorHandler";
-import {
+/*import {
   verificarAutenticacion,
   verificarAdmin,
-} from "../middleware/authMiddleware";
+} from "../middleware/authMiddleware";*/
 import {
   uploadArchivoMiddleware,
   uploadMultiplesMiddleware,
@@ -33,7 +33,7 @@ router.get(
  */
 router.post(
   "/subir",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   uploadArchivoMiddleware,
   validarArchivoSubido,
   limpiarArchivosTemporales,
@@ -47,7 +47,7 @@ router.post(
  */
 router.post(
   "/subir-multiples",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   uploadMultiplesMiddleware,
   validarArchivoSubido,
   limpiarArchivosTemporales,
@@ -61,7 +61,7 @@ router.post(
  */
 router.post(
   "/procesar-imagen",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   uploadArchivoMiddleware,
   validarArchivoSubido,
   limpiarArchivosTemporales,
@@ -75,7 +75,7 @@ router.post(
  */
 router.post(
   "/optimizar-imagen",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   asyncHandler(archivoController.optimizarImagen.bind(archivoController))
 );
 
@@ -86,7 +86,7 @@ router.post(
  */
 router.post(
   "/crear-thumbnail",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   asyncHandler(archivoController.crearThumbnail.bind(archivoController))
 );
 
@@ -97,7 +97,7 @@ router.post(
  */
 router.get(
   "/informacion/:ruta(*)",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   asyncHandler(
     archivoController.obtenerInformacionArchivo.bind(archivoController)
   )
@@ -110,7 +110,7 @@ router.get(
  */
 router.delete(
   "/:id",
-  verificarAutenticacion,
+  /*verificarAutenticacion,*/
   asyncHandler(archivoController.eliminarArchivo.bind(archivoController))
 );
 
@@ -121,8 +121,8 @@ router.delete(
  */
 router.get(
   "/estadisticas",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(archivoController.obtenerEstadisticas.bind(archivoController))
 );
 
@@ -133,8 +133,8 @@ router.get(
  */
 router.post(
   "/limpiar-temporales",
-  verificarAutenticacion,
-  verificarAdmin,
+  /*verificarAutenticacion,
+  verificarAdmin,*/
   asyncHandler(
     archivoController.limpiarArchivosTemporales.bind(archivoController)
   )

@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { DiagnosticoController } from "../controllers/diagnosticoController";
-import {
+/*import {
   verificarAutenticacion,
   verificarRoles,
-} from "../middleware/authMiddleware";
+} from "../middleware/authMiddleware";*/
 
 const router = Router();
 const diagnosticoController = new DiagnosticoController();

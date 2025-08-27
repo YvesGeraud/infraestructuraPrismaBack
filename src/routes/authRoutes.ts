@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { AuthController } from "../controllers/authController";
+//import { AuthController } from "../controllers/authController";
 import { validateRequest } from "../middleware/validateRequest";
-import { verificarAutenticacion } from "../middleware/authMiddleware";
+//import { verificarAutenticacion } from "../middleware/authMiddleware";
 import { authLimiter } from "../middleware/rateLimiter";
-import {
+/*import {
   esquemaLogin,
   esquemaRefreshToken,
   esquemaLogout,
-} from "../schemas/authSchemas";
+} from "../schemas/authSchemas";*/
 
 const router = Router();
-const authController = new AuthController();
+//const authController = new AuthController();
 
 // ===== RUTAS PÚBLICAS (NO REQUIEREN AUTENTICACIÓN) =====
 
@@ -20,9 +20,9 @@ const authController = new AuthController();
  */
 router.post(
   "/login",
-  authLimiter, // Rate limiting para intentos de login
-  validateRequest({ body: esquemaLogin }),
-  authController.login.bind(authController)
+  authLimiter // Rate limiting para intentos de login
+  /*validateRequest({ body: esquemaLogin }),
+  authController.login.bind(authController)*/
 );
 
 /**
@@ -30,9 +30,9 @@ router.post(
  * POST /api/auth/refresh
  */
 router.post(
-  "/refresh",
-  validateRequest({ body: esquemaRefreshToken }),
-  authController.refreshToken.bind(authController)
+  "/refresh"
+  /*validateRequest({ body: esquemaRefreshToken }),
+  authController.refreshToken.bind(authController)*/
 );
 
 /**
@@ -40,9 +40,9 @@ router.post(
  * POST /api/auth/logout
  */
 router.post(
-  "/logout",
-  validateRequest({ body: esquemaLogout }),
-  authController.logout.bind(authController)
+  "/logout"
+  /*validateRequest({ body: esquemaLogout }),
+  authController.logout.bind(authController)*/
 );
 
 // ===== RUTAS PROTEGIDAS (REQUIEREN AUTENTICACIÓN) =====
@@ -52,9 +52,9 @@ router.post(
  * GET /api/auth/me
  */
 router.get(
-  "/me",
-  verificarAutenticacion,
-  authController.obtenerUsuarioActual.bind(authController)
+  "/me"
+  /*verificarAutenticacion,
+  authController.obtenerUsuarioActual.bind(authController)*/
 );
 
 /**
@@ -62,9 +62,9 @@ router.get(
  * GET /api/auth/verify
  */
 router.get(
-  "/verify",
-  verificarAutenticacion,
-  authController.verificarToken.bind(authController)
+  "/verify"
+  /*verificarAutenticacion,
+  authController.verificarToken.bind(authController)*/
 );
 
 export default router;

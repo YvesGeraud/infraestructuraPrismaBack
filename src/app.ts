@@ -113,7 +113,7 @@ app.get(`${serverConfig.host}health`, async (req, res) => {
 app.use(`${serverConfig.host}api`, apiRoutes);
 
 // Ruta de prueba para verificar Prisma
-app.get(`${serverConfig.host}api/test`, async (req, res) => {
+/*app.get(`${serverConfig.host}api/test`, async (req, res) => {
   try {
     const userCount = await prisma.user.count();
     const productCount = await prisma.product.count();
@@ -130,7 +130,7 @@ app.get(`${serverConfig.host}api/test`, async (req, res) => {
       message: error instanceof Error ? error.message : "Error desconocido",
     });
   }
-});
+});*/
 
 // Middleware de manejo de errores
 app.use(

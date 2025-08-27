@@ -54,5 +54,5 @@ export const validateRequest = (schemas: ValidationSchemas) => {
 
 // Helper específico para validar solo el ID en params
 export const validateId = validateRequest({
-  params: require("../schemas/userSchemas").idParamSchema,
+  //params: require("../schemas/userSchemas").idParamSchema,
 });
