@@ -8,6 +8,10 @@ import emailRoutes from "./emailRoutes";
 
 import { diagnosticoRoutes } from "./diagnosticoRoutes";
 
+//Todo rutas de infraestructura
+import ctUnidadRoutes from "./infraestructura/ct_unidad.routes";
+
+//Todo rutas de inventario
 import ctColorRoutes from "./inventario/ct_color.routes";
 
 const router = Router();
@@ -22,7 +26,12 @@ router.use("/emails", emailRoutes);
 
 router.use("/diagnostico", diagnosticoRoutes);
 
-router.use("/ct_color", ctColorRoutes);
+//Todo rutas de infraestructura
+router.use("/unidad", ctUnidadRoutes);
+
+//Todo rutas de inventario
+router.use("/color", ctColorRoutes);
+
 // Ruta de salud para las APIs
 router.get("/health", (req, res) => {
   res.json({

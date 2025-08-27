@@ -71,9 +71,6 @@ export interface ArchivoInfo {
   tamanioMB?: string;
 }
 
-// ===== EXPORTACIONES DE TIPOS ESPECÍFICOS =====
-export * from "./order";
-
 // ===== EXTENSIONES DE EXPRESS =====
 declare global {
   namespace Express {
