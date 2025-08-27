@@ -4,12 +4,12 @@ import { z } from "zod";
 
 //? Schema para paginación - usado en todos los módulos
 export const paginationSchema = z.object({
-  page: z
+  pagina: z
     .string()
     .transform((val) => parseInt(val, 10) || 1)
     .pipe(z.number().int().min(1))
     .optional(),
-  limit: z
+  limite: z
     .string()
     .transform((val) => parseInt(val, 10) || 10)
     .pipe(z.number().int().min(1).max(100))

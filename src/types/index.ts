@@ -15,12 +15,12 @@ export interface PaginationParams {
 export interface PaginatedResponse<T> {
   data: T[];
   pagination: {
-    page: number;
-    limit: number;
+    pagina: number;
+    limite: number;
     total: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
+    totalPaginas: number;
+    tieneSiguiente: boolean;
+    tieneAnterior: boolean;
   };
 }
 

@@ -8,11 +8,16 @@ import emailRoutes from "./emailRoutes";
 
 import { diagnosticoRoutes } from "./diagnosticoRoutes";
 
-//Todo rutas de infraestructura
+//TODO ===== RUTAS DE INFRAESTRUCTURA =====
 import ctUnidadRoutes from "./infraestructura/ct_unidad.routes";
 
-//Todo rutas de inventario
+//TODO ===== RUTAS DE INVENTARIO =====
 import ctColorRoutes from "./inventario/ct_color.routes";
+import ctMarcaRoutes from "./inventario/ct_marca_base.routes";
+
+//TODO ===== RUTAS DE GENERALES =====
+import ctAccionRoutes from "./ct_accion.routes";
+import ctEntidadRoutes from "./ct_entidad.routes";
 
 const router = Router();
 
@@ -26,11 +31,18 @@ router.use("/emails", emailRoutes);
 
 router.use("/diagnostico", diagnosticoRoutes);
 
-//Todo rutas de infraestructura
+//TODO ===== RUTAS DE INFRAESTRUCTURA =====
 router.use("/unidad", ctUnidadRoutes);
 
-//Todo rutas de inventario
+//TODO ===== RUTAS DE INVENTARIO =====
 router.use("/color", ctColorRoutes);
+router.use("/marca", ctMarcaRoutes);
+
+//TODO ===== RUTAS DE CT_ACCION =====
+router.use("/accion", ctAccionRoutes);
+
+//TODO ===== RUTAS DE CT_ENTIDAD =====
+router.use("/entidad", ctEntidadRoutes);
 
 // Ruta de salud para las APIs
 router.get("/health", (req, res) => {

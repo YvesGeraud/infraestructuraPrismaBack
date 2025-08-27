@@ -133,6 +133,11 @@ export const buscarUnidadesSchema = z.object({
   id_sostenimiento: z.number().optional(),
   vigente: z.number().optional(),
   id_tipo_escuela: z.number().optional(),
+  // Filtro por municipio usando cve_mun
+  municipio_cve: z
+    .string()
+    .regex(/^\d{2,3}$/, "La clave del municipio debe ser de 2 a 3 dígitos")
+    .optional(),
 });
 
 //? Schema para obtener unidades por municipio

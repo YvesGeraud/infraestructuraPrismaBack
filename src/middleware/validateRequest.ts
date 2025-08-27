@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { z, ZodError } from "zod";
+import { enviarRespuestaError } from "../utils/responseUtils";
 
 export interface ValidationSchemas {
   body?: z.ZodSchema;
@@ -34,20 +35,18 @@ export const validateRequest = (schemas: ValidationSchemas) => {
           code: err.code,
         }));
 
-        res.status(400).json({
-          success: false,
-          message: "Datos de entrada inválidos",
-          errors,
+        return enviarRespuestaError(res, "Datos de entrada inválidos", 400, {
+          errores: errors,
         });
-        return;
       }
 
       // Para otros tipos de errores
       console.error("Error de validación:", error);
-      res.status(500).json({
-        success: false,
-        message: "Error interno del servidor durante la validación",
-      });
+      return enviarRespuestaError(
+        res,
+        "Error interno del servidor durante la validación",
+        500
+      );
     }
   };
 };

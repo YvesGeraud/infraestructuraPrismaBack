@@ -1,21 +1,19 @@
 import { Request, Response } from "express";
 import { BaseController } from "../BaseController";
-import { CtUnidadService } from "../../services/infraestructura/ct_unidad.service";
+import { CtUnidadBaseService } from "../../services/infraestructura/ct_unidad_base.service";
 import {
   CrearCtUnidadInput,
   ActualizarCtUnidadInput,
   BuscarUnidadesInput,
-  crearCtUnidadSchema,
-  actualizarCtUnidadSchema,
   ctUnidadIdParamSchema,
   CtUnidadIdParam,
 } from "../../schemas/infraestructura/ct_unidad.schema";
 import { PaginationInput } from "../../schemas/commonSchemas";
 
-//TODO ===== CONTROLADOR PARA CT_INFRAESTRUCTURA_UNIDAD =====
-const ctUnidadService = new CtUnidadService();
+//TODO ===== CONTROLADOR PARA CT_INFRAESTRUCTURA_UNIDAD CON BASE SERVICE =====
+const ctUnidadBaseService = new CtUnidadBaseService();
 
-export class CtUnidadController extends BaseController {
+export class CtUnidadBaseController extends BaseController {
   /**
    * 🏫 Crear una nueva unidad de infraestructura
    * @route POST /api/infraestructura/unidad
@@ -25,9 +23,8 @@ export class CtUnidadController extends BaseController {
       req,
       res,
       async () => {
-        // Los datos ya están validados por el middleware validateRequest
         const unidadData: CrearCtUnidadInput = req.body;
-        return await ctUnidadService.crearUnidad(unidadData);
+        return await ctUnidadBaseService.crear(unidadData);
       },
       "Unidad creada exitosamente"
     );
@@ -42,13 +39,12 @@ export class CtUnidadController extends BaseController {
       req,
       res,
       async () => {
-        // Validar parámetros usando BaseController
         const { id_unidad } = this.validarDatosConEsquema<CtUnidadIdParam>(
           ctUnidadIdParamSchema,
           req.params
         );
 
-        return await ctUnidadService.obtenerUnidadPorId(id_unidad);
+        return await ctUnidadBaseService.obtenerPorId(id_unidad);
       },
       "Unidad obtenida exitosamente"
     );
@@ -68,11 +64,6 @@ export class CtUnidadController extends BaseController {
    * - vigente: Filtrar por estado vigente (0 o 1)
    * - page: Número de página (default: 1)
    * - limit: Elementos por página (default: 10, max: 1000)
-   *
-   * Ejemplos:
-   * - GET /api/infraestructura/unidad?cct=29DPR
-   * - GET /api/infraestructura/unidad?nombre_unidad=primaria&municipio_cve=051
-   * - GET /api/infraestructura/unidad?vigente=1&page=2&limit=20
    */
   obtenerTodosLosCtUnidades = async (
     req: Request,
@@ -82,11 +73,10 @@ export class CtUnidadController extends BaseController {
       req,
       res,
       async () => {
-        // Los filtros y paginación ya están validados por el middleware
         const filters: BuscarUnidadesInput = req.query as any;
         const pagination: PaginationInput = req.query as any;
 
-        return await ctUnidadService.obtenerUnidades(filters, pagination);
+        return await ctUnidadBaseService.obtenerTodos(filters, pagination);
       },
       "Unidades obtenidas exitosamente"
     );
@@ -101,14 +91,13 @@ export class CtUnidadController extends BaseController {
       req,
       res,
       async () => {
-        // Validar parámetros usando BaseController
         const { id_unidad } = this.validarDatosConEsquema<CtUnidadIdParam>(
           ctUnidadIdParamSchema,
           req.params
         );
         const unidadData: ActualizarCtUnidadInput = req.body;
 
-        return await ctUnidadService.actualizarUnidad(id_unidad, unidadData);
+        return await ctUnidadBaseService.actualizar(id_unidad, unidadData);
       },
       "Unidad actualizada exitosamente"
     );
@@ -123,20 +112,75 @@ export class CtUnidadController extends BaseController {
       req,
       res,
       async () => {
-        // Validar parámetros usando BaseController
         const { id_unidad } = this.validarDatosConEsquema<CtUnidadIdParam>(
           ctUnidadIdParamSchema,
           req.params
         );
 
-        await ctUnidadService.eliminarUnidad(id_unidad);
+        await ctUnidadBaseService.eliminar(id_unidad);
       },
       "Unidad eliminada exitosamente"
     );
   };
 
   // ==========================================
-  // NOTA: Todas las búsquedas se manejan con el método obtenerTodosLosCtUnidades
-  // usando query parameters como filtros
+  // MÉTODOS ADICIONALES CON BASE SERVICE
   // ==========================================
+
+  /**
+   * 🔍 Obtener unidad por CCT
+   * @route GET /api/infraestructura/unidad/cct/:cct
+   */
+  obtenerUnidadPorCCT = async (req: Request, res: Response): Promise<void> => {
+    await this.manejarOperacion(
+      req,
+      res,
+      async () => {
+        const { cct } = req.params;
+        return await ctUnidadBaseService.obtenerPorCCT(cct);
+      },
+      "Unidad obtenida por CCT exitosamente"
+    );
+  };
+
+  /**
+   * 🗺️ Obtener unidades por municipio
+   * @route GET /api/infraestructura/unidad/municipio/:cve_mun
+   */
+  obtenerUnidadesPorMunicipio = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarOperacion(
+      req,
+      res,
+      async () => {
+        const { cve_mun } = req.params;
+        return await ctUnidadBaseService.obtenerPorMunicipio({ cve_mun });
+      },
+      "Unidades del municipio obtenidas exitosamente"
+    );
+  };
+
+  /**
+   * 📝 Autocompletar unidades por nombre
+   * @route GET /api/infraestructura/unidad/autocompletar?nombre=xxx&limite=10
+   */
+  autocompletarUnidades = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarOperacion(
+      req,
+      res,
+      async () => {
+        const { nombre, limite } = req.query;
+        const nombreStr = nombre as string;
+        const limiteNum = limite ? parseInt(limite as string, 10) : 10;
+
+        return await ctUnidadBaseService.buscarPorNombre(nombreStr, limiteNum);
+      },
+      "Búsqueda de unidades completada exitosamente"
+    );
+  };
 }

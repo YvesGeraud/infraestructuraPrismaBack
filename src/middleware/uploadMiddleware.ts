@@ -8,7 +8,7 @@ import {
   obtenerDirectorio,
   generarNombreArchivo,
 } from "../config/upload";
-import { RespuestaUtil } from "../utils/respuestas";
+import { enviarRespuestaError } from "../utils/responseUtils";
 import logger from "../config/logger";
 
 /**
@@ -163,21 +163,25 @@ export const manejarUpload = (uploadMiddleware: any) => {
 
         switch (error.code) {
           case "LIMIT_FILE_SIZE":
-            return RespuestaUtil.error(
+            return enviarRespuestaError(
               res,
               "El archivo excede el tamaño máximo permitido",
               400
             );
           case "LIMIT_FILE_COUNT":
-            return RespuestaUtil.error(
+            return enviarRespuestaError(
               res,
               "Se excedió el número máximo de archivos",
               400
             );
           case "LIMIT_UNEXPECTED_FILE":
-            return RespuestaUtil.error(res, "Campo de archivo inesperado", 400);
+            return enviarRespuestaError(
+              res,
+              "Campo de archivo inesperado",
+              400
+            );
           default:
-            return RespuestaUtil.error(
+            return enviarRespuestaError(
               res,
               `Error en la subida de archivos: ${error.message}`,
               400
@@ -187,7 +191,7 @@ export const manejarUpload = (uploadMiddleware: any) => {
 
       if (error) {
         logger.error("Error en upload:", error);
-        return RespuestaUtil.error(
+        return enviarRespuestaError(
           res,
           error.message || "Error en la subida de archivos",
           400
@@ -249,7 +253,7 @@ export const validarArchivoSubido = (
   next: NextFunction
 ) => {
   if (!req.file && !req.files) {
-    return RespuestaUtil.error(res, "No se ha subido ningún archivo", 400);
+    return enviarRespuestaError(res, "No se ha subido ningún archivo", 400);
   }
   next();
 };

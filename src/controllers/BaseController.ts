@@ -1,5 +1,14 @@
 import { Request, Response } from "express";
-import { RespuestaUtil } from "../utils/respuestas";
+import {
+  enviarRespuestaExitosa,
+  enviarRespuestaError,
+  respuestaCreada,
+  respuestaNoEncontrado,
+  respuestaConflicto,
+  respuestaProhibido,
+  respuestaNoAutorizado,
+  validarDatos,
+} from "../utils/responseUtils";
 import logger from "../config/logger";
 
 export abstract class BaseController {
@@ -16,11 +25,14 @@ export abstract class BaseController {
       const resultado = await operacion();
 
       if (resultado === null || resultado === undefined) {
-        RespuestaUtil.noEncontrado(res, "Recurso no encontrado");
+        respuestaNoEncontrado(res, "Recurso no encontrado");
         return;
       }
 
-      RespuestaUtil.exito(res, resultado, mensajeExito);
+      enviarRespuestaExitosa(res, {
+        datos: resultado,
+        mensaje: mensajeExito || "Operación exitosa",
+      });
     } catch (error) {
       this.manejarError(req, res, error);
     }
@@ -37,7 +49,11 @@ export abstract class BaseController {
   ): Promise<void> {
     try {
       const resultado = await operacion();
-      RespuestaUtil.creado(res, resultado, mensajeExito);
+      respuestaCreada(
+        res,
+        resultado,
+        mensajeExito || "Recurso creado exitosamente"
+      );
     } catch (error) {
       this.manejarError(req, res, error);
     }
@@ -61,48 +77,54 @@ export abstract class BaseController {
       // Manejar errores específicos conocidos
       if (
         error.message.includes("ya está registrado") ||
-        error.message.includes("ya existe")
+        error.message.includes("ya existe") ||
+        error.message.includes("duplicado")
       ) {
-        RespuestaUtil.conflicto(res, error.message);
+        respuestaConflicto(res, error.message);
         return;
       }
 
       if (
         error.message.includes("no encontrado") ||
-        error.message.includes("not found")
+        error.message.includes("not found") ||
+        error.message.includes("no encontrada")
       ) {
-        RespuestaUtil.noEncontrado(res, error.message);
+        respuestaNoEncontrado(res, error.message);
         return;
       }
 
       if (
         error.message.includes("sin permisos") ||
-        error.message.includes("no autorizado")
+        error.message.includes("no autorizado") ||
+        error.message.includes("prohibido")
       ) {
-        RespuestaUtil.prohibido(res, error.message);
+        respuestaProhibido(res, error.message);
         return;
       }
 
       if (
         error.message.includes("credenciales") ||
-        error.message.includes("contraseña")
+        error.message.includes("contraseña") ||
+        error.message.includes("token")
       ) {
-        RespuestaUtil.noAutorizado(res, error.message);
+        respuestaNoAutorizado(res, error.message);
         return;
       }
 
       // Error genérico con mensaje
-      RespuestaUtil.error(
-        res,
-        "Error interno del servidor",
-        500,
-        error.message
-      );
+      enviarRespuestaError(res, "Error interno del servidor", 500, {
+        detalle: error.message,
+        ruta: req.path,
+        metodo: req.method,
+      });
       return;
     }
 
     // Error desconocido
-    RespuestaUtil.error(res, "Error interno del servidor");
+    enviarRespuestaError(res, "Error interno del servidor", 500, {
+      ruta: req.path,
+      metodo: req.method,
+    });
   }
 
   /**
@@ -144,5 +166,84 @@ export abstract class BaseController {
     }
 
     return id;
+  }
+
+  /**
+   * Wrapper para validar datos con esquemas Zod
+   */
+  protected validarDatosConEsquema<T>(schema: any, data: any): T {
+    return validarDatos<T>(schema, data);
+  }
+
+  /**
+   * Wrapper para operaciones de eliminación
+   */
+  protected async manejarEliminacion(
+    req: Request,
+    res: Response,
+    operacion: () => Promise<any>,
+    mensajeExito?: string
+  ): Promise<void> {
+    try {
+      await operacion();
+      enviarRespuestaExitosa(res, {
+        datos: { eliminado: true },
+        mensaje: mensajeExito || "Recurso eliminado exitosamente",
+      });
+    } catch (error) {
+      this.manejarError(req, res, error);
+    }
+  }
+
+  /**
+   * Wrapper para operaciones que devuelven listas paginadas
+   */
+  protected async manejarListaPaginada(
+    req: Request,
+    res: Response,
+    operacion: () => Promise<{ data: any[]; pagination: any }>,
+    mensajeExito?: string
+  ): Promise<void> {
+    try {
+      const resultado = await operacion();
+
+      enviarRespuestaExitosa(res, {
+        datos: resultado.data,
+        mensaje:
+          mensajeExito ||
+          `Registros obtenidos exitosamente (${resultado.pagination.total} encontrados)`,
+        metaAdicional: {
+          paginacion: resultado.pagination,
+        },
+      });
+    } catch (error) {
+      this.manejarError(req, res, error);
+    }
+  }
+
+  /**
+   * Wrapper para operaciones de actualización
+   */
+  protected async manejarActualizacion(
+    req: Request,
+    res: Response,
+    operacion: () => Promise<any>,
+    mensajeExito?: string
+  ): Promise<void> {
+    try {
+      const resultado = await operacion();
+
+      if (resultado === null || resultado === undefined) {
+        respuestaNoEncontrado(res, "Recurso no encontrado para actualizar");
+        return;
+      }
+
+      enviarRespuestaExitosa(res, {
+        datos: resultado,
+        mensaje: mensajeExito || "Recurso actualizado exitosamente",
+      });
+    } catch (error) {
+      this.manejarError(req, res, error);
+    }
   }
 }

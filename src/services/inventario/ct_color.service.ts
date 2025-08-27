@@ -56,9 +56,9 @@ export class CtColorService {
     filters: any = {},
     pagination: PaginationInput = {}
   ): Promise<PaginatedResponse<CtColorResponse>> {
-    const page = pagination.page || 1;
-    const limit = pagination.limit || 10;
-    const skip = (page - 1) * limit;
+    const pagina = pagination.pagina || 1;
+    const limite = pagination.limite || 10;
+    const skip = (pagina - 1) * limite;
 
     // Construir where clause
     const where: any = {};
@@ -74,22 +74,22 @@ export class CtColorService {
       prisma.ct_inventario_color.findMany({
         where,
         skip,
-        take: limit,
+        take: limite,
       }),
       prisma.ct_inventario_color.count({ where }),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPaginas = Math.ceil(total / limite);
 
     return {
       data: ctColor.map((ctColor: any) => this.mapToCtColorResponse(ctColor)),
       pagination: {
-        page,
-        limit,
+        pagina,
+        limite,
         total,
-        totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
+        totalPaginas,
+        tieneSiguiente: pagina < totalPaginas,
+        tieneAnterior: pagina > 1,
       },
     };
   }

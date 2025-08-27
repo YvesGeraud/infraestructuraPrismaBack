@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { z, ZodError } from "zod";
+import { enviarRespuestaError } from "../utils/responseUtils";
 
 // Middleware para validar el body de las requests
 export const validateBody = (schema: z.ZodSchema) => {
@@ -16,19 +17,13 @@ export const validateBody = (schema: z.ZodSchema) => {
           code: err.code,
         }));
 
-        res.status(400).json({
-          success: false,
-          message: "Errores de validación",
-          errors,
+        return enviarRespuestaError(res, "Errores de validación", 400, {
+          errores: errors,
         });
-        return;
       }
 
       // Error inesperado
-      res.status(500).json({
-        success: false,
-        message: "Error interno del servidor",
-      });
+      return enviarRespuestaError(res, "Error interno del servidor", 500);
     }
   };
 };
@@ -48,18 +43,15 @@ export const validateQuery = (schema: z.ZodSchema) => {
           code: err.code,
         }));
 
-        res.status(400).json({
-          success: false,
-          message: "Parámetros de consulta inválidos",
-          errors,
-        });
-        return;
+        return enviarRespuestaError(
+          res,
+          "Parámetros de consulta inválidos",
+          400,
+          { errores: errors }
+        );
       }
 
-      res.status(500).json({
-        success: false,
-        message: "Error interno del servidor",
-      });
+      return enviarRespuestaError(res, "Error interno del servidor", 500);
     }
   };
 };
@@ -79,18 +71,12 @@ export const validateParams = (schema: z.ZodSchema) => {
           code: err.code,
         }));
 
-        res.status(400).json({
-          success: false,
-          message: "Parámetros de ruta inválidos",
-          errors,
+        return enviarRespuestaError(res, "Parámetros de ruta inválidos", 400, {
+          errores: errors,
         });
-        return;
       }
 
-      res.status(500).json({
-        success: false,
-        message: "Error interno del servidor",
-      });
+      return enviarRespuestaError(res, "Error interno del servidor", 500);
     }
   };
 };
