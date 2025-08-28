@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BaseController } from "../BaseController";
-import { CtUnidadBaseService } from "../../services/infraestructura/ct_unidad_base.service";
+import { CtUnidadBaseService } from "../../services/infraestructura/ejemploservice";
 import {
   CrearCtUnidadInput,
   ActualizarCtUnidadInput,
@@ -62,8 +62,8 @@ export class CtUnidadBaseController extends BaseController {
    * - id_sostenimiento: Filtrar por ID de sostenimiento
    * - id_tipo_escuela: Filtrar por ID de tipo de escuela
    * - vigente: Filtrar por estado vigente (0 o 1)
-   * - page: Número de página (default: 1)
-   * - limit: Elementos por página (default: 10, max: 1000)
+   * - pagina: Número de página (default: 1)
+   * - limite: Elementos por página (default: 10, max: 1000)
    */
   obtenerTodosLosCtUnidades = async (
     req: Request,

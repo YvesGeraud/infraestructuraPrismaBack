@@ -19,8 +19,8 @@ const ctUnidadController = new CtUnidadController();
 //? NOTA: Las búsquedas se manejan con la ruta GET principal usando query parameters
 //? Ejemplos de uso:
 //? GET /api/infraestructura/unidad?cct=29DPR0001K
-//? GET /api/infraestructura/unidad?nombre_unidad=escuela&limit=10
-//? GET /api/infraestructura/unidad?vigente=1&page=1&limit=20
+//? GET /api/infraestructura/unidad?nombre_unidad=escuela&limite=10
+//? GET /api/infraestructura/unidad?vigente=1&pagina=1&limite=20
 
 //? Crear una nueva unidad de infraestructura
 //TODO POST /api/ct_unidad

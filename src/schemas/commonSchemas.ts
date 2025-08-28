@@ -18,13 +18,28 @@ export const paginationSchema = z.object({
   sortOrder: z.enum(["asc", "desc"]).optional(),
 });
 
-//? Schema para validar IDs en parámetros de ruta
+//? Schema para validar IDs en parámetros de ruta (maneja string y number)
 export const idParamSchema = z.object({
   id: z
-    .string()
-    .transform((val) => parseInt(val, 10))
+    .union([z.string(), z.number()])
+    .transform((val) => (typeof val === "string" ? parseInt(val, 10) : val))
     .pipe(z.number().int().positive("ID debe ser un número positivo")),
 });
+
+//? Helper para crear schemas de ID específicos (soluciona problema de Express parseando números)
+export const createIdParamSchema = (fieldName: string, message?: string) => {
+  return z.object({
+    [fieldName]: z
+      .union([z.string(), z.number()])
+      .transform((val) => (typeof val === "string" ? parseInt(val, 10) : val))
+      .pipe(
+        z
+          .number()
+          .int()
+          .positive(message || `${fieldName} debe ser un número positivo`)
+      ),
+  });
+};
 
 //? Schema para búsqueda general
 export const searchSchema = z.object({

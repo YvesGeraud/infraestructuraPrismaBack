@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CtMarcaBaseController } from "../../controllers/inventario/ct_marca_base.controller";
+import { CtMarcaBaseController } from "../../controllers/inventario/ejemplocontroller";
 import { validateRequest } from "../../middleware/validateRequest";
 import {
   crearCtMarcaSchema,

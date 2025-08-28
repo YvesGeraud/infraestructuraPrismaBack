@@ -175,7 +175,7 @@ export class CtUnidadBaseService extends BaseService<
       const filtros: BuscarUnidadesInput = {
         nombre_unidad: nombre,
       };
-      const paginacion = { page: 1, limit: limite };
+      const paginacion = { pagina: 1, limite: limite };
 
       const resultado = await this.obtenerTodos(filtros, paginacion);
       return resultado.data;
@@ -193,7 +193,7 @@ export class CtUnidadBaseService extends BaseService<
    * Método legacy - obtener todas las unidades
    */
   async obtenerUnidades(): Promise<Ct_infraestructura_unidad[]> {
-    const resultado = await this.obtenerTodos({}, { page: 1, limit: 100 });
+    const resultado = await this.obtenerTodos({}, { pagina: 1, limite: 100 });
     return resultado.data;
   }
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BaseController } from "../BaseController";
-import { CtMarcaBaseService } from "../../services/inventario/ct_marca_base.service";
+import { CtMarcaBaseService } from "../../services/inventario/ejemploservice";
 import {
   CrearCtMarcaInput,
   ActualizarCtMarcaInput,
@@ -55,8 +55,8 @@ export class CtMarcaBaseController extends BaseController {
    *
    * Query parameters soportados:
    * - descripcion: Filtrar por descripción (búsqueda parcial)
-   * - page: Número de página (default: 1)
-   * - limit: Elementos por página (default: 10)
+   * - pagina: Número de página (default: 1)
+   * - limite: Elementos por página (default: 10)
    */
   obtenerTodasLasMarcas = async (
     req: Request,

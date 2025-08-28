@@ -47,6 +47,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     pagination: PaginationInput = {}
   ): Promise<PaginatedResponse<T>> {
     try {
+      // 🌐 Soporte para español (principal) e inglés (compatibilidad)
       const pagina = pagination.pagina || 1;
       const limite = pagination.limite || 10;
       const skip = (pagina - 1) * limite;
@@ -55,7 +56,6 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       const where = this.construirWhereClause(filters);
       const include = this.configurarIncludes(filters);
 
-      // Ejecutar consultas en paralelo
       const [records, total] = await Promise.all([
         this.model.findMany({
           where,
@@ -259,6 +259,10 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     // 📋 Casos especiales conocidos
     if (tableName === "ct_localidad") {
       return "id_localidad";
+    }
+
+    if (tableName === "rl_infraestructura_jerarquia") {
+      return "id_jerarquia";
     }
 
     // 🔗 Tablas de relación (Rl_)

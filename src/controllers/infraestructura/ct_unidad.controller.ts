@@ -66,13 +66,13 @@ export class CtUnidadController extends BaseController {
    * - id_sostenimiento: Filtrar por ID de sostenimiento
    * - id_tipo_escuela: Filtrar por ID de tipo de escuela
    * - vigente: Filtrar por estado vigente (0 o 1)
-   * - page: Número de página (default: 1)
-   * - limit: Elementos por página (default: 10, max: 1000)
+   * - pagina: Número de página (default: 1)
+   * - limite: Elementos por página (default: 10, max: 1000)
    *
    * Ejemplos:
    * - GET /api/infraestructura/unidad?cct=29DPR
    * - GET /api/infraestructura/unidad?nombre_unidad=primaria&municipio_cve=051
-   * - GET /api/infraestructura/unidad?vigente=1&page=2&limit=20
+   * - GET /api/infraestructura/unidad?vigente=1&pagina=2&limite=20
    */
   obtenerTodosLosCtUnidades = async (
     req: Request,
