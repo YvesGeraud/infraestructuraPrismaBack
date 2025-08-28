@@ -1,7 +1,7 @@
 // ===== EXPORTACIONES DE UTILIDADES =====
 
-export { RespuestaUtil } from "./respuestas";
-export type { RespuestaExito, RespuestaError } from "./respuestas";
+export { enviarRespuestaExitosa, enviarRespuestaError } from "./responseUtils";
+export type { RespuestaNormalizada } from "./responseUtils";
 
 export { CorsUtils } from "./corsUtils";
 

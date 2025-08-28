@@ -51,4 +51,8 @@ router.delete(
   ctArticuloController.eliminarArticulo
 );
 
+// ========== RUTAS DE REPORTES ==========
+// NOTA: Los reportes ahora se manejan en /api/reportes/
+// Ver: GET /api/reportes/articulos/jerarquia/:id_jerarquia/pdf
+
 export default router;

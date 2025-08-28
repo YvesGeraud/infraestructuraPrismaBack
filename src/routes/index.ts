@@ -19,6 +19,9 @@ import ctColorRoutes from "./inventario/ct_color.routes";
 import ctMarcaRoutes from "./inventario/ejemploroutes";
 import ctArticuloRoutes from "./inventario/ct_articulo.routes";
 
+//TODO ===== RUTAS DE REPORTES =====
+import reportesRoutes from "./reportes.routes";
+
 //TODO ===== RUTAS DE GENERALES =====
 import ctAccionRoutes from "./ct_accion.routes";
 import ctEntidadRoutes from "./ct_entidad.routes";
@@ -51,6 +54,9 @@ router.use("/articulo", ctArticuloRoutes);
 
 //TODO ===== RUTAS DE CT_ACCION =====
 router.use("/accion", ctAccionRoutes);
+
+//TODO ===== RUTAS DE REPORTES =====
+router.use("/reportes", reportesRoutes);
 
 //TODO ===== RUTAS DE CT_ENTIDAD =====
 router.use("/entidad", ctEntidadRoutes);
