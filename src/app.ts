@@ -72,7 +72,7 @@ app.use(
   /*authenticateJWT,*/ municipiosRoutes
 );
 app.use(
-  `${process.env.HOST}api/localidades`,
+  `${process.env.HOST}api/localidad`,
   /*authenticateJWT,*/ localidadRoutes
 );
 app.use(
