@@ -149,7 +149,7 @@ dependences_prod:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-infraestructura
+    - prod-apps
   cache:
     key:
       files:
@@ -164,7 +164,7 @@ build_prod:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-infraestructura
+    - prod-apps
   cache:
     - key:
         files:
@@ -186,7 +186,7 @@ publish_prod:
   rules:
     - if: $CI_COMMIT_BRANCH =~ /main/
   tags:
-    - prod-infraestructura
+    - prod-apps
   cache:
     - key:
         files:
