@@ -3,7 +3,9 @@ stages:
   - build
   - publish
 
-#DEV
+#Recuerden que el tag de versionado solo va en front
+#Despliegue a dev
+
 dependences_dev:
   stage: dependences
   rules:
@@ -18,7 +20,6 @@ dependences_dev:
       - node_modules
   script:
     - npm install
-   
 
 build_dev:
   stage: build
@@ -42,7 +43,7 @@ build_dev:
 publish_dev:
   variables:
     DEPLOY: "/var/www/api-dev"
-    FOLDER: "cedex"
+    FOLDER: "base"
   stage: publish
   rules:
     - if: $CI_COMMIT_BRANCH == "dev"
@@ -66,9 +67,7 @@ publish_dev:
     - mkdir -p $DEPLOY/$FOLDER/tmp/
     - touch $DEPLOY/$FOLDER/tmp/restart.txt
 
-
-
-#UAT
+#Despliegue a uat
 dependences_uat:
   stage: dependences
   rules:
@@ -83,7 +82,6 @@ dependences_uat:
       - node_modules
   script:
     - npm install
-    - npm list express-rate-limit || true 
 
 build_uat:
   stage: build
@@ -107,7 +105,7 @@ build_uat:
 publish_uat:
   variables:
     DEPLOY: "/var/www/api-uat"
-    FOLDER: "cedex"
+    FOLDER: "base"
   stage: publish
   rules:
     - if: $CI_COMMIT_BRANCH == "uat"
@@ -131,9 +129,7 @@ publish_uat:
     - mkdir -p $DEPLOY/$FOLDER/tmp/
     - touch $DEPLOY/$FOLDER/tmp/restart.txt
 
-
-    #PRODUCCION
-
+#Despliegue de base a produccion
 dependences_prod:
   stage: dependences
   rules:
@@ -148,7 +144,6 @@ dependences_prod:
       - node_modules
   script:
     - npm install
-    - npm list express-rate-limit || true 
 
 build_prod:
   stage: build
@@ -171,8 +166,8 @@ build_prod:
 
 publish_prod:
   variables:
-    DEPLOY: "/var/www"
-    FOLDER: "api-cedex"
+    DEPLOY: "/var/www/api"
+    FOLDER: "base"
   stage: publish
   rules:
     - if: $CI_COMMIT_BRANCH == "main"

@@ -94,7 +94,8 @@ const envSchema = z.object({
 
   // JWT
   JWT_SECRET: z.string().min(8, "JWT_SECRET debe tener al menos 8 caracteres"),
-  JWT_EXPIRES_IN: z.string().default("7d"),
+  JWT_EXPIRES_IN: z.string().default("15m"), // Token corto para seguridad
+  JWT_REFRESH_EXPIRES_IN: z.string().default("7d"), // Refresh token más largo
 
   // Bcrypt
   BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
@@ -177,6 +178,7 @@ export const serverConfig = {
 export const jwtConfig = {
   secret: env.JWT_SECRET,
   expiresIn: env.JWT_EXPIRES_IN,
+  refreshExpiresIn: env.JWT_REFRESH_EXPIRES_IN,
 };
 
 // ===== CONFIGURACIÓN BCRYPT =====

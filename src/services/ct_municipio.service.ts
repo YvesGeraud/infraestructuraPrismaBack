@@ -4,45 +4,36 @@
  */
 
 import { BaseService } from "./BaseService";
-import { ct_localidad } from "@prisma/client";
+  import { ct_municipio } from "@prisma/client";
 import {
-  CrearCtLocalidadInput,
-  ActualizarCtLocalidadInput,
-  BuscarCtLocalidadInput,
-} from "../schemas/ct_localidad.schema";
+  CrearCtMunicipioInput,
+  ActualizarCtMunicipioInput,
+  BuscarCtMunicipioInput,
+} from "../schemas/ct_municipio.schema";
 
-//TODO ===== SERVICIO PARA CT_LOCALIDAD CON BASE SERVICE =====
+//TODO ===== SERVICIO PARA CT_MUNICIPIO CON BASE SERVICE =====
 
-export class CtLocalidadBaseService extends BaseService<
-  ct_localidad,
-  CrearCtLocalidadInput,
-  ActualizarCtLocalidadInput,
-  BuscarCtLocalidadInput
+export class CtMunicipioBaseService extends BaseService<
+  ct_municipio,
+  CrearCtMunicipioInput,
+  ActualizarCtMunicipioInput,
+  BuscarCtMunicipioInput
 > {
   // 🔧 Configuración específica del modelo (4 líneas)
   protected config = {
-    tableName: "ct_localidad", // Nombre del modelo en Prisma (no de la tabla)
-    defaultOrderBy: { id_ct_localidad: "asc" as const },
+    tableName: "ct_municipio",
+    defaultOrderBy: { id_ct_municipio: "asc" as const },
     campoActivo: "estado",
   };
 
   // 🔗 Includes condicionales basados en filtros
-  protected configurarIncludes(filters?: BuscarCtLocalidadInput) {
+  protected configurarIncludes(filters?: BuscarCtMunicipioInput) {
     // Por defecto, sin includes para mejor performance
     const includes: any = {};
 
-    // Include condicional de municipio
-    if (filters?.incluir_municipio) {
-      includes.ct_municipio = true;
-    }
-
-    // Include anidado: municipio + entidad
-    if (filters?.incluir_municipio_con_entidad) {
-      includes.ct_municipio = {
-        include: {
-          ct_entidad: true,
-        },
-      };
+    // Solo incluir entidad si se solicita explícitamente
+    if (filters?.incluir_ct_entidad) {
+      includes.ct_entidad = true;
     }
 
     // 🎯 IMPORTANTE: Si no hay includes, retornar undefined para que Prisma no incluya nada
@@ -50,13 +41,14 @@ export class CtLocalidadBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para municipios
-  protected construirWhereClause(filters?: BuscarCtLocalidadInput) {
+  protected construirWhereClause(filters?: BuscarCtMunicipioInput) {
     const where: any = {};
     const conditions: any[] = [];
 
-    if (filters?.id_ct_localidad) {
+    // Filtro de municipio
+    if (filters?.id_ct_municipio) {
       conditions.push({
-        id_ct_localidad: filters.id_ct_localidad,
+        id_ct_municipio: filters.id_ct_municipio,
       });
     }
 
@@ -70,16 +62,16 @@ export class CtLocalidadBaseService extends BaseService<
     }
 
     // Filtro de municipio
-    if (filters?.ambito) {
+    if (filters?.cve_mun) {
       conditions.push({
-        ambito: filters.ambito,
+        cve_mun: filters.cve_mun,
       });
     }
 
     // Filtro de ámbito
-    if (filters?.id_ct_municipio) {
+    if (filters?.id_ct_entidad) {
       conditions.push({
-        id_ct_municipio: filters.id_ct_municipio,
+        id_ct_entidad: filters.id_ct_entidad,
       });
     }
 
@@ -94,7 +86,7 @@ export class CtLocalidadBaseService extends BaseService<
   
   // 🔧 Sobrescribir campo PK (3 líneas)
   protected getPrimaryKeyField(): string {
-    return "id_ct_localidad";
+    return "id_ct_municipio";
   }
 
   // ✨ ¡YA TIENES CRUD COMPLETO AUTOMÁTICAMENTE!

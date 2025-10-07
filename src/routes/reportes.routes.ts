@@ -1,57 +1,79 @@
 import { Router } from "express";
 import { reportesController } from "../controllers/reportes.controller";
-import { validateRequest } from "../middleware/validateRequest";
-import { z } from "zod";
+import { validarRequest } from "../middleware/validacion";
+import {
+  reporteLocalidadesFiltrosSchema,
+  reporteGenericoSchema,
+  reporteMunicipioParamSchema,
+} from "../schemas/reportes.schema";
 
 const router = Router();
 
-// Schema para validar parámetros de jerarquía
-const jerarquiaIdParamSchema = z.object({
-  id_jerarquia: z
-    .union([z.string(), z.number()])
-    .transform((val) => (typeof val === "string" ? parseInt(val, 10) : val))
-    .pipe(
-      z.number().int().positive("ID de jerarquía debe ser un número positivo")
-    ),
-});
-
-// Schema para reporte genérico
-const reporteGenericoSchema = z.object({
-  datos: z.array(z.any()).min(1, "Debe incluir al menos un registro"),
-  configuracion: z.object({
-    titulo: z.string().min(1, "Título es requerido"),
-    descripcion: z.string().optional(),
-    columnas: z
-      .array(
-        z.object({
-          campo: z.string(),
-          titulo: z.string(),
-          tipo: z.enum(["texto", "numero", "fecha", "booleano"]).optional(),
-          ancho: z.string().optional(),
-        })
-      )
-      .min(1, "Debe incluir al menos una columna"),
-    filtros: z.record(z.string(), z.any()).optional(),
-    metadatos: z.record(z.string(), z.any()).optional(),
-  }),
-});
-
-// ========== RUTAS DE REPORTES ESPECÍFICOS ==========
+// ========== RUTAS DE REPORTES DE LOCALIDADES ==========
 
 /**
- * @route GET /api/reportes/articulos/jerarquia/:id_jerarquia/pdf
- * @description Genera reporte PDF de artículos filtrado por jerarquía
- * @param {number} id_jerarquia - ID de la jerarquía para filtrar artículos
+ * @route GET /api/reportes/localidades/pdf
+ * @description Genera reporte PDF de localidades con filtros opcionales
+ * @query {string} localidad - Filtro por nombre de localidad (opcional)
+ * @query {string} ambito - Filtro por ámbito: 'U' (Urbano) o 'R' (Rural) (opcional)
+ * @query {number} id_municipio - Filtro por ID de municipio (opcional)
+ * @query {boolean} incluir_municipio - Incluir datos de municipio (opcional)
+ * @query {boolean} incluir_municipio_con_entidad - Incluir datos de municipio y estado (opcional)
  * @returns {file} PDF - Archivo PDF descargable
  *
  * @example
- * GET /api/reportes/articulos/jerarquia/2160/pdf
- * Descarga: articulos_jerarquia_2160_2025-08-28.pdf
+ * GET /api/reportes/localidades/pdf
+ * GET /api/reportes/localidades/pdf?ambito=U
+ * GET /api/reportes/localidades/pdf?incluir_municipio=true
+ * GET /api/reportes/localidades/pdf?id_municipio=1&incluir_municipio_con_entidad=true
+ * Descarga: localidades_reporte_2025-09-23.pdf
  */
 router.get(
-  "/articulos/jerarquia/:id_jerarquia/pdf",
-  validateRequest({ params: jerarquiaIdParamSchema }),
-  reportesController.generarReporteArticulosPorJerarquia
+  "/localidades/pdf",
+  validarRequest({ query: reporteLocalidadesFiltrosSchema }),
+  reportesController.generarReporteLocalidades
+);
+
+/**
+ * @route GET /api/reportes/localidades/excel
+ * @description Genera reporte Excel de localidades con filtros opcionales (HÍBRIDO)
+ * @query {string} localidad - Filtro por nombre de localidad (opcional)
+ * @query {string} ambito - Filtro por ámbito: 'U' (Urbano) o 'R' (Rural) (opcional)
+ * @query {number} id_municipio - Filtro por ID de municipio (opcional)
+ * @query {boolean} incluir_municipio - Incluir datos de municipio (opcional)
+ * @query {boolean} incluir_municipio_con_entidad - Incluir datos de municipio y estado (opcional)
+ * @returns {file} Excel - Archivo Excel descargable
+ *
+ * 🎯 SISTEMA HÍBRIDO:
+ * - < 50k registros: Excel hermoso con estilos, colores, bordes
+ * - ≥ 50k registros: Excel streaming (simple pero eficiente)
+ *
+ * @example
+ * GET /api/reportes/localidades/excel
+ * GET /api/reportes/localidades/excel?ambito=U
+ * GET /api/reportes/localidades/excel?incluir_municipio=true
+ * Descarga: localidades_reporte_2025-09-23.xlsx
+ */
+router.get(
+  "/localidades/excel",
+  validarRequest({ query: reporteLocalidadesFiltrosSchema }),
+  reportesController.generarReporteLocalidadesExcel
+);
+
+/**
+ * @route GET /api/reportes/localidades/municipio/:id_municipio/pdf
+ * @description Genera reporte PDF de localidades de un municipio específico
+ * @param {number} id_municipio - ID del municipio para filtrar localidades
+ * @returns {file} PDF - Archivo PDF descargable con localidades del municipio
+ *
+ * @example
+ * GET /api/reportes/localidades/municipio/1/pdf
+ * Descarga: localidades_municipio_1_2025-09-23.pdf
+ */
+router.get(
+  "/localidades/municipio/:id_municipio/pdf",
+  validarRequest({ params: reporteMunicipioParamSchema }),
+  reportesController.generarReporteLocalidadesPorMunicipio
 );
 
 // ========== RUTAS DE REPORTES GENÉRICOS ==========
@@ -83,21 +105,23 @@ router.get(
  */
 router.post(
   "/generico/pdf",
-  validateRequest({ body: reporteGenericoSchema }),
+  validarRequest({ body: reporteGenericoSchema }),
   reportesController.generarReporteGenerico
 );
 
 // ========== RUTAS FUTURAS (Para expansión) ==========
 
 /**
- * Rutas futuras que se pueden implementar:
+ * Rutas futuras que se pueden implementar siguiendo el mismo patrón:
  *
- * GET /api/reportes/inventario/resumen/pdf
- * GET /api/reportes/infraestructura/estado/pdf
- * GET /api/reportes/usuarios/actividad/pdf
- * POST /api/reportes/dashboard/pdf
- * GET /api/reportes/plantillas
- * POST /api/reportes/plantilla/:id/pdf
+ * GET /api/reportes/municipios/pdf - Reporte de municipios con estados
+ * GET /api/reportes/municipios/entidad/:id_entidad/pdf - Municipios por estado
+ * GET /api/reportes/entidades/pdf - Reporte de estados/entidades
+ * GET /api/reportes/estadisticas/localidades/pdf - Estadísticas de localidades
+ * GET /api/reportes/comparativo/municipios/pdf - Comparativo entre municipios
+ * POST /api/reportes/dashboard/pdf - Dashboard personalizado
+ * GET /api/reportes/plantillas - Listar plantillas disponibles
+ * POST /api/reportes/plantilla/:id/pdf - Generar reporte desde plantilla
  */
 
 export default router;

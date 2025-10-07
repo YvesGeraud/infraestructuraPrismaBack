@@ -1,6 +1,12 @@
-# 🚀 **Cedex Backend - Sistema Completo**
+# 🚀 **Infraestructura Backend - Sistema Completo**
 
-## cosa
+## **Extenciones que recomiendo**
+
+- Better Comments
+- Error Lens
+- Material Icon Theme
+- Prettier
+-
 
 ## 📋 **Índice**
 

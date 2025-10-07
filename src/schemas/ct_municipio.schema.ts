@@ -22,39 +22,39 @@ import {
   esquemaNumeroOpcional,
 } from "./commonSchemas";
 
-//TODO ===== SCHEMAS PARA CT_LOCALIDAD =====
+//TODO ===== SCHEMAS PARA CT_MUNICIPIO =====
 
 //? Esquema para crear una nueva capitulo
-export const crearCtLocalidadSchema = z.object({
+export const crearCtMunicipioSchema = z.object({
+  cve_mun: esquemaTextoRequerido(3, 3),
   nombre: esquemaTextoRequerido(2, 100),
-  ambito: esquemaTextoRequerido(1, 1),
-  id_ct_municipio: esquemaNumeroRequerido,
+  id_ct_entidad: esquemaNumeroRequerido(1, 100000),
   estado: esquemaEstadoRequerido,
   id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar una capitulo
-export const actualizarCtLocalidadSchema = z.object({
+export const actualizarCtMunicipioSchema = z.object({
+  cve_mun: esquemaTextoOpcional(3),
   nombre: esquemaTextoOpcional(100),
-  ambito: esquemaTextoOpcional(1),
-  id_ct_municipio: esquemaNumeroOpcional,
+  id_ct_entidad: esquemaNumeroOpcional(1, 100000),
   estado: esquemaEstadoOpcional,
   id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  fecha_up: esquemaFechaOpcional,
 });
 
 //? Schema para filtros y paginación de capitulos
 //! NOTA: Implementa soft delete - por defecto solo muestra registros activos
-export const ctLocalidadFiltrosSchema = z.object({
+export const ctMunicipioFiltrosSchema = z.object({
   //? Filtros específicos
-  id_ct_localidad: esquemaQueryId,
-  nombre: esquemaQueryTexto,
-  ambito: esquemaQueryTexto,
   id_ct_municipio: esquemaQueryId,
+  cve_mun: esquemaQueryTexto,
+  nombre: esquemaQueryTexto,
+  id_ct_entidad: esquemaQueryNumeroOpcional,
   estado: esquemaQueryBoolean,
-  id_ct_usuario_up: esquemaQueryId,
+  id_ct_usuario_in: esquemaQueryId,
   fecha_in: esquemaFechaOpcional,
-  incluir_municipio: esquemaQueryBoolean,
-  incluir_municipio_con_entidad: esquemaQueryBoolean,
+  incluir_ct_entidad: esquemaQueryBoolean,
 
   //? Filtros para incluir inactivos de capitulos
   incluirInactivos: esquemaQueryBoolean,
@@ -64,24 +64,24 @@ export const ctLocalidadFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearCtLocalidadInput = z.infer<typeof crearCtLocalidadSchema>;
-export type ActualizarCtLocalidadInput = z.infer<
-  typeof actualizarCtLocalidadSchema
+export type CrearCtMunicipioInput = z.infer<typeof crearCtMunicipioSchema>;
+export type ActualizarCtMunicipioInput = z.infer<
+  typeof actualizarCtMunicipioSchema
 >;
 
-export type BuscarCtLocalidadInput = z.infer<typeof ctLocalidadFiltrosSchema>;
+export type BuscarCtMunicipioInput = z.infer<typeof ctMunicipioFiltrosSchema>;
 
 //? Esquema para parámetros de URL (ID de capitulo)
-export const ctLocalidadIdParamSchema = z.object({
-  id_ct_localidad: esquemaParamId,
+export const ctMunicipioIdParamSchema = z.object({
+  id_ct_municipio: esquemaParamId,
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtLocalidadSchema = esquemaDeleteConUsuario;
+export const eliminarCtMunicipioSchema = esquemaDeleteConUsuario;
 
-export type CtLocalidadIdParam = z.infer<typeof ctLocalidadIdParamSchema>;
+export type CtMunicipioIdParam = z.infer<typeof ctMunicipioIdParamSchema>;
 
-export type EliminarCtLocalidadInput = z.infer<typeof eliminarCtLocalidadSchema>;
+export type EliminarCtMunicipioInput = z.infer<typeof eliminarCtMunicipioSchema>;
 
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES

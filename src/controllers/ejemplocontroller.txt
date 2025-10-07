@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import { BaseController } from "./BaseController";
-    import { CtEntidadBaseService } from "../services/ct_entidad.service";
+import { CtEntidadBaseService } from "../services/entidad.service";
 import {
   CrearCtEntidadInput,
   ActualizarCtEntidadInput,
   ctEntidadIdParamSchema,
   CtEntidadIdParam,
-} from "../schemas/ct_entidad.schema";
+} from "../schemas/entidad.schema";
 import { PaginationInput } from "../schemas/commonSchemas";
 
 //TODO ===== CONTROLADOR PARA CT_ENTIDAD CON BASE SERVICE =====
-    const ctEntidadBaseService = new CtEntidadBaseService();
+const ctEntidadBaseService = new CtEntidadBaseService();
 
 export class CtEntidadBaseController extends BaseController {
   /**
@@ -25,7 +25,7 @@ export class CtEntidadBaseController extends BaseController {
         const entidadData: CrearCtEntidadInput = req.body;
         return await ctEntidadBaseService.crear(entidadData);
       },
-        "Entidad creada exitosamente"
+      "Entidad creada exitosamente"
     );
   };
 
@@ -38,12 +38,12 @@ export class CtEntidadBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
+        const { id_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
           ctEntidadIdParamSchema,
           req.params
         );
 
-            return await ctEntidadBaseService.obtenerPorId(id_ct_entidad);
+        return await ctEntidadBaseService.obtenerPorId(id_entidad);
       },
       "Entidad obtenida exitosamente"
     );
@@ -85,13 +85,13 @@ export class CtEntidadBaseController extends BaseController {
       req,
       res,
       async () => {
-            const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
+        const { id_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
           ctEntidadIdParamSchema,
           req.params
         );
         const entidadData: ActualizarCtEntidadInput = req.body;
 
-        return await ctEntidadBaseService.actualizar(id_ct_entidad, entidadData);
+        return await ctEntidadBaseService.actualizar(id_entidad, entidadData);
       },
       "Entidad actualizada exitosamente"
     );
@@ -106,12 +106,12 @@ export class CtEntidadBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
-            ctEntidadIdParamSchema,
+        const { id_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
+          ctEntidadIdParamSchema,
           req.params
         );
 
-        await ctEntidadBaseService.eliminar(id_ct_entidad);
+        await ctEntidadBaseService.eliminar(id_entidad);
       },
       "Entidad eliminada exitosamente"
     );

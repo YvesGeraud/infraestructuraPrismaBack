@@ -41,6 +41,12 @@ export const createIdParamSchema = (fieldName: string, message?: string) => {
   });
 };
 
+//? Esquema base para transformar string/number a number en parámetros de URL
+export const esquemaParamId = z
+  .union([z.string(), z.number()])
+  .transform((val) => (typeof val === "string" ? parseInt(val, 10) : val))
+  .pipe(z.number().int().positive("ID debe ser un número positivo"));
+
 //? Schema para búsqueda general
 export const searchSchema = z.object({
   search: z.string().min(1, "El término de búsqueda es requerido").optional(),
@@ -63,6 +69,120 @@ export const dateRangeSchema = z.object({
 //? Schema para estados de vigencia
 export const vigenciaSchema = z.object({
   vigente: z.enum(["S", "N"]).optional(),
+});
+
+//TODO ===== ESQUEMAS BASE REUTILIZABLES =====
+
+//? Esquemas para campos de ID (números enteros positivos)
+export const esquemaNumeroRequerido = (min: number = 1, max: number = 100000) =>
+  z.number().int().min(min).max(max);
+export const esquemaNumeroOpcional = (min: number = 1, max: number = 100000) =>
+  z.number().int().min(min).max(max).optional();
+export const esquemaIdRequerido = z.number().int().positive();
+export const esquemaIdOpcional = z.number().int().positive().optional();
+export const esquemaDecimalOpcional = (
+  min: number = 0,
+  max: number = 999999.999
+) => z.number().min(min).max(max).optional();
+export const esquemaDecimalRequerido = (
+  min: number = 0,
+  max: number = 999999.999
+) => z.number().min(min).max(max);
+
+//? Esquemas para campos de texto
+export const esquemaTextoRequerido = (
+  minLength: number = 1,
+  maxLength: number = 255
+) =>
+  z
+    .string()
+    .min(minLength, `Debe tener al menos ${minLength} caracteres`)
+    .max(maxLength, `No puede exceder ${maxLength} caracteres`);
+
+export const esquemaTextoOpcional = (maxLength: number = 255) =>
+  z
+    .string()
+    .max(maxLength, `No puede exceder ${maxLength} caracteres`)
+    .optional();
+
+//? Esquemas para campos booleanos
+export const esquemaBooleanRequerido = z.boolean();
+export const esquemaBooleanOpcional = z.boolean().optional();
+
+//? Esquemas para fechas
+export const esquemaFechaRequerida = z.date();
+export const esquemaFechaOpcional = z.date().optional();
+
+//? Esquemas para campos de usuario (auditoría)
+export const esquemaUsuarioCreacion = z
+  .number()
+  .int()
+  .positive("ID de usuario de creación debe ser positivo");
+export const esquemaUsuarioActualizacion = z
+  .number()
+  .int()
+  .positive("ID de usuario de actualización debe ser positivo")
+  .optional();
+
+//? Esquemas para campos de estado/activo
+export const esquemaEstadoRequerido = z.boolean().default(true);
+export const esquemaEstadoOpcional = z.boolean().optional();
+export const esquemaActivoRequerido = z.boolean().default(true);
+export const esquemaActivoOpcional = z.boolean().optional();
+
+//? Esquemas para transformaciones de query parameters (string a number/boolean)
+export const esquemaQueryId = z
+  .string()
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null || val === "") return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) || num <= 0 ? undefined : num;
+  })
+  .pipe(z.number().int().positive().optional());
+
+export const esquemaQueryBoolean = z
+  .string()
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null || val === "") return undefined;
+    return val === "true" || val === "1";
+  })
+  .pipe(z.boolean().optional());
+
+export const esquemaQueryTexto = z.string().optional();
+
+export const esquemaQueryNumeroRequerido = z.number().int().positive();
+export const esquemaQueryNumeroOpcional = z
+  .number()
+  .int()
+  .positive()
+  .optional();
+
+//? Esquemas para paginación mejorados
+export const esquemaPaginaQuery = z
+  .string()
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null || val === "") return 1;
+    const num = parseInt(val, 10);
+    return isNaN(num) || num < 1 ? 1 : num;
+  })
+  .pipe(z.number().int().min(1));
+
+export const esquemaLimiteQuery = z
+  .string()
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null || val === "") return 10;
+    const num = parseInt(val, 10);
+    return isNaN(num) || num < 1 ? 10 : Math.min(num, 100);
+  })
+  .pipe(z.number().int().min(1).max(100));
+
+//? Esquema para el body de DELETE con auditoría
+export const esquemaDeleteConUsuario = z.object({
+  id_ct_usuario_up: esquemaUsuarioCreacion,
 });
 
 //TODO ===== TIPOS INFERIDOS =====

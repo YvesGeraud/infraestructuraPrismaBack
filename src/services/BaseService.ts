@@ -14,6 +14,7 @@ export interface BaseServiceConfig {
   tableName: string;
   defaultOrderBy: Record<string, "asc" | "desc">;
   relations?: Record<string, any>;
+  campoActivo?: string; // Campo que indica si el registro está activo (por defecto 'activo')
 }
 
 /**
@@ -53,7 +54,17 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       const skip = (pagina - 1) * limite;
 
       // Construir clauses específicos del modelo
-      const where = this.construirWhereClause(filters);
+      const baseWhere = this.construirWhereClause(filters);
+
+      // 🔍 FILTRO AUTOMÁTICO: Solo mostrar registros activos por defecto
+      // A menos que se especifique explícitamente incluir inactivos
+      const campoActivo = this.config.campoActivo || "activo";
+      const where = {
+        ...baseWhere,
+        // Solo agregar filtro de activo si no se especifica en los filtros
+        ...(!(filters as any)?.incluirInactivos && { [campoActivo]: true }),
+      };
+
       const include = this.configurarIncludes(filters);
 
       const [records, total] = await Promise.all([
@@ -93,8 +104,13 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     try {
       const include = this.configurarIncludes(filters);
 
+      const campoActivo = this.config.campoActivo || "activo";
       const record = await this.model.findUnique({
-        where: { [this.getPrimaryKeyField()]: id },
+        where: {
+          [this.getPrimaryKeyField()]: id,
+          // 🔍 FILTRO AUTOMÁTICO: Solo buscar registros activos por defecto
+          ...(!(filters as any)?.incluirInactivos && { [campoActivo]: true }),
+        },
         include,
       });
 
@@ -102,6 +118,65 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     } catch (error) {
       console.error(`Error al obtener ${this.config.tableName} por ID:`, error);
       throw new Error(`Error al obtener registro de ${this.config.tableName}`);
+    }
+  }
+
+  /**
+   * 📊 Obtener TODOS los registros sin paginación
+   * Útil para reportes, exportaciones, etc.
+   * ⚠️ PRECAUCIÓN: Puede retornar muchos registros
+   */
+  async obtenerTodosSinPaginacion(
+    filters?: Partial<FilterInput>
+  ): Promise<T[]> {
+    try {
+      const where = this.construirWhereClause(filters as FilterInput);
+      const include = this.configurarIncludes(filters as FilterInput);
+
+      // 🔍 FILTRO AUTOMÁTICO: Solo mostrar registros activos por defecto
+      const campoActivo = this.config.campoActivo || "activo";
+      const whereCompleto = {
+        ...where,
+        ...(!(filters as any)?.incluirInactivos && { [campoActivo]: true }),
+      };
+
+      const records = await this.model.findMany({
+        where: whereCompleto,
+        include,
+        orderBy: this.config.defaultOrderBy,
+        // Sin take/skip = trae TODOS los registros
+      });
+
+      return records;
+    } catch (error) {
+      console.error(
+        `Error al obtener todos los ${this.config.tableName}:`,
+        error
+      );
+      throw new Error(`Error al obtener registros de ${this.config.tableName}`);
+    }
+  }
+
+  /**
+   * 🔢 Contar registros que cumplan con los filtros
+   * Útil para decidir si usar streaming o carga normal
+   */
+  async contarRegistros(filters?: Partial<FilterInput>): Promise<number> {
+    try {
+      const where = this.construirWhereClause(filters as FilterInput);
+
+      // 🔍 FILTRO AUTOMÁTICO: Solo contar registros activos por defecto
+      const campoActivo = this.config.campoActivo || "activo";
+      const whereCompleto = {
+        ...where,
+        ...(!(filters as any)?.incluirInactivos && { [campoActivo]: true }),
+      };
+
+      const count = await this.model.count({ where: whereCompleto });
+      return count;
+    } catch (error) {
+      console.error(`Error al contar ${this.config.tableName}:`, error);
+      throw new Error(`Error al contar registros de ${this.config.tableName}`);
     }
   }
 
@@ -126,7 +201,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       return record;
     } catch (error) {
       console.error(`Error al crear ${this.config.tableName}:`, error);
-      throw error; // Re-lanzar para que el controlador lo maneje
+      throw this.manejarErrorPrisma(error);
     }
   }
 
@@ -151,7 +226,11 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 
       const record = await this.model.update({
         where: { [this.getPrimaryKeyField()]: id },
-        data: datos,
+        data: {
+          ...datos,
+          // 🕐 Actualizar automáticamente updatedAt en cada UPDATE
+          fecha_up: new Date(),
+        },
         include,
       });
 
@@ -161,14 +240,16 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       return record;
     } catch (error) {
       console.error(`Error al actualizar ${this.config.tableName}:`, error);
-      throw error; // Re-lanzar para que el controlador lo maneje
+      throw this.manejarErrorPrisma(error);
     }
   }
 
   /**
    * 🗑️ Eliminar un registro
+   * @param id - ID del registro a eliminar
+   * @param idUsuarioUp - ID del usuario que ejecuta la eliminación (opcional)
    */
-  async eliminar(id: number): Promise<void> {
+  async eliminar(id: number, idUsuarioUp?: number): Promise<void> {
     try {
       // Hook para validaciones personalizadas antes de eliminar
       await this.antesDeEliminar(id);
@@ -181,14 +262,34 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
         throw new Error(`${this.config.tableName} no encontrado`);
       }
 
-      await this.model.delete({
+      // 🚫 SOFT DELETE: Actualizar estado a false en lugar de eliminar físicamente
+      // Esto preserva los datos para auditoría y evita problemas de integridad referencial
+      const campoActivo = this.config.campoActivo || "activo";
+      const updateData: any = {
+        [campoActivo]: false,
+        // Si existe campo de actualización, también lo actualizamos
+        ...(existingRecord.hasOwnProperty("fecha_up") && {
+          fecha_up: new Date(),
+        }),
+        // Si se proporciona el usuario que elimina, registrarlo
+        ...(idUsuarioUp &&
+          existingRecord.hasOwnProperty("id_ct_usuario_up") && {
+            id_ct_usuario_up: idUsuarioUp,
+          }),
+      };
+
+      await this.model.update({
         where: { [this.getPrimaryKeyField()]: id },
+        data: updateData,
       });
 
-      // Hook para acciones después de eliminar
+      // Hook para acciones después de eliminar (soft delete)
       await this.despuesDeEliminar(existingRecord);
     } catch (error) {
-      console.error(`Error al eliminar ${this.config.tableName}:`, error);
+      console.error(
+        `Error al eliminar (soft delete) ${this.config.tableName}:`,
+        error
+      );
       throw error; // Re-lanzar para que el controlador lo maneje
     }
   }
@@ -309,4 +410,61 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     );
     return `id_${tableName}`;
   }
+
+  /**
+   * 🛡️ Manejar errores de Prisma y convertirlos en mensajes amigables
+   */
+  protected manejarErrorPrisma(error: any): Error {
+    // Error de constraint UNIQUE violado
+    if (error.code === "P2002") {
+      const campo = error.meta?.target?.[0] || "campo";
+      return new Error(
+        `Ya existe un registro con ese ${campo}. Por favor, use un valor diferente.`
+      );
+    }
+
+    // Error de registro no encontrado
+    if (error.code === "P2025") {
+      return new Error(`${this.config.tableName} no encontrado`);
+    }
+
+    // Error de foreign key constraint
+    if (error.code === "P2003") {
+      return new Error(
+        `No se puede realizar la operación. Existe una referencia a otro registro.`
+      );
+    }
+
+    // Error de constraint requerido
+    if (error.code === "P2011") {
+      const campo = error.meta?.constraint || "campo requerido";
+      return new Error(`El campo ${campo} es obligatorio`);
+    }
+
+    // Para otros errores, devolver el error original
+    return error;
+  }
 }
+
+/*
+🔄 SOFT DELETE IMPLEMENTADO:
+
+✅ Cambios realizados:
+1. 🚫 método eliminar() - Ahora hace UPDATE activo=false en lugar de DELETE físico
+2. 🔍 método obtenerTodos() - Solo muestra registros activos por defecto
+3. 🔍 método obtenerPorId() - Solo busca registros activos por defecto
+4. 🛡️ manejarErrorPrisma() - Convierte errores de BD en mensajes amigables
+5. 🕐 método actualizar() - Actualiza automáticamente updatedAt en cada UPDATE
+
+📋 Beneficios:
+- ✅ Preserva datos para auditoría
+- ✅ Evita problemas de integridad referencial
+- ✅ Permite recuperación de datos "eliminados"
+- ✅ Mantiene historial completo del sistema
+
+🔧 Para incluir registros inactivos:
+- Pasar { incluirInactivos: true } en los filtros
+- Ejemplo: obtenerTodos({}, { incluirInactivos: true })
+
+⚠️  Nota: Todos los modelos deben tener campo 'activo' (Boolean)
+*/

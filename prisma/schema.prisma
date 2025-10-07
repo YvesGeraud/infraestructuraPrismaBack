@@ -7,987 +7,226 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Ct_accion {
-  id_accion              Int                      @id @default(autoincrement())
-  nombre_accion          String?                  @db.VarChar(250)
-  descripcion            String?                  @db.VarChar(250)
-
-  // Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-  dt_bitacora            Dt_bitacora[]
-
-  @@map("ct_accion")
-}
-
-model Ct_codigo_postal {
-  id_codigo_postal Int     @id @default(autoincrement())
-  codigo_postal    String? @db.VarChar(10)
-  asentamiento     String? @db.VarChar(150)
-  id_localidad     Int?
-
-  // Relaciones
-
-  ct_localidad      Ct_localidad?       @relation(fields: [id_localidad], references: [id_localidad])
-  @@map("ct_codigo_postal")
-}
-
-model Ct_entidad {
-  id_entidad   Int            @id @default(autoincrement())
-  nombre       String?        @unique(map: "nombre") @db.VarChar(100)
-  abreviatura  String?        @db.VarChar(10)
-
-  // Relaciones
-  ct_municipio      Ct_municipio[]
-
-  @@map("ct_entidad")
-}
-
-model Ct_infraestructura_adecuacion_discapacidad {
-  id_adecuacion Int    @id @default(autoincrement())
-  descripcion   String @db.VarChar(100)
-
-  @@map("ct_infraestructura_adecuacion_discapacidad")
-}
-
-model Ct_infraestructura_almacenamiento_agua {
-  id_almacenamiento                             Int                                             @id @default(autoincrement())
-  descripcion                                   String                                          @db.VarChar(100)
-
-  // Relaciones
-  rl_infraestructura_unidad_almacenamiento_agua Rl_infraestructura_unidad_almacenamiento_agua[]
-
-  @@map("ct_infraestructura_almacenamiento_agua")
-}
-
-model Ct_infraestructura_anexo {
-  id_anexo Int       @id @default(autoincrement())
-  nombre   String    @db.VarChar(255)
-  estado   Boolean   @default(true)
-  fecha_in DateTime  @default(now()) @db.Timestamp(0)
-  fecha_at DateTime? @db.Timestamp(0)
-
-  @@map("ct_infraestructura_anexo")
-}
-
-model Ct_infraestructura_antiguedad_inmueble {
-  id_antiguedad             Int                         @id
-  descripcion               String                      @db.VarChar(50)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_antiguedad_inmueble")
-}
-
-model Ct_infraestructura_area {
-  id_area  Int       @id @default(autoincrement())
-  nombre   String    @db.VarChar(255)
-  estado   Boolean   @default(true)
-  fecha_in DateTime  @default(now()) @db.Timestamp(0)
-  fecha_at DateTime? @db.Timestamp(0)
-
-  @@map("ct_infraestructura_area")
-}
-
-model Ct_infraestructura_area_de_servicio {
-  id_servicio Int     @id @default(autoincrement())
-  descripcion String? @db.VarChar(100)
-
-  @@map("ct_infraestructura_area_de_servicio")
-}
-
-model Ct_infraestructura_construccion_inmueble {
-  id_construccion                                 Int                                               @id @default(autoincrement())
-  descripcion                                     String?                                           @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_construccion_inmueble Rl_infraestructura_unidad_construccion_inmueble[]
-
-  @@map("ct_infraestructura_construccion_inmueble")
-}
-
-model Ct_infraestructura_departamento {
-  id_departamento Int       @id @default(autoincrement())
-  nombre          String    @db.VarChar(255)
-  estado          Boolean   @default(true)
-  fecha_in        DateTime  @default(now()) @db.Timestamp(0)
-  fecha_at        DateTime? @db.Timestamp(0)
-
-  @@map("ct_infraestructura_departamento")
-}
-
-model Ct_infraestructura_dimension_terreno {
-  id_dimension              Int                         @id @default(autoincrement())
-  descripcion               String                      @db.VarChar(100)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_dimension_terreno")
-}
-
-model Ct_infraestructura_direccion {
-  id_direccion Int       @id @default(autoincrement())
-  nombre       String    @db.VarChar(255)
-  estado       Boolean   @default(true)
-  fecha_in     DateTime  @default(now()) @db.Timestamp(0)
-  fecha_at     DateTime? @db.Timestamp(0)
-
-  @@map("ct_infraestructura_direccion")
-}
-
-model Ct_infraestructura_edificio {
-  id_edificio                          Int                                    @id @default(autoincrement())
-  id_unidad                            Int
-  num_niveles                          Int
-  id_material_paredes                  Int?
-  material_paredes_otro                String?                                @db.VarChar(255)
-  id_material_techo                    Int?
-  material_techo_otro                  String?                                @db.VarChar(255)
-  id_material_pisos                    Int?
-  material_pisos_otro                  String?                                @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad            Ct_infraestructura_unidad              @relation(fields: [id_unidad], references: [id_unidad])
-  rl_infraestructura_edificio_problema Rl_infraestructura_edificio_problema[]
-
-  @@map("ct_infraestructura_edificio")
-}
-
-model Ct_infraestructura_equipo_discapacidad {
-  id_equipo                                     Int                                             @id @default(autoincrement())
-  descripcion                                   String                                          @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_equipo_discapacidad Rl_infraestructura_unidad_equipo_discapacidad[]
-
-  @@map("ct_infraestructura_equipo_discapacidad")
-}
-
-model Ct_infraestructura_espacio_educativo {
-  id_espacio                                    Int                                             @id @default(autoincrement())
-  descripcion                                   String                                          @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_espacios_educativos Rl_infraestructura_unidad_espacios_educativos[]
-
-  @@map("ct_infraestructura_espacio_educativo")
-}
-
-model Ct_infraestructura_espacio_inmueble {
-  id_espacio                                 Int                                          @id @default(autoincrement())
-  descripcion                                String                                       @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_espacio_inmueble Rl_infraestructura_unidad_espacio_inmueble[]
-
-  @@map("ct_infraestructura_espacio_inmueble")
-}
-
-model Ct_infraestructura_fin_inmueble {
-  id_fin                                 Int                                      @id @default(autoincrement())
-  descripcion                            String                                   @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_fin_inmueble Rl_infraestructura_unidad_fin_inmueble[]
-
-  @@map("ct_infraestructura_fin_inmueble")
-}
-
-model Ct_infraestructura_frecuencia_limpieza {
-  id_frecuencia             Int                         @id @default(autoincrement())
-  descripcion               String                      @db.VarChar(100)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_frecuencia_limpieza")
-}
-
-model Ct_infraestructura_jefe_sector {
-  id_jefe_sector  Int                   @id @default(autoincrement())
-  nombre_unidad   String?               @db.VarChar(255)
-  cct             String?               @db.VarChar(11)
-  calle           String?               @db.VarChar(255)
-  numero_exterior String?               @db.VarChar(255)
-  id_localidad    Int?
-  colonia         String?               @db.VarChar(255)
-  codigo_postal   Int?
-  longitud        Float?                @db.Float
-  latitud         Float?                @db.Float
-  vigente         Int?                  @db.TinyInt
-  id_rupet_info   Int?
-
-  //Relaciones
-  ct_localidad    Ct_localidad?         @relation(fields: [id_localidad], references: [id_localidad])
-
-  @@map("ct_infraestructura_jefe_sector")
-}
-
-model Ct_infraestructura_material_pared {
-  id_material_pared Int    @id @default(autoincrement())
-  descripcion       String @db.VarChar(100)
-
-  @@map("ct_infraestructura_material_pared")
-}
-
-model Ct_infraestructura_material_piso {
-  id_material_piso Int    @id @default(autoincrement())
-  descripcion      String @db.VarChar(100)
-
-  @@map("ct_infraestructura_material_piso")
-}
-
-model Ct_infraestructura_material_techo {
-  id_material_techo Int    @id @default(autoincrement())
-  descripcion       String @db.VarChar(100)
-
-  @@map("ct_infraestructura_material_techo")
-}
-
-model Ct_infraestructura_nivel_educativo {
-  id_nivel                        Int                               @id @default(autoincrement())
-  descripcion                     String                            @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_nivel Rl_infraestructura_unidad_nivel[]
-
-  @@map("ct_infraestructura_nivel_educativo")
-}
-
-model Ct_infraestructura_obra_mantenimiento {
-  id_obra                                      Int                                            @id @default(autoincrement())
-  descripcion                                  String                                         @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_obra_mantenimiento Rl_infraestructura_unidad_obra_mantenimiento[]
-
-  @@map("ct_infraestructura_obra_mantenimiento")
-}
-
-model Ct_infraestructura_pauta_de_seguridad {
-  id_pauta    Int    @id @default(autoincrement())
-  descripcion String @db.VarChar(100)
-
-  @@map("ct_infraestructura_pauta_de_seguridad")
-}
-
-model Ct_infraestructura_problema_edificio {
-  id_problema                          Int                                    @id @default(autoincrement())
-  descripcion                          String                                 @db.VarChar(255)
-
-  //Relaciones
-  rl_infraestructura_edificio_problema Rl_infraestructura_edificio_problema[]
-
-  @@map("ct_infraestructura_problema_edificio")
-}
-
-model Ct_infraestructura_razon_no_construccion {
-  id_razon                  Int                         @id @default(autoincrement())
-  descripcion               String                      @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_razon_no_construccion")
-}
-
-model Ct_infraestructura_senalamiento_discapacidad {
-  id_senalamiento Int    @id @default(autoincrement())
-  descripcion     String @db.VarChar(100)
-
-  @@map("ct_infraestructura_senalamiento_discapacidad")
-}
-
-model Ct_infraestructura_sostenimiento {
-  id_sostenimiento          Int                         @id @default(autoincrement())
-  sostenimiento             String                      @unique @db.VarChar(20)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_sostenimiento")
-}
-
-model Ct_infraestructura_suministro_agua {
-  id_suministro_agua                        Int                                         @id @default(autoincrement())
-  descripcion                               String                                      @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_suministro_agua Rl_infraestructura_unidad_suministro_agua[]
-
-  @@map("ct_infraestructura_suministro_agua")
-}
-
-model Ct_infraestructura_suministro_energia {
-  id_suministro_energia     Int                         @id @default(autoincrement())
-  descripcion               String                      @db.VarChar(100)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_suministro_energia")
-}
-
-model Ct_infraestructura_suministro_gas {
-  id_suministro_gas         Int                         @id @default(autoincrement())
-  descripcion               String                      @db.VarChar(100)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_suministro_gas")
-}
-
-model Ct_infraestructura_supervisor {
-  id_supervisor   Int                   @id @default(autoincrement())
-  nombre_unidad   String?               @db.VarChar(255)
-  cct             String?               @db.VarChar(11)
-  calle           String?               @db.VarChar(255)
-  numero_exterior String?               @db.VarChar(255)
-  id_localidad    Int?
-  colonia         String?               @db.VarChar(255)
-  codigo_postal   Int?
-  longitud        Float?                @db.Float
-  latitud         Float?                @db.Float
-  vigente         Int?                  @db.TinyInt
-  id_rupet_info   Int?       
-  
-  //Relaciones
-  ct_localidad    Ct_localidad?         @relation(fields: [id_localidad], references: [id_localidad])
-
-  @@map("ct_infraestructura_supervisor")
-}
-
-model Ct_infraestructura_tipo_construccion {
-  id_construccion                        Int                                      @id @default(autoincrement())
-  descripcion                            String                                   @db.VarChar(100)
-
-  //Relaciones
-  rl_infraestructura_unidad_construccion Rl_infraestructura_unidad_construccion[]
-
-  @@map("ct_infraestructura_tipo_construccion")
-}
-
-model Ct_infraestructura_tipo_descarga {
-  id_tipo_descarga          Int                         @id @default(autoincrement())
-  descripcion               String                      @db.VarChar(100)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_tipo_descarga")
-}
-
-model Ct_infraestructura_tipo_escuela {
-  id_tipo_escuela           Int                         @id @default(autoincrement())
-  tipo_escuela              String                      @db.VarChar(85)
-  clave                     String                      @db.VarChar(2)
-
-  //Relaciones
-  ct_infraestructura_unidad Ct_infraestructura_unidad[]
-
-  @@map("ct_infraestructura_tipo_escuela")
-}
-
-model Ct_infraestructura_tipo_instancia {
-  id_tipo                      Int                            @id @default(autoincrement())
-  descripcion                  String?                        @db.VarChar(50)
-
-  //Relaciones
-  rl_infraestructura_jerarquia Rl_infraestructura_jerarquia[]
-
-  @@map("ct_infraestructura_tipo_instancia")
-}
-
-model Ct_infraestructura_unidad {
-  id_unidad                                       Int                                               @id @default(autoincrement())
-  id_escuelaPlantel                               Int                                               @default(0)
-  id_tipo_escuela                                 Int                                               @default(0)
-  cct                                             String                                            @db.VarChar(11)
-  nombre_unidad                                   String                                            @db.VarChar(255)
-  calle                                           String?                                           @db.VarChar(255)
-  numero_exterior                                 String?                                           @db.VarChar(10)
-  numero_interior                                 String?                                           @db.VarChar(10)
-  id_localidad                                    Int?
-  colonia                                         String?                                           @db.VarChar(255)
-  codigo_postal                                   Int?
-  longitud                                        Float?                                            @db.Float
-  latitud                                         Float?                                            @db.Float
-  id_sostenimiento                                Int?
-  vigente                                         Int?                                              @db.TinyInt
-  id_rupet_info                                   Int?
-  num_centros_trabajo                             Int?                                              @default(0)
-  construido_para_uso_educativo                   Boolean?                                          @default(false)
-  uso_temporal_educacion_basica                   Boolean?                                          @default(false)
-  id_razon_no_construccion                        Int?
-  razon_no_construccion_otro                      String?                                           @db.VarChar(255)
-  id_antiguedad_inmueble                          Int?
-  id_dimension_terreno                            Int?
-  num_edificios_educacion_basica                  Int?                                              @default(0)
-  porcentaje_ocupacion_edificios                  Decimal?                                          @db.Decimal(5, 2)
-  servicio_agua_regular                           Boolean?                                          @default(false)
-  agua_potable_frecuente                          Boolean?                                          @default(false)
-  id_suministro_energia                           Int?
-  id_suministro_gas                               Int?
-  suministro_gas_otro                             String?                                           @db.VarChar(255)
-  id_tipo_descarga                                Int?
-  tipo_descarga_otro                              String?                                           @db.VarChar(255)
-  separacion_aguas                                Boolean?                                          @default(false)
-  banios_hombres                                  Int?                                              @default(0)
-  banios_mujeres                                  Int?                                              @default(0)
-  banios_mixtos                                   Int?                                              @default(0)
-  tazas_sanitarias_uso                            Int?                                              @default(0)
-  tazas_sanitarias_fuera_uso                      Int?                                              @default(0)
-  mingitorios_uso                                 Int?                                              @default(0)
-  mingitorios_fuera_uso                           Int?                                              @default(0)
-  letrinas_uso                                    Int?                                              @default(0)
-  letrinas_fuera_uso                              Int?                                              @default(0)
-  tazas_hombres                                   Int?                                              @default(0)
-  tazas_mujeres                                   Int?                                              @default(0)
-  tazas_mixtos                                    Int?                                              @default(0)
-  tazas_alum                                      Int?                                              @default(0)
-  tazas_docadm                                    Int?                                              @default(0)
-  tazas_ambos                                     Int?                                              @default(0)
-  mingitorios_alum                                Int?                                              @default(0)
-  mingitorios_docadm                              Int?                                              @default(0)
-  mingitorios_ambos                               Int?                                              @default(0)
-  letrinas_alum                                   Int?                                              @default(0)
-  letrinas_docadm                                 Int?                                              @default(0)
-  letrinas_ambos                                  Int?                                              @default(0)
-  lavamanos_hombres_uso                           Int?                                              @default(0)
-  lavamanos_hombres_fuera_uso                     Int?                                              @default(0)
-  lavamanos_mujeres_uso                           Int?                                              @default(0)
-  lavamanos_mujeres_fuera_uso                     Int?                                              @default(0)
-  lavamanos_mixtos_uso                            Int?                                              @default(0)
-  lavamanos_mixtos_fuera_uso                      Int?                                              @default(0)
-  bebederos_uso                                   Int?                                              @default(0)
-  bebederos_fuera_uso                             Int?                                              @default(0)
-  area_mantenimiento                              Boolean?                                          @default(false)
-  rehabilitacion_5_anios                          Boolean?                                          @default(false)
-  reconversion_5_anios                            Boolean?                                          @default(false)
-  id_frecuencia_limpieza                          Int?
-  programa_proteccion_civil                       Boolean?                                          @default(false)
-  alarmas_existentes                              Int?                                              @default(0)
-  alarmas_uso                                     Int?                                              @default(0)
-  botiquines_existentes                           Int?                                              @default(0)
-  botiquines_uso                                  Int?                                              @default(0)
-  extintores_existentes                           Int?                                              @default(0)
-  extintores_uso                                  Int?                                              @default(0)
-  senales_emergencia_existentes                   Int?                                              @default(0)
-  senales_emergencia_uso                          Int?                                              @default(0)
-  salidas_emergencia_existentes                   Int?                                              @default(0)
-  salidas_emergencia_uso                          Int?                                              @default(0)
-  zonas_seguridad_existentes                      Int?                                              @default(0)
-  zonas_seguridad_uso                             Int?                                              @default(0)
-  estacionamiento                                 Boolean?                                          @default(false)
-  estacionamiento_estudiantes                     Int?                                              @default(0)
-  estacionamiento_docentes                        Int?                                              @default(0)
-  estacionamiento_admin                           Int?                                              @default(0)
-  estacionamiento_discapacidad                    Int?                                              @default(0)
-  estacionamiento_otros                           Int?                                              @default(0)
-  infraestructura_discapacidad                    Boolean?                                          @default(false)
-  aulas_accesibles                                Boolean?                                          @default(false)
-  biblioteca_accesible                            Boolean?                                          @default(false)
-  laboratorios_accesibles                         Boolean?                                          @default(false)
-  talleres_accesibles                             Boolean?                                          @default(false)
-  cafeteria_accesible                             Boolean?                                          @default(false)
-  sanitarios_accesibles                           Boolean?                                          @default(false)
-  bebederos_accesibles                            Boolean?                                          @default(false)
-  otras_areas_accesibles                          Boolean?                                          @default(false)
-  otras_areas_accesibles_desc                     String?                                           @db.VarChar(255)
-  banios_discap_hombres_uso                       Int?                                              @default(0)
-  banios_discap_mujeres_uso                       Int?                                              @default(0)
-  banios_discap_mixtos_uso                        Int?                                              @default(0)
-  banios_discap_hombres_fuera_uso                 Int?                                              @default(0)
-  banios_discap_mujeres_fuera_uso                 Int?                                              @default(0)
-  banios_discap_mixtos_fuera_uso                  Int?                                              @default(0)
-  senializacion_discapacidad                      Boolean?                                          @default(false)
-  rampas                                          Boolean?                                          @default(false)
-  pavimento_tactil                                Boolean?                                          @default(false)
-  barandales_pasamanos                            Boolean?                                          @default(false)
-  area_braille                                    Boolean?                                          @default(false)
-  elevadores_plataformas                          Boolean?                                          @default(false)
-  tira_antiderrapante                             Boolean?                                          @default(false)
-  aula_especializada_discapacidad                 Boolean?                                          @default(false)
-  seniales_mundial_ciegos                         Int?                                              @default(0)
-  seniales_mundial_sordos                         Int?                                              @default(0)
-  seniales_accesibilidad_para_perros_guia         Int?                                              @default(0)
-  seniales_telefono_texto_sordos                  Int?                                              @default(0)
-  num_software_discapacidad                       Int?                                              @default(0)
-  claves_centros_trabajo                          String?                                           @db.Text
-
-  //Relaciones
-  ct_infraestructura_edificio                     Ct_infraestructura_edificio[]
-  rl_infraestructura_unidad_almacenamiento_agua   Rl_infraestructura_unidad_almacenamiento_agua[]
-  rl_infraestructura_unidad_construccion          Rl_infraestructura_unidad_construccion[]
-  rl_infraestructura_unidad_construccion_inmueble Rl_infraestructura_unidad_construccion_inmueble[]
-  rl_infraestructura_unidad_equipo_discapacidad   Rl_infraestructura_unidad_equipo_discapacidad[]
-  rl_infraestructura_unidad_espacio_inmueble      Rl_infraestructura_unidad_espacio_inmueble[]
-  rl_infraestructura_unidad_espacios_educativos   Rl_infraestructura_unidad_espacios_educativos[]
-  rl_infraestructura_unidad_fin_inmueble          Rl_infraestructura_unidad_fin_inmueble[]
-  rl_infraestructura_unidad_nivel                 Rl_infraestructura_unidad_nivel[]
-  rl_infraestructura_unidad_obra_mantenimiento    Rl_infraestructura_unidad_obra_mantenimiento[]
-  rl_infraestructura_unidad_suministro_agua       Rl_infraestructura_unidad_suministro_agua[]
-
-  ct_infraestructura_tipo_escuela                 Ct_infraestructura_tipo_escuela                   @relation(fields: [id_tipo_escuela], references: [id_tipo_escuela])
-  ct_infraestructura_frecuencia_limpieza          Ct_infraestructura_frecuencia_limpieza?           @relation(fields: [id_frecuencia_limpieza], references: [id_frecuencia])
-  ct_localidad                                    Ct_localidad?                                     @relation(fields: [id_localidad], references: [id_localidad])
-  ct_infraestructura_sostenimiento                Ct_infraestructura_sostenimiento?                 @relation(fields: [id_sostenimiento], references: [id_sostenimiento])
-  ct_infraestructura_razon_no_construccion        Ct_infraestructura_razon_no_construccion?         @relation(fields: [id_razon_no_construccion], references: [id_razon])
-  ct_infraestructura_antiguedad_inmueble          Ct_infraestructura_antiguedad_inmueble?           @relation(fields: [id_antiguedad_inmueble], references: [id_antiguedad])
-  ct_infraestructura_dimension_terreno            Ct_infraestructura_dimension_terreno?             @relation(fields: [id_dimension_terreno], references: [id_dimension])
-  ct_infraestructura_suministro_energia           Ct_infraestructura_suministro_energia?            @relation(fields: [id_suministro_energia], references: [id_suministro_energia])
-  ct_infraestructura_suministro_gas               Ct_infraestructura_suministro_gas?                @relation(fields: [id_suministro_gas], references: [id_suministro_gas])
-  ct_infraestructura_tipo_descarga                Ct_infraestructura_tipo_descarga?                 @relation(fields: [id_tipo_descarga], references: [id_tipo_descarga])
-
-  @@map("ct_infraestructura_unidad")
-}
-
-model Ct_inventario_alta {
-  id_alta     Int     @id @default(autoincrement())
-  descripcion String? @db.VarChar(50)
-
-  @@map("ct_inventario_alta")
-}
-
-model Ct_inventario_articulo {
-  id_articulo                  Int                           @id @default(autoincrement())
-  id_jerarquia                 Int?
-  folio                        String?                       @db.VarChar(255)
-  folio_nuevo                  String?                       @db.VarChar(255)
-  no_serie                     String?                       @db.VarChar(255)
-  estatus                      Int?                          @db.TinyInt
-  observaciones                String?                       @db.VarChar(255)
-  modelo                       String?                       @db.VarChar(250)
-  fecha_alta                   DateTime?                     @db.DateTime(0)
-  fecha_baja                   DateTime?                     @db.DateTime(0)
-  fecha_registro               DateTime?                     @db.DateTime(0)
-  id_subclase                  Int?
-  id_marca                     Int?
-  id_material                  Int?
-  id_color                     Int?
-  id_proveedor                 Int?
-  id_accion                    Int?
-  id_estado_fisico             Int?
-  id_consecutivo               Int?
-  cct                          String?                       @db.VarChar(255)
-
-  //Relaciones
-  ct_inventario_estado_fisico  Ct_inventario_estado_fisico?  @relation(fields: [id_estado_fisico], references: [id_estado_fisico])
-  rl_infraestructura_jerarquia Rl_infraestructura_jerarquia? @relation(fields: [id_jerarquia], references: [id_jerarquia])
-  ct_inventario_consecutivo    Ct_inventario_consecutivo?    @relation(fields: [id_consecutivo], references: [id_consecutivo])
-  ct_accion                    Ct_accion?                    @relation(fields: [id_accion], references: [id_accion])
-  ct_inventario_color          Ct_inventario_color?          @relation(fields: [id_color], references: [id_color])
-  ct_inventario_material       Ct_inventario_material?       @relation(fields: [id_material], references: [id_material])
-  ct_inventario_proveedor      Ct_inventario_proveedor?      @relation(fields: [id_proveedor], references: [id_proveedor])
-  ct_inventario_subclase       Ct_inventario_subclase?       @relation(fields: [id_subclase], references: [id_subclase])
-  ct_inventario_marca          Ct_inventario_marca?          @relation(fields: [id_marca], references: [id_marca])
-  dt_inventario_bajas          Dt_inventario_bajas[]
-
-  @@map("ct_inventario_articulo")
-}
-
-model Ct_inventario_baja {
-  id_baja     Int     @id @default(autoincrement())
-  descripcion String? @db.VarChar(255)
-
-  @@map("ct_inventario_baja")
-}
-
-model Ct_inventario_clase {
-  id_clase               Int                      @id @default(autoincrement())
-  descripcion            String                   @db.VarChar(250)
-
-  //Relaciones
-  ct_inventario_subclase Ct_inventario_subclase[]
-
-  @@map("ct_inventario_clase")
-}
-
-model Ct_inventario_clasificacion {
-  id_clasificacion     Int    @id @default(autoincrement())
-  nombre_clasificacion String @db.VarChar(255)
-
-  @@map("ct_inventario_clasificacion")
-}
-
-model Ct_inventario_color {
-  id_color               Int                      @id @default(autoincrement())
-  descripcion            String                   @unique(map: "unique_nombre_color") @db.VarChar(255)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-
-  @@map("ct_inventario_color")
-}
-
-model Ct_inventario_consecutivo {
-  id_consecutivo         Int                      @id @default(autoincrement())
-  id_subclase            Int
-  no_consecutivo         Int
-  descripcion            String                   @db.VarChar(255)
-  tipo_bien              String                   @default("0") @db.VarChar(1)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-
-  @@map("ct_inventario_consecutivo")
-}
-
-model Ct_inventario_estado_fisico {
-  id_estado_fisico       Int                      @id @default(autoincrement())
-  descripcion            String                   @unique(map: "unique_descripcion") @db.VarChar(50)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-
-  @@map("ct_inventario_estado_fisico")
-}
-
-model Ct_inventario_marca {
-  id_marca               Int                      @id @default(autoincrement())
-  descripcion            String                   @unique(map: "unique_descripcion") @db.VarChar(255)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-
-  @@map("ct_inventario_marca")
-}
-
-model Ct_inventario_material {
-  id_material            Int                      @id @default(autoincrement())
-  descripcion            String                   @unique(map: "unique_nombre_material") @db.VarChar(255)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-
-  @@map("ct_inventario_material")
-}
-
-model Ct_inventario_modelo {
-  id_modelo     Int    @id @default(autoincrement())
-  nombre_modelo String @db.VarChar(255)
-
-  @@map("ct_inventario_modelo")
-}
-
-model Ct_inventario_proveedor {
-  id_proveedor           Int                      @id @default(autoincrement())
-  descripcion            String                   @unique(map: "unique_nombre_proveedor") @db.VarChar(255)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-
-  @@map("ct_inventario_proveedor")
-}
-
-model Ct_inventario_subclase {
-  id_subclase            Int                      @id @default(autoincrement())
-  id_clase               Int
-  no_subclase            String                   @db.VarChar(4)
-  descripcion            String                   @db.VarChar(255)
-
-  //Relaciones
-  ct_inventario_articulo Ct_inventario_articulo[]
-  ct_inventario_clase    Ct_inventario_clase      @relation(fields: [id_clase], references: [id_clase])
-
-  @@map("ct_inventario_subclase")
-}
-
-model Ct_localidad {
-  id_localidad                   Int                              @id @default(autoincrement())
-  localidad                      String?                          @db.VarChar(150)
-  ambito                         String?                          @default("R") @db.Char(1)
-  id_municipio                   Int?
-
-  //Relaciones
-  ct_infraestructura_jefe_sector Ct_infraestructura_jefe_sector[]
-  ct_infraestructura_supervisor  Ct_infraestructura_supervisor[]
-  ct_infraestructura_unidad      Ct_infraestructura_unidad[]
-  ct_codigo_postal               Ct_codigo_postal[]
-  ct_municipio                   Ct_municipio?                    @relation(fields: [id_municipio], references: [id_municipio])
-
-  @@map("ct_localidad")
-}
-
-model Ct_municipio {
-  id_municipio Int            @id @default(autoincrement())
-  cve_mun      String         @db.VarChar(3)
-  nombre       String         @db.VarChar(100)
-  id_entidad   Int
-
-  //Relaciones
-  ct_localidad Ct_localidad[]
-  ct_entidad   Ct_entidad     @relation(fields: [id_entidad], references: [id_entidad])
-
-  @@map("ct_municipio")
-}
-
-model Ct_usuario {
-  id_usuario         Int       @id @default(autoincrement())
-  usuario            String    @unique(map: "IDX_daaab6a989ac4c341e57f18bbe") @db.VarChar(100)
-  contrasena         String    @db.VarChar(255)
-  estatus            Int       @default(1)
-  fecha_registro     DateTime? @default(now()) @db.DateTime(6)
-  fecha_modificacion DateTime? @db.DateTime(6)
-
-  @@map("ct_usuario")
-}
-
-model Dt_bitacora {
-  id_bitacora        Int        @id @default(autoincrement())
-  id_usuario         Int?
-  id_accion          Int?
-  id_registro        Int?
-  tabla              String?    @db.VarChar(100)
-  ip_origen          String?    @db.VarChar(255)
-  dispositivo        String?    @db.VarChar(255)
-  modulo             String?    @db.VarChar(255)
-  descripcion_accion String?    @db.Text
-  cct                String?    @db.VarChar(15)
-  fecha_in           DateTime?  @default(now()) @db.Timestamp(0)
-
-  //Relaciones
-  ct_accion          Ct_accion? @relation(fields: [id_accion], references: [id_accion])
-
-  @@map("dt_bitacora")
-}
-
-model Dt_inventario_bajas {
-  id_baja                 Int                    @id @default(autoincrement())
-  id_articulo             Int
-  tipo_baja               String                 @db.VarChar(50)
-  motivo                  String?                @db.Text
-  nombre_archivo_original String                 @db.VarChar(255)
-  nombre_archivo_sistema  String                 @db.VarChar(255)
-  ruta_archivo            String                 @db.VarChar(500)
-  tama_o_archivo          BigInt?                @map("tamaño_archivo")
-  fecha_baja              DateTime?              @default(now()) @db.Timestamp(0)
-
-  //Relaciones
-  ct_inventario_articulo  Ct_inventario_articulo @relation(fields: [id_articulo], references: [id_articulo])
-
-  @@map("dt_inventario_bajas")
-}
-
-model Dt_inventario_observaciones {
-  id_observacion      Int                                   @id @default(autoincrement())
-  id_unidad           Int
-  id_usuario          Int
-  observacion         String                                @db.Text
-  categoria           dt_inventario_observaciones_categoria @default(GENERAL)
-  prioridad           dt_inventario_observaciones_prioridad @default(MEDIA)
-  estado              dt_inventario_observaciones_estado    @default(ACTIVA)
-  es_privada          Boolean                               @default(false)
-  fecha_creacion      DateTime?                             @default(now()) @db.Timestamp(0)
-  fecha_actualizacion DateTime?                             @db.Timestamp(0)
-  fecha_resolucion    DateTime?                             @db.Timestamp(0)
-
-  @@map("dt_inventario_observaciones")
-}
-
-model Rl_infraestructura_edificio_problema {
-  id_edificio                          Int
-  id_problema                          Int
-  descripcion_otro                     String?                              @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_edificio          Ct_infraestructura_edificio          @relation(fields: [id_edificio], references: [id_edificio])
-  ct_infraestructura_problema_edificio Ct_infraestructura_problema_edificio @relation(fields: [id_problema], references: [id_problema])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_edificio, id_problema])
-
-  @@map("rl_infraestructura_edificio_problema")
-}
-
-model Rl_infraestructura_jerarquia {
-  id_jerarquia                      Int                               @id @default(autoincrement())
-  id_instancia                      Int
-  id_tipo_instancia                 Int
-  id_dependencia                    Int?
-  fecha_in                          DateTime?                         @default(now()) @db.Timestamp(0)
-  usuario_in                        Int?
-
-  //Relaciones
-  ct_inventario_articulo            Ct_inventario_articulo[]
-  ct_infraestructura_tipo_instancia Ct_infraestructura_tipo_instancia @relation(fields: [id_tipo_instancia], references: [id_tipo])
-
-  @@map("rl_infraestructura_jerarquia")
-}
-
-model Rl_infraestructura_unidad_almacenamiento_agua {
-  id_unidad                              Int
-  id_almacenamiento                      Int
-  almacenamiento_otro                    String?                                @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad              Ct_infraestructura_unidad              @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_almacenamiento_agua Ct_infraestructura_almacenamiento_agua @relation(fields: [id_almacenamiento], references: [id_almacenamiento])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_almacenamiento])
-
-  @@map("rl_infraestructura_unidad_almacenamiento_agua")
-}
-
-model Rl_infraestructura_unidad_construccion {
-  id_unidad                            Int
-  id_construccion                      Int
-  descripcion_otro                     String?                              @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad            Ct_infraestructura_unidad            @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_tipo_construccion Ct_infraestructura_tipo_construccion @relation(fields: [id_construccion], references: [id_construccion])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_construccion])
-
-  @@map("rl_infraestructura_unidad_construccion")
-}
-
-model Rl_infraestructura_unidad_construccion_inmueble {
-  id_unidad                                Int
-  id_construccion                          Int
-  descripcion_otro                         String?                                  @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad                Ct_infraestructura_unidad                @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_construccion_inmueble Ct_infraestructura_construccion_inmueble @relation(fields: [id_construccion], references: [id_construccion])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_construccion])
-
-  @@map("rl_infraestructura_unidad_construccion_inmueble")
-}
-
-model Rl_infraestructura_unidad_equipo_discapacidad {
-  id_unidad                              Int
-  id_equipo                              Int
-  en_operacion                           Int?                                   @default(0)
-  en_reparacion                          Int?                                   @default(0)
-  en_reserva                             Int?                                   @default(0)
-  total                                  Int?                                   @default(0)
-  especificacion_otro                    String?                                @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad              Ct_infraestructura_unidad              @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_equipo_discapacidad Ct_infraestructura_equipo_discapacidad @relation(fields: [id_equipo], references: [id_equipo])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_equipo])
-
-  @@map("rl_infraestructura_unidad_equipo_discapacidad")
-}
-
-model Rl_infraestructura_unidad_espacio_inmueble {
-  id_unidad                           Int
-  id_espacio                          Int
-  descripcion_otro                    String?                             @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad           Ct_infraestructura_unidad           @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_espacio_inmueble Ct_infraestructura_espacio_inmueble @relation(fields: [id_espacio], references: [id_espacio])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_espacio])
-
-  @@map("rl_infraestructura_unidad_espacio_inmueble")
-}
-
-model Rl_infraestructura_unidad_espacios_educativos {
-  id_unidad                            Int
-  id_espacio                           Int
-  total                                Int?                                 @default(0)
-  en_uso                               Int?                                 @default(0)
-  descripcion_otro                     String?                              @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad            Ct_infraestructura_unidad            @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_espacio_educativo Ct_infraestructura_espacio_educativo @relation(fields: [id_espacio], references: [id_espacio])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_espacio])
-
-  @@map("rl_infraestructura_unidad_espacios_educativos")
-}
-
-model Rl_infraestructura_unidad_fin_inmueble {
-  id_unidad                       Int
-  id_fin                          Int
-  fin_otro                        String?                         @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad       Ct_infraestructura_unidad       @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_fin_inmueble Ct_infraestructura_fin_inmueble @relation(fields: [id_fin], references: [id_fin])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_fin])
-
-  @@map("rl_infraestructura_unidad_fin_inmueble")
-}
-
-model Rl_infraestructura_unidad_nivel {
-  id_unidad                          Int
-  id_nivel                           Int
-
-  //Relaciones
-  ct_infraestructura_unidad          Ct_infraestructura_unidad          @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_nivel_educativo Ct_infraestructura_nivel_educativo @relation(fields: [id_nivel], references: [id_nivel])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_nivel])
-
-  @@map("rl_infraestructura_unidad_nivel")
-}
-
-model Rl_infraestructura_unidad_obra_mantenimiento {
-  id_unidad                             Int
-  id_obra                               Int
-  descripcion_otro                      String?                               @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad             Ct_infraestructura_unidad             @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_obra_mantenimiento Ct_infraestructura_obra_mantenimiento @relation(fields: [id_obra], references: [id_obra])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_obra])
-
-  @@map("rl_infraestructura_unidad_obra_mantenimiento")
-}
-
-model Rl_infraestructura_unidad_suministro_agua {
-  id_unidad                          Int
-  id_suministro_agua                 Int
-  suministro_agua_otro               String?                            @db.VarChar(255)
-
-  //Relaciones
-  ct_infraestructura_unidad          Ct_infraestructura_unidad          @relation(fields: [id_unidad], references: [id_unidad])
-  ct_infraestructura_suministro_agua Ct_infraestructura_suministro_agua @relation(fields: [id_suministro_agua], references: [id_suministro_agua])
-
-  //Validacion para que no se repitan combinaciones
-  @@id([id_unidad, id_suministro_agua])
-
-  @@map("rl_infraestructura_unidad_suministro_agua")
-}
-
-enum dt_inventario_observaciones_categoria {
-  INVENTARIO
-  INFRAESTRUCTURA
-  GENERAL
-  URGENTE
-}
-
-enum dt_inventario_observaciones_prioridad {
-  BAJA
-  MEDIA
-  ALTA
-  CRITICA
-}
-
-enum dt_inventario_observaciones_estado {
-  ACTIVA
-  EN_REVISION
-  RESUELTA
+model ct_entidad {
+  id_ct_entidad    Int            @id @default(autoincrement())
+  nombre           String         @unique(map: "nombre") @db.VarChar(100)
+  abreviatura      String         @db.VarChar(10)
+  estado           Boolean?       @default(true)
+  fecha_in         DateTime       @default(now()) @db.DateTime(0)
+  fecha_up         DateTime?      @db.DateTime(0)
+  id_ct_usuario_in Int
+  id_ct_usuario_up Int?
+  ct_municipio     ct_municipio[]
+}
+
+model ct_infraestructura_anexo {
+  id_ct_infraestructura_anexo Int       @id @default(autoincrement())
+  nombre                      String    @db.VarChar(255)
+  estado                      Boolean?  @default(true)
+  fecha_in                    DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                    DateTime? @db.DateTime(0)
+  id_ct_usuario_in            Int
+  id_ct_usuario_up            Int?
+}
+
+model ct_infraestructura_area {
+  id_ct_infraestructura_area Int       @id @default(autoincrement())
+  nombre                     String    @db.VarChar(255)
+  estado                     Boolean?  @default(true)
+  fecha_in                   DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                   DateTime? @db.DateTime(0)
+  id_ct_usuario_in           Int
+  id_ct_usuario_at           Int?
+}
+
+model ct_infraestructura_departamento {
+  id_ct_infraestructura_departamento Int       @id @default(autoincrement())
+  nombre                             String    @db.VarChar(255)
+  estado                             Boolean?  @default(true)
+  fecha_in                           DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                           DateTime? @db.DateTime(0)
+  id_ct_usuario_in                   Int
+  id_ct_usuario_up                   Int?
+}
+
+model ct_infraestructura_direccion {
+  id_ct_infraestructura_direccion Int       @id @default(autoincrement())
+  nombre                          String    @db.VarChar(255)
+  estado                          Boolean?  @default(true)
+  fecha_in                        DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime? @db.DateTime(0)
+  id_ct_usuario_in                Int
+  id_ct_usuario_at                Int?
+}
+
+model ct_infraestructura_jefe_sector {
+  id_ct_jefe_sector Int          @id @default(autoincrement())
+  nombre            String       @db.VarChar(255)
+  cct               String       @db.VarChar(11)
+  calle             String       @db.VarChar(255)
+  numero_exterior   String       @db.VarChar(255)
+  id_ct_localidad   Int          @default(0)
+  colonia           String       @db.VarChar(50)
+  codigo_postal     Int
+  latitud           Float        @db.Float
+  longitud          Float        @db.Float
+  estado            Boolean?     @default(true)
+  fecha_in          DateTime     @default(now()) @db.DateTime(0)
+  fecha_up          DateTime?    @db.DateTime(0)
+  id_ct_usuario_in  Int
+  id_ct_usuario_up  Int?
+  ct_localidad      ct_localidad @relation(fields: [id_ct_localidad], references: [id_ct_localidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_jefe_sector_ct_localidad")
+
+  @@index([id_ct_localidad], map: "id_ct_localidad")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ct_infraestructura_supervisor {
+  id_ct_supervisor Int
+  nombre           String       @db.VarChar(255)
+  cct              String       @db.VarChar(11)
+  calle            String       @db.VarChar(255)
+  numero_exterior  String       @db.VarChar(255)
+  id_ct_localidad  Int          @default(0)
+  colonia          String       @db.VarChar(50)
+  codigo_postal    Int
+  latitud          Float        @db.Float
+  longitud         Float        @db.Float
+  estado           Boolean?     @default(true)
+  fecha_in         DateTime     @default(now()) @db.DateTime(0)
+  fecha_up         DateTime?    @db.DateTime(0)
+  id_ct_usuario_in Int
+  id_ct_usuario_up Int?
+  ct_localidad     ct_localidad @relation(fields: [id_ct_localidad], references: [id_ct_localidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_supervisor_ct_localidad")
+
+  @@index([id_ct_localidad], map: "FK_ct_infraestructura_supervisor_ct_localidad")
+  @@ignore
+}
+
+model ct_infraestructura_unidad {
+  id_ct_unidad        Int          @id @default(autoincrement())
+  id_escuela_Plantel  Int          @default(0)
+  id_ct_tipo_escuela  Int          @default(0)
+  cct                 String       @db.VarChar(11)
+  nombre              String       @db.VarChar(255)
+  calle               String       @db.VarChar(255)
+  numero_exterior     String       @db.VarChar(255)
+  numero_interior     String       @db.VarChar(255)
+  id_ct_localidad     Int          @default(0)
+  colonia             String       @db.VarChar(50)
+  codigo_postal       Int
+  latitud             Float        @db.Float
+  longitud            Float        @db.Float
+  id_ct_sostenimiento Float        @db.Float
+  estado              Boolean?     @default(true)
+  fecha_in            DateTime     @default(now()) @db.DateTime(0)
+  fecha_up            DateTime?    @db.DateTime(0)
+  id_ct_usuario_in    Int
+  id_ct_usuario_up    Int?
+  ct_localidad        ct_localidad @relation(fields: [id_ct_localidad], references: [id_ct_localidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_localidad")
+
+  @@index([id_ct_localidad], map: "FK_ct_infraestructura_unidad_ct_localidad")
+}
+
+model ct_localidad {
+  id_ct_localidad                Int                              @id @default(autoincrement())
+  nombre                         String                           @db.VarChar(150)
+  ambito                         String                           @db.Char(1)
+  id_ct_municipio                Int
+  estado                         Boolean?                         @default(true)
+  fecha_in                       DateTime                         @default(now()) @db.DateTime(0)
+  fecha_up                       DateTime?                        @db.DateTime(0)
+  id_ct_usuario_in               Int
+  id_ct_usuario_up               Int?
+  ct_infraestructura_jefe_sector ct_infraestructura_jefe_sector[]
+  ct_infraestructura_supervisor  ct_infraestructura_supervisor[]  @ignore
+  ct_infraestructura_unidad      ct_infraestructura_unidad[]
+  ct_municipio                   ct_municipio                     @relation(fields: [id_ct_municipio], references: [id_ct_municipio], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_localidad_ct_municipio")
+
+  @@index([id_ct_municipio], map: "ct_localidad_id_ct_municipio_fkey")
+}
+
+model ct_municipio {
+  id_ct_municipio  Int            @id @default(autoincrement())
+  cve_mun          String         @db.VarChar(3)
+  nombre           String         @db.VarChar(100)
+  id_ct_entidad    Int
+  estado           Boolean?       @default(true)
+  fecha_in         DateTime       @default(now()) @db.DateTime(0)
+  fecha_up         DateTime?      @db.DateTime(0)
+  id_ct_usuario_in Int
+  id_ct_usuario_up Int?
+  ct_localidad     ct_localidad[]
+  ct_entidad       ct_entidad     @relation(fields: [id_ct_entidad], references: [id_ct_entidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_municipio_ct_entidad")
+
+  @@index([id_ct_entidad], map: "ct_municipio_id_ct_entidad_fkey")
+}
+
+model ct_rate_limit {
+  id_ct_rate_limit String    @id @db.VarChar(36)
+  identificador    String    @db.VarChar(255)
+  endpoint         String    @db.VarChar(100)
+  intentos         Int       @default(1)
+  ventana_inicio   DateTime  @default(now()) @db.DateTime(6)
+  bloqueado_hasta  DateTime? @db.DateTime(6)
+
+  @@index([bloqueado_hasta])
+  @@index([identificador, endpoint])
+  @@index([ventana_inicio])
+}
+
+model ct_refresh_token {
+  id_ct_refresh_token String     @id @db.VarChar(36)
+  id_ct_usuario       Int
+  token_hash          String     @unique @db.VarChar(255)
+  id_ct_sesion        String?    @db.VarChar(36)
+  fecha_creacion      DateTime   @default(now()) @db.DateTime(6)
+  fecha_expiracion    DateTime   @db.DateTime(6)
+  fecha_uso           DateTime?  @db.DateTime(6)
+  usado               Boolean    @default(false)
+  revocado            Boolean    @default(false)
+  motivo_revocacion   String?    @db.VarChar(100)
+  ct_usuario          ct_usuario @relation(fields: [id_ct_usuario], references: [id_ct_usuario], onDelete: Cascade)
+
+  @@index([fecha_expiracion])
+  @@index([id_ct_usuario])
+  @@index([revocado])
+  @@index([token_hash])
+  @@index([usado])
+}
+
+model ct_sesion {
+  id_ct_sesion     String     @id @db.VarChar(36)
+  id_ct_usuario    Int
+  jti              String     @unique @db.VarChar(36)
+  ip_origen        String?    @db.VarChar(45)
+  user_agent       String?    @db.VarChar(500)
+  dispositivo      String?    @db.VarChar(100)
+  ubicacion        String?    @db.VarChar(100)
+  fecha_creacion   DateTime   @default(now()) @db.DateTime(6)
+  fecha_expiracion DateTime   @db.DateTime(6)
+  fecha_ultimo_uso DateTime?  @db.DateTime(6)
+  activa           Boolean    @default(true)
+  ct_usuario       ct_usuario @relation(fields: [id_ct_usuario], references: [id_ct_usuario], onDelete: Cascade)
+
+  @@index([activa])
+  @@index([fecha_expiracion])
+  @@index([id_ct_usuario])
+  @@index([jti])
+}
+
+model ct_usuario {
+  id_ct_usuario      Int                @id @default(autoincrement())
+  usuario            String             @unique(map: "IDX_daaab6a989ac4c341e57f18bbe") @db.VarChar(100)
+  contrasena         String             @db.VarChar(255)
+  estado             Boolean            @default(true)
+  fecha_registro     DateTime?          @default(now()) @db.DateTime(6)
+  fecha_modificacion DateTime?          @db.DateTime(6)
+  uuid_usuario       String             @unique @db.VarChar(36)
+  email              String?            @unique @db.VarChar(255)
+  ultimo_login       DateTime?          @db.DateTime(6)
+  intentos_fallidos  Int                @default(0)
+  bloqueado_hasta    DateTime?          @db.DateTime(6)
+  ct_refresh_token   ct_refresh_token[]
+  ct_sesion          ct_sesion[]
 }
