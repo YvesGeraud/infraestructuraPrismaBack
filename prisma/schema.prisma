@@ -21,129 +21,180 @@ model ct_entidad {
 
 model ct_infraestructura_anexo {
   id_ct_infraestructura_anexo Int       @id @default(autoincrement())
-  nombre                      String    @db.VarChar(255)
+  nombre                      String    @unique(map: "nombre") @db.VarChar(255)
   estado                      Boolean?  @default(true)
   fecha_in                    DateTime  @default(now()) @db.DateTime(0)
   fecha_up                    DateTime? @db.DateTime(0)
   id_ct_usuario_in            Int
   id_ct_usuario_up            Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_infraestructura_area {
   id_ct_infraestructura_area Int       @id @default(autoincrement())
-  nombre                     String    @db.VarChar(255)
+  nombre                     String    @unique(map: "nombre") @db.VarChar(255)
   estado                     Boolean?  @default(true)
   fecha_in                   DateTime  @default(now()) @db.DateTime(0)
   fecha_up                   DateTime? @db.DateTime(0)
   id_ct_usuario_in           Int
   id_ct_usuario_at           Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_at], map: "id_ct_usuario_at")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
 model ct_infraestructura_departamento {
   id_ct_infraestructura_departamento Int       @id @default(autoincrement())
-  nombre                             String    @db.VarChar(255)
+  nombre                             String    @unique(map: "nombre") @db.VarChar(255)
   estado                             Boolean?  @default(true)
   fecha_in                           DateTime  @default(now()) @db.DateTime(0)
   fecha_up                           DateTime? @db.DateTime(0)
   id_ct_usuario_in                   Int
   id_ct_usuario_up                   Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_infraestructura_direccion {
   id_ct_infraestructura_direccion Int       @id @default(autoincrement())
-  nombre                          String    @db.VarChar(255)
+  nombre                          String    @unique(map: "nombre") @db.VarChar(255)
   estado                          Boolean?  @default(true)
   fecha_in                        DateTime  @default(now()) @db.DateTime(0)
   fecha_up                        DateTime? @db.DateTime(0)
   id_ct_usuario_in                Int
   id_ct_usuario_at                Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_at], map: "id_ct_usuario_at")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
 model ct_infraestructura_jefe_sector {
-  id_ct_jefe_sector Int          @id @default(autoincrement())
-  nombre            String       @db.VarChar(255)
-  cct               String       @db.VarChar(11)
-  calle             String       @db.VarChar(255)
-  numero_exterior   String       @db.VarChar(255)
-  id_ct_localidad   Int          @default(0)
-  colonia           String       @db.VarChar(50)
-  codigo_postal     Int
-  latitud           Float        @db.Float
-  longitud          Float        @db.Float
-  estado            Boolean?     @default(true)
-  fecha_in          DateTime     @default(now()) @db.DateTime(0)
-  fecha_up          DateTime?    @db.DateTime(0)
-  id_ct_usuario_in  Int
-  id_ct_usuario_up  Int?
-  ct_localidad      ct_localidad @relation(fields: [id_ct_localidad], references: [id_ct_localidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_jefe_sector_ct_localidad")
+  id_ct_infraestructura_jefe_sector Int       @id @default(autoincrement())
+  nombre                            String    @unique(map: "nombre") @db.VarChar(255)
+  cct                               String    @db.VarChar(11)
+  id_dt_infraestructura_ubicacion   Int       @default(0)
+  estado                            Boolean?  @default(true)
+  fecha_in                          DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                          DateTime? @db.DateTime(0)
+  id_ct_usuario_in                  Int
+  id_ct_usuario_up                  Int?
 
-  @@index([id_ct_localidad], map: "id_ct_localidad")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+  @@index([id_dt_infraestructura_ubicacion], map: "id_dt_infraestructura_ubicacion")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ct_infraestructura_sostenimiento {
+  id_ct_infraestructura_sostenimiento Int                         @id @default(autoincrement())
+  sostenimiento                       String                      @unique(map: "sostenimiento") @default("") @db.VarChar(50)
+  estado                              Boolean                     @default(true)
+  fecha_in                            DateTime                    @default(now()) @db.DateTime(0)
+  fecha_up                            DateTime?                   @db.DateTime(0)
+  id_ct_usuario_in                    Int
+  id_ct_usuario_up                    Int?
+  ct_infraestructura_unidad           ct_infraestructura_unidad[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
 model ct_infraestructura_supervisor {
-  id_ct_supervisor Int
-  nombre           String       @db.VarChar(255)
-  cct              String       @db.VarChar(11)
-  calle            String       @db.VarChar(255)
-  numero_exterior  String       @db.VarChar(255)
-  id_ct_localidad  Int          @default(0)
-  colonia          String       @db.VarChar(50)
-  codigo_postal    Int
-  latitud          Float        @db.Float
-  longitud         Float        @db.Float
+  id_ct_infraestructura_supervisor Int       @id @default(autoincrement())
+  nombre                           String    @unique(map: "nombre") @db.VarChar(255)
+  cct                              String    @db.VarChar(11)
+  id_dt_infraestructura_ubicacion  Int
+  estado                           Boolean?  @default(true)
+  fecha_in                         DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                         DateTime? @db.DateTime(0)
+  id_ct_usuario_in                 Int
+  id_ct_usuario_up                 Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+  @@index([id_dt_infraestructura_ubicacion], map: "id_dt_infraestructura_ubicacion")
+}
+
+model ct_infraestructura_tipo_escuela {
+  id_ct_infraestructura_tipo_escuela Int                         @id @default(autoincrement())
+  tipo_escuela                       Int
+  clave                              Int
+  estado                             Boolean?                    @default(true)
+  fecha_in                           DateTime                    @db.DateTime(0)
+  fecha_up                           DateTime?                   @default(now()) @db.DateTime(0)
+  id_ct_usuario_in                   Int
+  id_ct_usuario_up                   Int?
+  ct_infraestructura_unidad          ct_infraestructura_unidad[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_infraestructura_tipo_instancia {
+  id_ct_infraestructura_tipo_instancia Int                            @id @default(autoincrement())
+  nombre                               String                         @unique(map: "nombre") @default("0") @db.VarChar(50)
+  estado                               Boolean?                       @default(true)
+  fecha_in                             DateTime                       @default(now()) @db.DateTime(0)
+  fecha_up                             DateTime?                      @db.DateTime(0)
+  id_ct_usuario_in                     Int
+  id_ct_usuario_up                     Int?
+  rl_infraestructura_jerarquia         rl_infraestructura_jerarquia[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_infraestructura_unidad {
+  id_ct_infraestructura_unidad     Int                              @id @default(autoincrement())
+  id_escuela_Plantel               Int                              @default(0)
+  id_ct_tipo_escuela               Int                              @default(0)
+  cct                              String                           @unique(map: "cct") @db.VarChar(11)
+  nombre                           String                           @db.VarChar(255)
+  id_ct_sostenimiento              Int                              @default(0)
+  id_dt_infraestructura_ubicacion  Int                              @default(0)
+  estado                           Boolean?                         @default(true)
+  fecha_in                         DateTime                         @default(now()) @db.DateTime(0)
+  fecha_up                         DateTime?                        @db.DateTime(0)
+  id_ct_usuario_in                 Int
+  id_ct_usuario_up                 Int?
+  ct_infraestructura_sostenimiento ct_infraestructura_sostenimiento @relation(fields: [id_ct_sostenimiento], references: [id_ct_infraestructura_sostenimiento], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_sostenimiento")
+  ct_infraestructura_tipo_escuela  ct_infraestructura_tipo_escuela  @relation(fields: [id_ct_tipo_escuela], references: [id_ct_infraestructura_tipo_escuela], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_tipo_escuela")
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_sostenimiento], map: "id_ct_sostenimiento")
+  @@index([id_ct_tipo_escuela], map: "id_ct_tipo_escuela")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+  @@index([id_dt_infraestructura_ubicacion], map: "id_dt_infraestructura_ubicacion")
+}
+
+model ct_localidad {
+  id_ct_localidad  Int          @id @default(autoincrement())
+  nombre           String       @db.VarChar(150)
+  ambito           String       @db.Char(1)
+  id_ct_municipio  Int
   estado           Boolean?     @default(true)
   fecha_in         DateTime     @default(now()) @db.DateTime(0)
   fecha_up         DateTime?    @db.DateTime(0)
   id_ct_usuario_in Int
   id_ct_usuario_up Int?
-  ct_localidad     ct_localidad @relation(fields: [id_ct_localidad], references: [id_ct_localidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_supervisor_ct_localidad")
-
-  @@index([id_ct_localidad], map: "FK_ct_infraestructura_supervisor_ct_localidad")
-  @@ignore
-}
-
-model ct_infraestructura_unidad {
-  id_ct_unidad        Int          @id @default(autoincrement())
-  id_escuela_Plantel  Int          @default(0)
-  id_ct_tipo_escuela  Int          @default(0)
-  cct                 String       @db.VarChar(11)
-  nombre              String       @db.VarChar(255)
-  calle               String       @db.VarChar(255)
-  numero_exterior     String       @db.VarChar(255)
-  numero_interior     String       @db.VarChar(255)
-  id_ct_localidad     Int          @default(0)
-  colonia             String       @db.VarChar(50)
-  codigo_postal       Int
-  latitud             Float        @db.Float
-  longitud            Float        @db.Float
-  id_ct_sostenimiento Float        @db.Float
-  estado              Boolean?     @default(true)
-  fecha_in            DateTime     @default(now()) @db.DateTime(0)
-  fecha_up            DateTime?    @db.DateTime(0)
-  id_ct_usuario_in    Int
-  id_ct_usuario_up    Int?
-  ct_localidad        ct_localidad @relation(fields: [id_ct_localidad], references: [id_ct_localidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_localidad")
-
-  @@index([id_ct_localidad], map: "FK_ct_infraestructura_unidad_ct_localidad")
-}
-
-model ct_localidad {
-  id_ct_localidad                Int                              @id @default(autoincrement())
-  nombre                         String                           @db.VarChar(150)
-  ambito                         String                           @db.Char(1)
-  id_ct_municipio                Int
-  estado                         Boolean?                         @default(true)
-  fecha_in                       DateTime                         @default(now()) @db.DateTime(0)
-  fecha_up                       DateTime?                        @db.DateTime(0)
-  id_ct_usuario_in               Int
-  id_ct_usuario_up               Int?
-  ct_infraestructura_jefe_sector ct_infraestructura_jefe_sector[]
-  ct_infraestructura_supervisor  ct_infraestructura_supervisor[]  @ignore
-  ct_infraestructura_unidad      ct_infraestructura_unidad[]
-  ct_municipio                   ct_municipio                     @relation(fields: [id_ct_municipio], references: [id_ct_municipio], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_localidad_ct_municipio")
+  ct_municipio     ct_municipio @relation(fields: [id_ct_municipio], references: [id_ct_municipio], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_localidad_ct_municipio")
 
   @@index([id_ct_municipio], map: "ct_localidad_id_ct_municipio_fkey")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_municipio {
@@ -160,6 +211,9 @@ model ct_municipio {
   ct_entidad       ct_entidad     @relation(fields: [id_ct_entidad], references: [id_ct_entidad], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_municipio_ct_entidad")
 
   @@index([id_ct_entidad], map: "ct_municipio_id_ct_entidad_fkey")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_rate_limit {
@@ -229,4 +283,47 @@ model ct_usuario {
   bloqueado_hasta    DateTime?          @db.DateTime(6)
   ct_refresh_token   ct_refresh_token[]
   ct_sesion          ct_sesion[]
+}
+
+model dt_infraestructura_ubicacion {
+  id_dt_infraestructura_ubicacion Int       @id @default(autoincrement())
+  calle                           String    @db.VarChar(255)
+  numero_exterior                 Int?
+  numero_interior                 Int?
+  id_ct_localidad                 Int
+  colonia                         String    @db.VarChar(255)
+  id_ct_codigo_postal             Int
+  latitud                         Float?    @db.Float
+  longitud                        Float?    @db.Float
+  estado                          Boolean?  @default(true)
+  fecha_in                        DateTime  @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime? @db.DateTime(0)
+  id_ct_usuario_in                Int
+  id_ct_usuario_up                Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_codigo_postal], map: "id_ct_codigo_postal")
+  @@index([id_ct_localidad], map: "id_ct_localidad")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model rl_infraestructura_jerarquia {
+  id_rl_infraestructura_jerarquia      Int                                @id @default(autoincrement())
+  id_instancia                         Int?
+  id_ct_infraestructura_tipo_instancia Int?
+  id_dependencia                       Int?
+  estado                               Boolean?                           @default(true)
+  fecha_in                             DateTime                           @default(now()) @db.DateTime(0)
+  fecha_up                             DateTime?                          @db.DateTime(0)
+  id_ct_usuario_in                     Int
+  id_ct_usuario_up                     Int?
+  ct_infraestructura_tipo_instancia    ct_infraestructura_tipo_instancia? @relation(fields: [id_ct_infraestructura_tipo_instancia], references: [id_ct_infraestructura_tipo_instancia], onDelete: NoAction, onUpdate: NoAction, map: "FK_rl_infraestructura_jerarquia_ct_infraestructura_tipo")
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+  @@index([id_dependencia], map: "id_dependencia")
+  @@index([id_instancia], map: "id_instancia")
+  @@index([id_ct_infraestructura_tipo_instancia], map: "id_tipo_instancia")
 }
