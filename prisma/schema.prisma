@@ -95,6 +95,31 @@ model ct_infraestructura_direccion {
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
+model ct_infraestructura_escuela {
+  id_ct_infraestructura_escuela    Int                              @id @default(autoincrement())
+  id_escuela_plantel               Int                              @default(0)
+  id_ct_tipo_escuela               Int                              @default(0)
+  cct                              String                           @unique(map: "cct") @db.VarChar(11)
+  nombre                           String                           @db.VarChar(255)
+  id_ct_sostenimiento              Int                              @default(0)
+  id_dt_infraestructura_ubicacion  Int                              @default(0)
+  estado                           Boolean?                         @default(true)
+  fecha_in                         DateTime                         @default(now()) @db.DateTime(0)
+  fecha_up                         DateTime?                        @db.DateTime(0)
+  id_ct_usuario_in                 Int
+  id_ct_usuario_up                 Int?
+  ct_infraestructura_sostenimiento ct_infraestructura_sostenimiento @relation(fields: [id_ct_sostenimiento], references: [id_ct_infraestructura_sostenimiento], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_sostenimiento")
+  ct_infraestructura_tipo_escuela  ct_infraestructura_tipo_escuela  @relation(fields: [id_ct_tipo_escuela], references: [id_ct_infraestructura_tipo_escuela], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_tipo_escuela")
+  dt_infraestructura_ubicacion     dt_infraestructura_ubicacion     @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_dt_infraestructura_ubicacion")
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_sostenimiento], map: "id_ct_sostenimiento")
+  @@index([id_ct_tipo_escuela], map: "id_ct_tipo_escuela")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+  @@index([id_dt_infraestructura_ubicacion], map: "id_dt_infraestructura_ubicacion")
+}
+
 model ct_infraestructura_jefe_sector {
   id_ct_infraestructura_jefe_sector Int                          @id @default(autoincrement())
   nombre                            String                       @unique(map: "nombre") @db.VarChar(255)
@@ -114,14 +139,14 @@ model ct_infraestructura_jefe_sector {
 }
 
 model ct_infraestructura_sostenimiento {
-  id_ct_infraestructura_sostenimiento Int                         @id @default(autoincrement())
-  sostenimiento                       String                      @unique(map: "sostenimiento") @default("") @db.VarChar(50)
-  estado                              Boolean                     @default(true)
-  fecha_in                            DateTime                    @default(now()) @db.DateTime(0)
-  fecha_up                            DateTime?                   @db.DateTime(0)
+  id_ct_infraestructura_sostenimiento Int                          @id @default(autoincrement())
+  sostenimiento                       String                       @unique(map: "sostenimiento") @default("") @db.VarChar(50)
+  estado                              Boolean                      @default(true)
+  fecha_in                            DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                            DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                    Int
   id_ct_usuario_up                    Int?
-  ct_infraestructura_unidad           ct_infraestructura_unidad[]
+  ct_infraestructura_escuela          ct_infraestructura_escuela[]
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -147,15 +172,15 @@ model ct_infraestructura_supervisor {
 }
 
 model ct_infraestructura_tipo_escuela {
-  id_ct_infraestructura_tipo_escuela Int                         @id @default(autoincrement())
-  tipo_escuela                       Int
-  clave                              Int
-  estado                             Boolean?                    @default(true)
-  fecha_in                           DateTime                    @db.DateTime(0)
-  fecha_up                           DateTime?                   @default(now()) @db.DateTime(0)
+  id_ct_infraestructura_tipo_escuela Int                          @id @default(autoincrement())
+  tipo_escuela                       String                       @db.VarChar(85)
+  clave                              String                       @db.VarChar(2)
+  estado                             Boolean?                     @default(true)
+  fecha_in                           DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                           DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                   Int
   id_ct_usuario_up                   Int?
-  ct_infraestructura_unidad          ct_infraestructura_unidad[]
+  ct_infraestructura_escuela         ct_infraestructura_escuela[]
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -177,37 +202,12 @@ model ct_infraestructura_tipo_instancia {
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
-model ct_infraestructura_unidad {
-  id_ct_infraestructura_unidad     Int                              @id @default(autoincrement())
-  id_escuela_Plantel               Int                              @default(0)
-  id_ct_tipo_escuela               Int                              @default(0)
-  cct                              String                           @unique(map: "cct") @db.VarChar(11)
-  nombre                           String                           @db.VarChar(255)
-  id_ct_sostenimiento              Int                              @default(0)
-  id_dt_infraestructura_ubicacion  Int                              @default(0)
-  estado                           Boolean?                         @default(true)
-  fecha_in                         DateTime                         @default(now()) @db.DateTime(0)
-  fecha_up                         DateTime?                        @db.DateTime(0)
-  id_ct_usuario_in                 Int
-  id_ct_usuario_up                 Int?
-  ct_infraestructura_sostenimiento ct_infraestructura_sostenimiento @relation(fields: [id_ct_sostenimiento], references: [id_ct_infraestructura_sostenimiento], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_sostenimiento")
-  ct_infraestructura_tipo_escuela  ct_infraestructura_tipo_escuela  @relation(fields: [id_ct_tipo_escuela], references: [id_ct_infraestructura_tipo_escuela], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_tipo_escuela")
-  dt_infraestructura_ubicacion     dt_infraestructura_ubicacion     @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_dt_infraestructura_ubicacion")
-
-  @@index([estado], map: "estado")
-  @@index([id_ct_sostenimiento], map: "id_ct_sostenimiento")
-  @@index([id_ct_tipo_escuela], map: "id_ct_tipo_escuela")
-  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
-  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
-  @@index([id_dt_infraestructura_ubicacion], map: "id_dt_infraestructura_ubicacion")
-}
-
 model ct_inventario_alta {
   id_ct_inventario_alta Int       @id @default(autoincrement())
-  nombre                Int       @unique(map: "nombre")
+  nombre                String    @unique(map: "nombre") @db.VarChar(50)
   estado                Boolean?  @default(true)
-  fecha_in              DateTime  @db.DateTime(0)
-  fecha_up              DateTime? @default(now()) @db.DateTime(0)
+  fecha_in              DateTime  @default(now()) @db.DateTime(0)
+  fecha_up              DateTime? @db.DateTime(0)
   id_ct_usuario_in      Int
   id_ct_usuario_up      Int?
 
@@ -218,10 +218,10 @@ model ct_inventario_alta {
 
 model ct_inventario_baja {
   id_ct_inventario_baja Int       @id @default(autoincrement())
-  nombre                Int       @unique(map: "nombre")
+  nombre                String    @unique(map: "nombre") @db.VarChar(50)
   estado                Boolean?  @default(true)
-  fecha_in              DateTime  @db.DateTime(0)
-  fecha_up              DateTime? @default(now()) @db.DateTime(0)
+  fecha_in              DateTime  @default(now()) @db.DateTime(0)
+  fecha_up              DateTime? @db.DateTime(0)
   id_ct_usuario_in      Int
   id_ct_usuario_up      Int?
 
@@ -232,10 +232,10 @@ model ct_inventario_baja {
 
 model ct_inventario_clase {
   id_ct_inventario_clase Int                      @id @default(autoincrement())
-  nombre                 Int                      @unique(map: "nombre")
+  nombre                 String                   @unique(map: "nombre") @db.VarChar(50)
   estado                 Boolean?                 @default(true)
-  fecha_in               DateTime                 @db.DateTime(0)
-  fecha_up               DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in               DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up               DateTime?                @db.DateTime(0)
   id_ct_usuario_in       Int
   id_ct_usuario_up       Int?
   ct_inventario_subclase ct_inventario_subclase[]
@@ -247,10 +247,10 @@ model ct_inventario_clase {
 
 model ct_inventario_color {
   id_ct_inventario_color Int                      @id @default(autoincrement())
-  nombre                 Int                      @unique(map: "nombre")
+  nombre                 String                   @unique(map: "nombre") @db.VarChar(50)
   estado                 Boolean?                 @default(true)
-  fecha_in               DateTime                 @db.DateTime(0)
-  fecha_up               DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in               DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up               DateTime?                @db.DateTime(0)
   id_ct_usuario_in       Int
   id_ct_usuario_up       Int?
   dt_inventario_articulo dt_inventario_articulo[]
@@ -262,10 +262,10 @@ model ct_inventario_color {
 
 model ct_inventario_estado_fisico {
   id_ct_inventario_estado_fisico Int                      @id @default(autoincrement())
-  nombre                         Int                      @unique(map: "nombre")
+  nombre                         String                   @unique(map: "nombre") @db.VarChar(50)
   estado                         Boolean?                 @default(true)
-  fecha_in                       DateTime                 @db.DateTime(0)
-  fecha_up                       DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in                       DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up                       DateTime?                @db.DateTime(0)
   id_ct_usuario_in               Int
   id_ct_usuario_up               Int?
   dt_inventario_articulo         dt_inventario_articulo[]
@@ -277,10 +277,10 @@ model ct_inventario_estado_fisico {
 
 model ct_inventario_marca {
   id_ct_inventario_material Int                      @id @default(autoincrement())
-  nombre                    Int                      @unique(map: "nombre")
+  nombre                    String                   @unique(map: "nombre") @db.VarChar(50)
   estado                    Boolean?                 @default(true)
-  fecha_in                  DateTime                 @db.DateTime(0)
-  fecha_up                  DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in                  DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up                  DateTime?                @db.DateTime(0)
   id_ct_usuario_in          Int
   id_ct_usuario_up          Int?
   dt_inventario_articulo    dt_inventario_articulo[]
@@ -292,10 +292,10 @@ model ct_inventario_marca {
 
 model ct_inventario_material {
   id_ct_inventario_marca Int       @id @default(autoincrement())
-  nombre                 Int       @unique(map: "nombre")
+  nombre                 String    @unique(map: "nombre") @db.VarChar(50)
   estado                 Boolean?  @default(true)
-  fecha_in               DateTime  @db.DateTime(0)
-  fecha_up               DateTime? @default(now()) @db.DateTime(0)
+  fecha_in               DateTime  @default(now()) @db.DateTime(0)
+  fecha_up               DateTime? @db.DateTime(0)
   id_ct_usuario_in       Int
   id_ct_usuario_up       Int?
 
@@ -306,10 +306,10 @@ model ct_inventario_material {
 
 model ct_inventario_proveedor {
   id_ct_inventario_proveedor Int                      @id @default(autoincrement())
-  nombre                     Int                      @unique(map: "nombre")
+  nombre                     String                   @unique(map: "nombre") @db.VarChar(50)
   estado                     Boolean?                 @default(true)
-  fecha_in                   DateTime                 @db.DateTime(0)
-  fecha_up                   DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in                   DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up                   DateTime?                @db.DateTime(0)
   id_ct_usuario_in           Int
   id_ct_usuario_up           Int?
   dt_inventario_articulo     dt_inventario_articulo[]
@@ -325,8 +325,8 @@ model ct_inventario_subclase {
   no_subclase               Int
   nombre                    String                   @unique(map: "nombre", length: 4) @db.VarChar(100)
   estado                    Boolean?                 @default(true)
-  fecha_in                  DateTime                 @db.DateTime(0)
-  fecha_up                  DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in                  DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up                  DateTime?                @db.DateTime(0)
   id_ct_usuario_in          Int
   id_ct_usuario_up          Int?
   ct_inventario_clase       ct_inventario_clase      @relation(fields: [id_ct_inventario_clase], references: [id_ct_inventario_clase], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_inventario_subclase_ct_inventario_clase")
@@ -340,10 +340,10 @@ model ct_inventario_subclase {
 
 model ct_inventario_tipo_articulo {
   id_ct_inventario_tipo_articulo Int                      @id @default(autoincrement())
-  nombre                         Int                      @unique(map: "nombre")
+  nombre                         String                   @unique(map: "nombre") @db.VarChar(50)
   estado                         Boolean?                 @default(true)
-  fecha_in                       DateTime                 @db.DateTime(0)
-  fecha_up                       DateTime?                @default(now()) @db.DateTime(0)
+  fecha_in                       DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up                       DateTime?                @db.DateTime(0)
   id_ct_usuario_in               Int
   id_ct_usuario_up               Int?
   dt_inventario_articulo         dt_inventario_articulo[]
@@ -478,9 +478,9 @@ model dt_infraestructura_ubicacion {
   ct_infraestructura_area         ct_infraestructura_area[]
   ct_infraestructura_departamento ct_infraestructura_departamento[]
   ct_infraestructura_direccion    ct_infraestructura_direccion[]
+  ct_infraestructura_escuela      ct_infraestructura_escuela[]
   ct_infraestructura_jefe_sector  ct_infraestructura_jefe_sector[]
   ct_infraestructura_supervisor   ct_infraestructura_supervisor[]
-  ct_infraestructura_unidad       ct_infraestructura_unidad[]
 
   @@index([estado], map: "estado")
   @@index([id_ct_codigo_postal], map: "id_ct_codigo_postal")

@@ -97,6 +97,31 @@ CREATE TABLE `ct_infraestructura_direccion` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `ct_infraestructura_escuela` (
+    `id_ct_infraestructura_escuela` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_escuela_plantel` INTEGER NOT NULL DEFAULT 0,
+    `id_ct_tipo_escuela` INTEGER NOT NULL DEFAULT 0,
+    `cct` VARCHAR(11) NOT NULL,
+    `nombre` VARCHAR(255) NOT NULL,
+    `id_ct_sostenimiento` INTEGER NOT NULL DEFAULT 0,
+    `id_dt_infraestructura_ubicacion` INTEGER NOT NULL DEFAULT 0,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `cct`(`cct`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_sostenimiento`(`id_ct_sostenimiento`),
+    INDEX `id_ct_tipo_escuela`(`id_ct_tipo_escuela`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    INDEX `id_dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`),
+    PRIMARY KEY (`id_ct_infraestructura_escuela`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `ct_infraestructura_jefe_sector` (
     `id_ct_infraestructura_jefe_sector` INTEGER NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(255) NOT NULL,
@@ -156,11 +181,11 @@ CREATE TABLE `ct_infraestructura_supervisor` (
 -- CreateTable
 CREATE TABLE `ct_infraestructura_tipo_escuela` (
     `id_ct_infraestructura_tipo_escuela` INTEGER NOT NULL AUTO_INCREMENT,
-    `tipo_escuela` INTEGER NOT NULL,
-    `clave` INTEGER NOT NULL,
+    `tipo_escuela` VARCHAR(85) NOT NULL,
+    `clave` VARCHAR(2) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -188,37 +213,12 @@ CREATE TABLE `ct_infraestructura_tipo_instancia` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `ct_infraestructura_unidad` (
-    `id_ct_infraestructura_unidad` INTEGER NOT NULL AUTO_INCREMENT,
-    `id_escuela_Plantel` INTEGER NOT NULL DEFAULT 0,
-    `id_ct_tipo_escuela` INTEGER NOT NULL DEFAULT 0,
-    `cct` VARCHAR(11) NOT NULL,
-    `nombre` VARCHAR(255) NOT NULL,
-    `id_ct_sostenimiento` INTEGER NOT NULL DEFAULT 0,
-    `id_dt_infraestructura_ubicacion` INTEGER NOT NULL DEFAULT 0,
+CREATE TABLE `ct_inventario_alta` (
+    `id_ct_inventario_alta` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
     `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `fecha_up` DATETIME(0) NULL,
-    `id_ct_usuario_in` INTEGER NOT NULL,
-    `id_ct_usuario_up` INTEGER NULL,
-
-    UNIQUE INDEX `cct`(`cct`),
-    INDEX `estado`(`estado`),
-    INDEX `id_ct_sostenimiento`(`id_ct_sostenimiento`),
-    INDEX `id_ct_tipo_escuela`(`id_ct_tipo_escuela`),
-    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
-    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
-    INDEX `id_dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`),
-    PRIMARY KEY (`id_ct_infraestructura_unidad`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `ct_inventario_alta` (
-    `id_ct_inventario_alta` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
-    `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -232,10 +232,10 @@ CREATE TABLE `ct_inventario_alta` (
 -- CreateTable
 CREATE TABLE `ct_inventario_baja` (
     `id_ct_inventario_baja` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -249,10 +249,10 @@ CREATE TABLE `ct_inventario_baja` (
 -- CreateTable
 CREATE TABLE `ct_inventario_clase` (
     `id_ct_inventario_clase` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -266,10 +266,10 @@ CREATE TABLE `ct_inventario_clase` (
 -- CreateTable
 CREATE TABLE `ct_inventario_color` (
     `id_ct_inventario_color` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -283,10 +283,10 @@ CREATE TABLE `ct_inventario_color` (
 -- CreateTable
 CREATE TABLE `ct_inventario_estado_fisico` (
     `id_ct_inventario_estado_fisico` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -300,10 +300,10 @@ CREATE TABLE `ct_inventario_estado_fisico` (
 -- CreateTable
 CREATE TABLE `ct_inventario_marca` (
     `id_ct_inventario_material` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -317,10 +317,10 @@ CREATE TABLE `ct_inventario_marca` (
 -- CreateTable
 CREATE TABLE `ct_inventario_material` (
     `id_ct_inventario_marca` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -334,10 +334,10 @@ CREATE TABLE `ct_inventario_material` (
 -- CreateTable
 CREATE TABLE `ct_inventario_proveedor` (
     `id_ct_inventario_proveedor` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -355,8 +355,8 @@ CREATE TABLE `ct_inventario_subclase` (
     `no_subclase` INTEGER NOT NULL,
     `nombre` VARCHAR(100) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -371,10 +371,10 @@ CREATE TABLE `ct_inventario_subclase` (
 -- CreateTable
 CREATE TABLE `ct_inventario_tipo_articulo` (
     `id_ct_inventario_tipo_articulo` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` INTEGER NOT NULL,
+    `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL,
-    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
@@ -597,19 +597,19 @@ ALTER TABLE `ct_infraestructura_departamento` ADD CONSTRAINT `FK_ct_infraestruct
 ALTER TABLE `ct_infraestructura_direccion` ADD CONSTRAINT `FK_ct_infraestructura_direccion_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
+ALTER TABLE `ct_infraestructura_escuela` ADD CONSTRAINT `FK_ct_infraestructura_unidad_ct_infraestructura_sostenimiento` FOREIGN KEY (`id_ct_sostenimiento`) REFERENCES `ct_infraestructura_sostenimiento`(`id_ct_infraestructura_sostenimiento`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `ct_infraestructura_escuela` ADD CONSTRAINT `FK_ct_infraestructura_unidad_ct_infraestructura_tipo_escuela` FOREIGN KEY (`id_ct_tipo_escuela`) REFERENCES `ct_infraestructura_tipo_escuela`(`id_ct_infraestructura_tipo_escuela`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `ct_infraestructura_escuela` ADD CONSTRAINT `FK_ct_infraestructura_unidad_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE `ct_infraestructura_jefe_sector` ADD CONSTRAINT `FK_ct_infraestructura_jefe_sector_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `ct_infraestructura_supervisor` ADD CONSTRAINT `FK_ct_infraestructura_supervisor_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `ct_infraestructura_unidad` ADD CONSTRAINT `FK_ct_infraestructura_unidad_ct_infraestructura_sostenimiento` FOREIGN KEY (`id_ct_sostenimiento`) REFERENCES `ct_infraestructura_sostenimiento`(`id_ct_infraestructura_sostenimiento`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `ct_infraestructura_unidad` ADD CONSTRAINT `FK_ct_infraestructura_unidad_ct_infraestructura_tipo_escuela` FOREIGN KEY (`id_ct_tipo_escuela`) REFERENCES `ct_infraestructura_tipo_escuela`(`id_ct_infraestructura_tipo_escuela`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `ct_infraestructura_unidad` ADD CONSTRAINT `FK_ct_infraestructura_unidad_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `ct_inventario_subclase` ADD CONSTRAINT `FK_ct_inventario_subclase_ct_inventario_clase` FOREIGN KEY (`id_ct_inventario_clase`) REFERENCES `ct_inventario_clase`(`id_ct_inventario_clase`) ON DELETE NO ACTION ON UPDATE NO ACTION;
