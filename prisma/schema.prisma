@@ -17,74 +17,95 @@ model ct_entidad {
   id_ct_usuario_in Int
   id_ct_usuario_up Int?
   ct_municipio     ct_municipio[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_infraestructura_anexo {
-  id_ct_infraestructura_anexo Int       @id @default(autoincrement())
-  nombre                      String    @unique(map: "nombre") @db.VarChar(255)
-  estado                      Boolean?  @default(true)
-  fecha_in                    DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                    DateTime? @db.DateTime(0)
-  id_ct_usuario_in            Int
-  id_ct_usuario_up            Int?
+  id_ct_infraestructura_anexo     Int                          @id @default(autoincrement())
+  nombre                          String                       @unique(map: "nombre") @db.VarChar(255)
+  cct                             String                       @db.VarChar(11)
+  id_dt_infraestructura_ubicacion Int
+  estado                          Boolean?                     @default(true)
+  fecha_in                        DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime?                    @db.DateTime(0)
+  id_ct_usuario_in                Int
+  id_ct_usuario_up                Int?
+  dt_infraestructura_ubicacion    dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_anexo_dt_infraestructura_ubicacion")
 
+  @@index([id_dt_infraestructura_ubicacion], map: "FK_ct_infraestructura_anexo_dt_infraestructura_ubicacion")
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_infraestructura_area {
-  id_ct_infraestructura_area Int       @id @default(autoincrement())
-  nombre                     String    @unique(map: "nombre") @db.VarChar(255)
-  estado                     Boolean?  @default(true)
-  fecha_in                   DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                   DateTime? @db.DateTime(0)
-  id_ct_usuario_in           Int
-  id_ct_usuario_at           Int?
+  id_ct_infraestructura_area      Int                          @id @default(autoincrement())
+  nombre                          String                       @unique(map: "nombre") @db.VarChar(255)
+  cct                             String                       @db.VarChar(11)
+  id_dt_infraestructura_ubicacion Int
+  estado                          Boolean?                     @default(true)
+  fecha_in                        DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime?                    @db.DateTime(0)
+  id_ct_usuario_in                Int
+  id_ct_usuario_at                Int?
+  dt_infraestructura_ubicacion    dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_area_dt_infraestructura_ubicacion")
 
+  @@index([id_dt_infraestructura_ubicacion], map: "FK_ct_infraestructura_area_dt_infraestructura_ubicacion")
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_at], map: "id_ct_usuario_at")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
 model ct_infraestructura_departamento {
-  id_ct_infraestructura_departamento Int       @id @default(autoincrement())
-  nombre                             String    @unique(map: "nombre") @db.VarChar(255)
-  estado                             Boolean?  @default(true)
-  fecha_in                           DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                           DateTime? @db.DateTime(0)
+  id_ct_infraestructura_departamento Int                          @id @default(autoincrement())
+  nombre                             String                       @unique(map: "nombre") @db.VarChar(255)
+  cct                                String                       @db.VarChar(11)
+  id_dt_infraestructura_ubicacion    Int
+  estado                             Boolean?                     @default(true)
+  fecha_in                           DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                           DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                   Int
   id_ct_usuario_up                   Int?
+  dt_infraestructura_ubicacion       dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_departamento_dt_infraestructura_ubicacion")
 
+  @@index([id_dt_infraestructura_ubicacion], map: "FK_ct_infraestructura_departamento_dt_infraestructura_ubicacion")
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_infraestructura_direccion {
-  id_ct_infraestructura_direccion Int       @id @default(autoincrement())
-  nombre                          String    @unique(map: "nombre") @db.VarChar(255)
-  estado                          Boolean?  @default(true)
-  fecha_in                        DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                        DateTime? @db.DateTime(0)
+  id_ct_infraestructura_direccion Int                          @id @default(autoincrement())
+  nombre                          String                       @unique(map: "nombre") @db.VarChar(255)
+  cct                             String                       @db.VarChar(11)
+  id_dt_infraestructura_ubicacion Int
+  estado                          Boolean?                     @default(true)
+  fecha_in                        DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                Int
   id_ct_usuario_at                Int?
+  dt_infraestructura_ubicacion    dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_direccion_dt_infraestructura_ubicacion")
 
+  @@index([id_dt_infraestructura_ubicacion], map: "FK_ct_infraestructura_direccion_dt_infraestructura_ubicacion")
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_at], map: "id_ct_usuario_at")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
 model ct_infraestructura_jefe_sector {
-  id_ct_infraestructura_jefe_sector Int       @id @default(autoincrement())
-  nombre                            String    @unique(map: "nombre") @db.VarChar(255)
-  cct                               String    @db.VarChar(11)
-  id_dt_infraestructura_ubicacion   Int       @default(0)
-  estado                            Boolean?  @default(true)
-  fecha_in                          DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                          DateTime? @db.DateTime(0)
+  id_ct_infraestructura_jefe_sector Int                          @id @default(autoincrement())
+  nombre                            String                       @unique(map: "nombre") @db.VarChar(255)
+  cct                               String                       @db.VarChar(11)
+  id_dt_infraestructura_ubicacion   Int                          @default(0)
+  estado                            Boolean?                     @default(true)
+  fecha_in                          DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                          DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                  Int
   id_ct_usuario_up                  Int?
+  dt_infraestructura_ubicacion      dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_jefe_sector_dt_infraestructura_ubicacion")
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -108,15 +129,16 @@ model ct_infraestructura_sostenimiento {
 }
 
 model ct_infraestructura_supervisor {
-  id_ct_infraestructura_supervisor Int       @id @default(autoincrement())
-  nombre                           String    @unique(map: "nombre") @db.VarChar(255)
-  cct                              String    @db.VarChar(11)
+  id_ct_infraestructura_supervisor Int                          @id @default(autoincrement())
+  nombre                           String                       @unique(map: "nombre") @db.VarChar(255)
+  cct                              String                       @db.VarChar(11)
   id_dt_infraestructura_ubicacion  Int
-  estado                           Boolean?  @default(true)
-  fecha_in                         DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                         DateTime? @db.DateTime(0)
+  estado                           Boolean?                     @default(true)
+  fecha_in                         DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                         DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                 Int
   id_ct_usuario_up                 Int?
+  dt_infraestructura_ubicacion     dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_supervisor_dt_infraestructura_ubicacion")
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -170,6 +192,7 @@ model ct_infraestructura_unidad {
   id_ct_usuario_up                 Int?
   ct_infraestructura_sostenimiento ct_infraestructura_sostenimiento @relation(fields: [id_ct_sostenimiento], references: [id_ct_infraestructura_sostenimiento], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_sostenimiento")
   ct_infraestructura_tipo_escuela  ct_infraestructura_tipo_escuela  @relation(fields: [id_ct_tipo_escuela], references: [id_ct_infraestructura_tipo_escuela], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_ct_infraestructura_tipo_escuela")
+  dt_infraestructura_ubicacion     dt_infraestructura_ubicacion     @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_unidad_dt_infraestructura_ubicacion")
 
   @@index([estado], map: "estado")
   @@index([id_ct_sostenimiento], map: "id_ct_sostenimiento")
@@ -286,20 +309,27 @@ model ct_usuario {
 }
 
 model dt_infraestructura_ubicacion {
-  id_dt_infraestructura_ubicacion Int       @id @default(autoincrement())
-  calle                           String    @db.VarChar(255)
+  id_dt_infraestructura_ubicacion Int                               @id @default(autoincrement())
+  calle                           String                            @db.VarChar(255)
   numero_exterior                 Int?
   numero_interior                 Int?
   id_ct_localidad                 Int
-  colonia                         String    @db.VarChar(255)
+  colonia                         String                            @db.VarChar(255)
   id_ct_codigo_postal             Int
-  latitud                         Float?    @db.Float
-  longitud                        Float?    @db.Float
-  estado                          Boolean?  @default(true)
-  fecha_in                        DateTime  @default(now()) @db.DateTime(0)
-  fecha_up                        DateTime? @db.DateTime(0)
+  latitud                         Float?                            @db.Float
+  longitud                        Float?                            @db.Float
+  estado                          Boolean?                          @default(true)
+  fecha_in                        DateTime                          @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime?                         @db.DateTime(0)
   id_ct_usuario_in                Int
   id_ct_usuario_up                Int?
+  ct_infraestructura_anexo        ct_infraestructura_anexo[]
+  ct_infraestructura_area         ct_infraestructura_area[]
+  ct_infraestructura_departamento ct_infraestructura_departamento[]
+  ct_infraestructura_direccion    ct_infraestructura_direccion[]
+  ct_infraestructura_jefe_sector  ct_infraestructura_jefe_sector[]
+  ct_infraestructura_supervisor   ct_infraestructura_supervisor[]
+  ct_infraestructura_unidad       ct_infraestructura_unidad[]
 
   @@index([estado], map: "estado")
   @@index([id_ct_codigo_postal], map: "id_ct_codigo_postal")
@@ -309,16 +339,16 @@ model dt_infraestructura_ubicacion {
 }
 
 model rl_infraestructura_jerarquia {
-  id_rl_infraestructura_jerarquia      Int                                @id @default(autoincrement())
-  id_instancia                         Int?
-  id_ct_infraestructura_tipo_instancia Int?
-  id_dependencia                       Int?
-  estado                               Boolean?                           @default(true)
-  fecha_in                             DateTime                           @default(now()) @db.DateTime(0)
-  fecha_up                             DateTime?                          @db.DateTime(0)
+  id_rl_infraestructura_jerarquia      Int                               @id @default(autoincrement())
+  id_instancia                         Int
+  id_ct_infraestructura_tipo_instancia Int
+  id_dependencia                       Int
+  estado                               Boolean?                          @default(true)
+  fecha_in                             DateTime                          @default(now()) @db.DateTime(0)
+  fecha_up                             DateTime?                         @db.DateTime(0)
   id_ct_usuario_in                     Int
   id_ct_usuario_up                     Int?
-  ct_infraestructura_tipo_instancia    ct_infraestructura_tipo_instancia? @relation(fields: [id_ct_infraestructura_tipo_instancia], references: [id_ct_infraestructura_tipo_instancia], onDelete: NoAction, onUpdate: NoAction, map: "FK_rl_infraestructura_jerarquia_ct_infraestructura_tipo")
+  ct_infraestructura_tipo_instancia    ct_infraestructura_tipo_instancia @relation(fields: [id_ct_infraestructura_tipo_instancia], references: [id_ct_infraestructura_tipo_instancia], onDelete: NoAction, onUpdate: NoAction, map: "FK_rl_infraestructura_jerarquia_ct_infraestructura_tipo")
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
