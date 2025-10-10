@@ -24,6 +24,39 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   protected abstract config: BaseServiceConfig;
 
   /**
+   * 📝 SISTEMA DE BITÁCORA (Automático)
+   *
+   * Para activar en un servicio, solo necesitas 2 líneas:
+   * ```typescript
+   * protected registrarEnBitacora = true;
+   * protected nombreTablaParaBitacora = "LOCALIDAD"; // Nombre para dt_bitacora
+   * ```
+   *
+   * BaseService se encarga automáticamente de:
+   * - Capturar datos antes/después del cambio
+   * - Registrar en dt_bitacora dentro de la misma transacción
+   * - Hacer rollback si falla la bitácora
+   */
+  protected registrarEnBitacora: boolean = false;
+  protected nombreTablaParaBitacora: string = "";
+
+  /**
+   * 🎯 Campos a excluir del registro en bitácora (para no registrar datos sensibles)
+   * Override en servicios específicos si necesitas excluir más campos
+   *
+   * Por defecto excluye: contraseñas, tokens, archivos grandes
+   */
+  protected camposExcluidosBitacora: string[] = [
+    "password",
+    "contrasena",
+    "token",
+    "refresh_token",
+    "archivo",
+    "imagen",
+    "pdf",
+  ];
+
+  /**
    * Método abstracto para configurar includes específicos del modelo
    */
   protected abstract configurarIncludes(filters?: FilterInput): any;
@@ -38,6 +71,14 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
    */
   protected get model() {
     return (prisma as any)[this.config.tableName];
+  }
+
+  /**
+   * 🔧 Obtener modelo desde transacción o desde prisma global
+   * Útil para operaciones que pueden ejecutarse dentro o fuera de transacciones
+   */
+  protected obtenerModelo(tx?: any) {
+    return tx ? (tx as any)[this.config.tableName] : this.model;
   }
 
   /**
@@ -182,23 +223,33 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 
   /**
    * ✨ Crear un nuevo registro
+   * Ejecuta dentro de una transacción para garantizar atomicidad con bitácora
    */
   async crear(datos: CreateInput): Promise<T> {
     try {
-      // Hook para validaciones personalizadas antes de crear
-      await this.antesDeCrear(datos);
+      return await this.ejecutarEnTransaccion(async (tx) => {
+        // Hook para validaciones personalizadas antes de crear
+        await this.antesDeCrear(datos);
 
-      const include = this.configurarIncludes();
+        const include = this.configurarIncludes();
+        const modelo = this.obtenerModelo(tx);
 
-      const record = await this.model.create({
-        data: datos,
-        include,
+        // Crear el registro
+        const record = await modelo.create({
+          data: datos,
+          include,
+        });
+
+        // 📝 Hook de bitácora (solo si está habilitado)
+        if (this.registrarEnBitacora) {
+          await this.registrarCreacionEnBitacora(datos, record, tx);
+        }
+
+        // Hook para acciones personalizadas después de crear
+        await this.despuesDeCrear(record);
+
+        return record;
       });
-
-      // Hook para acciones después de crear
-      await this.despuesDeCrear(record);
-
-      return record;
     } catch (error) {
       console.error(`Error al crear ${this.config.tableName}:`, error);
       throw this.manejarErrorPrisma(error);
@@ -207,37 +258,54 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 
   /**
    * ✏️ Actualizar un registro existente
+   * Ejecuta dentro de una transacción para garantizar atomicidad con bitácora
    */
   async actualizar(id: number, datos: UpdateInput): Promise<T> {
     try {
-      // Hook para validaciones personalizadas antes de actualizar
-      await this.antesDeActualizar(id, datos);
+      return await this.ejecutarEnTransaccion(async (tx) => {
+        // Hook para validaciones personalizadas antes de actualizar
+        await this.antesDeActualizar(id, datos);
 
-      // Verificar que el registro existe
-      const existingRecord = await this.model.findUnique({
-        where: { [this.getPrimaryKeyField()]: id },
+        const modelo = this.obtenerModelo(tx);
+        const include = this.configurarIncludes();
+
+        // 📸 Obtener datos anteriores (para bitácora)
+        const datosAnteriores = await modelo.findUnique({
+          where: { [this.getPrimaryKeyField()]: id },
+          include,
+        });
+
+        if (!datosAnteriores) {
+          throw new Error(`${this.config.tableName} no encontrado`);
+        }
+
+        // Actualizar el registro
+        const record = await modelo.update({
+          where: { [this.getPrimaryKeyField()]: id },
+          data: {
+            ...datos,
+            // 🕐 Actualizar automáticamente updatedAt en cada UPDATE
+            fecha_up: new Date(),
+          },
+          include,
+        });
+
+        // 📝 Hook de bitácora (solo si está habilitado)
+        if (this.registrarEnBitacora) {
+          await this.registrarActualizacionEnBitacora(
+            id,
+            datos,
+            datosAnteriores,
+            record,
+            tx
+          );
+        }
+
+        // Hook para acciones personalizadas después de actualizar
+        await this.despuesDeActualizar(record);
+
+        return record;
       });
-
-      if (!existingRecord) {
-        throw new Error(`${this.config.tableName} no encontrado`);
-      }
-
-      const include = this.configurarIncludes();
-
-      const record = await this.model.update({
-        where: { [this.getPrimaryKeyField()]: id },
-        data: {
-          ...datos,
-          // 🕐 Actualizar automáticamente updatedAt en cada UPDATE
-          fecha_up: new Date(),
-        },
-        include,
-      });
-
-      // Hook para acciones después de actualizar
-      await this.despuesDeActualizar(record);
-
-      return record;
     } catch (error) {
       console.error(`Error al actualizar ${this.config.tableName}:`, error);
       throw this.manejarErrorPrisma(error);
@@ -245,46 +313,66 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   }
 
   /**
-   * 🗑️ Eliminar un registro
+   * 🗑️ Eliminar un registro (soft delete)
+   * Ejecuta dentro de una transacción para garantizar atomicidad con bitácora
    * @param id - ID del registro a eliminar
    * @param idUsuarioUp - ID del usuario que ejecuta la eliminación (opcional)
    */
   async eliminar(id: number, idUsuarioUp?: number): Promise<void> {
     try {
-      // Hook para validaciones personalizadas antes de eliminar
-      await this.antesDeEliminar(id);
+      await this.ejecutarEnTransaccion(async (tx) => {
+        // Hook para validaciones personalizadas antes de eliminar
+        await this.antesDeEliminar(id);
 
-      const existingRecord = await this.model.findUnique({
-        where: { [this.getPrimaryKeyField()]: id },
-      });
+        const modelo = this.obtenerModelo(tx);
+        const include = this.configurarIncludes();
 
-      if (!existingRecord) {
-        throw new Error(`${this.config.tableName} no encontrado`);
-      }
+        // 📸 Obtener datos antes de eliminar (para bitácora)
+        const datosAnteriores = await modelo.findUnique({
+          where: { [this.getPrimaryKeyField()]: id },
+          include,
+        });
 
-      // 🚫 SOFT DELETE: Actualizar estado a false en lugar de eliminar físicamente
-      // Esto preserva los datos para auditoría y evita problemas de integridad referencial
-      const campoActivo = this.config.campoActivo || "activo";
-      const updateData: any = {
-        [campoActivo]: false,
-        // Si existe campo de actualización, también lo actualizamos
-        ...(existingRecord.hasOwnProperty("fecha_up") && {
-          fecha_up: new Date(),
-        }),
-        // Si se proporciona el usuario que elimina, registrarlo
-        ...(idUsuarioUp &&
-          existingRecord.hasOwnProperty("id_ct_usuario_up") && {
-            id_ct_usuario_up: idUsuarioUp,
+        if (!datosAnteriores) {
+          throw new Error(`${this.config.tableName} no encontrado`);
+        }
+
+        // 🚫 SOFT DELETE: Actualizar estado a false en lugar de eliminar físicamente
+        // Esto preserva los datos para auditoría y evita problemas de integridad referencial
+        const campoActivo = this.config.campoActivo || "activo";
+        const updateData: any = {
+          [campoActivo]: false,
+          // Si existe campo de actualización, también lo actualizamos
+          ...(datosAnteriores.hasOwnProperty("fecha_up") && {
+            fecha_up: new Date(),
           }),
-      };
+          // Si se proporciona el usuario que elimina, registrarlo
+          ...(idUsuarioUp &&
+            datosAnteriores.hasOwnProperty("id_ct_usuario_up") && {
+              id_ct_usuario_up: idUsuarioUp,
+            }),
+        };
 
-      await this.model.update({
-        where: { [this.getPrimaryKeyField()]: id },
-        data: updateData,
+        const registroEliminado = await modelo.update({
+          where: { [this.getPrimaryKeyField()]: id },
+          data: updateData,
+          include,
+        });
+
+        // 📝 Hook de bitácora (solo si está habilitado)
+        if (this.registrarEnBitacora) {
+          await this.registrarEliminacionEnBitacora(
+            id,
+            datosAnteriores,
+            registroEliminado,
+            idUsuarioUp,
+            tx
+          );
+        }
+
+        // Hook para acciones personalizadas después de eliminar (soft delete)
+        await this.despuesDeEliminar(datosAnteriores);
       });
-
-      // Hook para acciones después de eliminar (soft delete)
-      await this.despuesDeEliminar(existingRecord);
     } catch (error) {
       console.error(
         `Error al eliminar (soft delete) ${this.config.tableName}:`,
@@ -347,6 +435,177 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
    */
   protected async despuesDeEliminar(record: T): Promise<void> {
     // Implementar en servicios específicos si es necesario
+  }
+
+  // ===========================================
+  // 📝 MÉTODOS AUTOMÁTICOS DE BITÁCORA
+  // ===========================================
+
+  /**
+   * 🔍 Extraer datos relevantes de un registro para bitácora
+   * Excluye campos sensibles y metadatos innecesarios
+   */
+  private extraerDatosParaBitacora(registro: any): any {
+    if (!registro) return null;
+
+    const datos: any = {};
+
+    for (const [key, value] of Object.entries(registro)) {
+      // Excluir campos sensibles
+      if (this.camposExcluidosBitacora.includes(key)) continue;
+
+      // Excluir campos de metadata que no son relevantes para auditoría
+      if (key.startsWith("id_ct_usuario")) continue; // Ya se registra por separado
+      if (key === "fecha_in" || key === "fecha_up") continue;
+
+      // Excluir relaciones anidadas (solo IDs son relevantes)
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+      ) {
+        continue;
+      }
+
+      datos[key] = value;
+    }
+
+    return datos;
+  }
+
+  /**
+   * 📝 Registrar operación en bitácora (automático)
+   */
+  private async registrarEnBitacoraAutomatico(
+    accion: "CREATE" | "UPDATE" | "DELETE",
+    idRegistro: number,
+    datosAnteriores: any | null,
+    datosNuevos: any,
+    idUsuario: number | undefined,
+    tx: any
+  ): Promise<void> {
+    try {
+      // Validar que se configuró el nombre de la tabla
+      if (!this.nombreTablaParaBitacora) {
+        console.warn(
+          `⚠️  registrarEnBitacora está activado pero nombreTablaParaBitacora no está configurado en ${this.config.tableName}`
+        );
+        return;
+      }
+
+      await tx.dt_bitacora.create({
+        data: {
+          tabla: this.nombreTablaParaBitacora,
+          accion,
+          id_registro: idRegistro,
+          datos_anteriores: datosAnteriores
+            ? this.extraerDatosParaBitacora(datosAnteriores)
+            : null,
+          datos_nuevos: this.extraerDatosParaBitacora(datosNuevos),
+          id_ct_usuario: idUsuario || 1, // Usuario por defecto si no se proporciona
+          observaciones: this.generarObservacionAutomatica(
+            accion,
+            datosAnteriores,
+            datosNuevos
+          ),
+          fecha: new Date(),
+        },
+      });
+    } catch (error) {
+      console.error(`Error al registrar en bitácora:`, error);
+      // Re-lanzar para que se haga rollback de toda la transacción
+      throw error;
+    }
+  }
+
+  /**
+   * 📝 Generar observación legible automáticamente
+   */
+  private generarObservacionAutomatica(
+    accion: string,
+    datosAnteriores: any | null,
+    datosNuevos: any
+  ): string {
+    const nombreCampo = datosNuevos?.nombre || datosNuevos?.descripcion || "";
+    const tabla = this.nombreTablaParaBitacora;
+
+    switch (accion) {
+      case "CREATE":
+        return nombreCampo
+          ? `${tabla} "${nombreCampo}" creado`
+          : `Nuevo registro en ${tabla}`;
+      case "UPDATE":
+        return nombreCampo
+          ? `${tabla} "${nombreCampo}" actualizado`
+          : `Registro en ${tabla} actualizado`;
+      case "DELETE":
+        return nombreCampo
+          ? `${tabla} "${nombreCampo}" desactivado`
+          : `Registro en ${tabla} desactivado`;
+      default:
+        return `Operación ${accion} en ${tabla}`;
+    }
+  }
+
+  /**
+   * 🎯 HOOKS OPCIONALES para personalizar bitácora
+   * Si necesitas lógica personalizada, puedes sobrescribir estos métodos
+   */
+  protected async registrarCreacionEnBitacora(
+    datos: CreateInput,
+    resultado: T,
+    tx: any
+  ): Promise<void> {
+    // Por defecto, usar registro automático
+    const idRegistro = (resultado as any)[this.getPrimaryKeyField()];
+    const idUsuario = (datos as any).id_ct_usuario_in;
+
+    await this.registrarEnBitacoraAutomatico(
+      "CREATE",
+      idRegistro,
+      null,
+      resultado,
+      idUsuario,
+      tx
+    );
+  }
+
+  protected async registrarActualizacionEnBitacora(
+    id: number,
+    datos: UpdateInput,
+    datosAnteriores: T,
+    resultado: T,
+    tx: any
+  ): Promise<void> {
+    // Por defecto, usar registro automático
+    const idUsuario = (datos as any).id_ct_usuario_up;
+
+    await this.registrarEnBitacoraAutomatico(
+      "UPDATE",
+      id,
+      datosAnteriores,
+      resultado,
+      idUsuario,
+      tx
+    );
+  }
+
+  protected async registrarEliminacionEnBitacora(
+    id: number,
+    datosAnteriores: T,
+    registroEliminado: T,
+    idUsuarioUp: number | undefined,
+    tx: any
+  ): Promise<void> {
+    // Por defecto, usar registro automático
+    await this.registrarEnBitacoraAutomatico(
+      "DELETE",
+      id,
+      datosAnteriores,
+      { estado: false },
+      idUsuarioUp,
+      tx
+    );
   }
 
   /**
@@ -443,6 +702,89 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 
     // Para otros errores, devolver el error original
     return error;
+  }
+
+  // ===========================================
+  // 🔄 MÉTODOS DE TRANSACCIONES
+  // ===========================================
+
+  /**
+   * 🔄 Ejecutar operación dentro de una transacción
+   * Garantiza atomicidad: TODO se ejecuta o NADA se ejecuta
+   *
+   * @param operacion - Función que recibe el cliente de transacción (tx)
+   * @returns Resultado de la operación
+   *
+   * @example
+   * ```typescript
+   * await this.ejecutarEnTransaccion(async (tx) => {
+   *   const usuario = await tx.ct_usuario.create({ data: datosUsuario });
+   *   await tx.dt_perfil.create({ data: { id_usuario: usuario.id, ...datos } });
+   *   return usuario;
+   * });
+   * ```
+   */
+  async ejecutarEnTransaccion<R>(
+    operacion: (tx: any) => Promise<R>
+  ): Promise<R> {
+    try {
+      return await prisma.$transaction(operacion, {
+        maxWait: 5000, // 5 segundos de espera para obtener conexión
+        timeout: 10000, // 10 segundos de timeout
+      });
+    } catch (error) {
+      console.error(
+        `Error en transacción para ${this.config.tableName}:`,
+        error
+      );
+      throw this.manejarErrorPrisma(error);
+    }
+  }
+
+  /**
+   * 📦 Crear múltiples registros de una vez (bulk insert)
+   * Más eficiente que crear uno por uno
+   *
+   * @param datosArray - Array de datos a crear
+   * @returns Número de registros creados
+   *
+   * @example
+   * ```typescript
+   * await municipioService.crearMultiples([
+   *   { nombre: "Mun 1", ... },
+   *   { nombre: "Mun 2", ... }
+   * ]);
+   * ```
+   */
+  async crearMultiples(datosArray: CreateInput[]): Promise<number> {
+    try {
+      if (!datosArray || datosArray.length === 0) {
+        throw new Error("No se proporcionaron datos para crear");
+      }
+
+      // Hook para validaciones de cada registro
+      for (const datos of datosArray) {
+        await this.antesDeCrear(datos);
+      }
+
+      // Usar createMany para inserción masiva eficiente
+      const resultado = await this.model.createMany({
+        data: datosArray,
+        skipDuplicates: false, // Fallar si hay duplicados
+      });
+
+      console.log(
+        `✅ ${resultado.count} registros creados en ${this.config.tableName}`
+      );
+
+      return resultado.count;
+    } catch (error) {
+      console.error(
+        `Error al crear múltiples ${this.config.tableName}:`,
+        error
+      );
+      throw this.manejarErrorPrisma(error);
+    }
   }
 }
 

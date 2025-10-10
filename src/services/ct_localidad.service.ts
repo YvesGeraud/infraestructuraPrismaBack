@@ -91,7 +91,6 @@ export class CtLocalidadBaseService extends BaseService<
     return where;
   }
 
-  
   // 🔧 Sobrescribir campo PK (3 líneas)
   protected getPrimaryKeyField(): string {
     return "id_ct_localidad";
@@ -103,7 +102,20 @@ export class CtLocalidadBaseService extends BaseService<
   // - crear() con validaciones ✅
   // - actualizar() con verificaciones ✅
   // - eliminar() con manejo de errores ✅
+
+  // ===========================================
+  // 📝 ACTIVAR BITÁCORA (Solo 2 líneas)
+  // ===========================================
+  // Para activar el registro automático en dt_bitacora:
+  // 1. Descomentar las 2 líneas siguientes
+  // 2. ¡Listo! BaseService registrará TODO automáticamente
+
+  // protected registrarEnBitacora = true;
+  // protected nombreTablaParaBitacora = "LOCALIDAD";
 }
 
 // 🎉 TOTAL: ¡Solo 18 líneas para CRUD completo!
 // Sin BaseService serían ~150 líneas 😱
+
+// 📝 CON BITÁCORA: ¡Solo +2 líneas más! (CRUD + auditoría automática)
+// Sin BaseService con bitácora serían ~350+ líneas 🚀

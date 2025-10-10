@@ -28,7 +28,7 @@ import {
 export const crearCtLocalidadSchema = z.object({
   nombre: esquemaTextoRequerido(2, 100),
   ambito: esquemaTextoRequerido(1, 1),
-  id_ct_municipio: esquemaNumeroRequerido,
+  id_ct_municipio: esquemaNumeroRequerido(1, 100000),
   estado: esquemaEstadoRequerido,
   id_ct_usuario_in: esquemaUsuarioCreacion,
 });
@@ -81,7 +81,9 @@ export const eliminarCtLocalidadSchema = esquemaDeleteConUsuario;
 
 export type CtLocalidadIdParam = z.infer<typeof ctLocalidadIdParamSchema>;
 
-export type EliminarCtLocalidadInput = z.infer<typeof eliminarCtLocalidadSchema>;
+export type EliminarCtLocalidadInput = z.infer<
+  typeof eliminarCtLocalidadSchema
+>;
 
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
