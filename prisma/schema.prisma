@@ -50,12 +50,12 @@ model ct_infraestructura_area {
   fecha_in                        DateTime                     @default(now()) @db.DateTime(0)
   fecha_up                        DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                Int
-  id_ct_usuario_at                Int?
+  id_ct_usuario_up                Int?
   dt_infraestructura_ubicacion    dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_area_dt_infraestructura_ubicacion")
 
   @@index([id_dt_infraestructura_ubicacion], map: "FK_ct_infraestructura_area_dt_infraestructura_ubicacion")
   @@index([estado], map: "estado")
-  @@index([id_ct_usuario_at], map: "id_ct_usuario_at")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_at")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
@@ -86,12 +86,12 @@ model ct_infraestructura_direccion {
   fecha_in                        DateTime                     @default(now()) @db.DateTime(0)
   fecha_up                        DateTime?                    @db.DateTime(0)
   id_ct_usuario_in                Int
-  id_ct_usuario_at                Int?
+  id_ct_usuario_up                Int?
   dt_infraestructura_ubicacion    dt_infraestructura_ubicacion @relation(fields: [id_dt_infraestructura_ubicacion], references: [id_dt_infraestructura_ubicacion], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_infraestructura_direccion_dt_infraestructura_ubicacion")
 
   @@index([id_dt_infraestructura_ubicacion], map: "FK_ct_infraestructura_direccion_dt_infraestructura_ubicacion")
   @@index([estado], map: "estado")
-  @@index([id_ct_usuario_at], map: "id_ct_usuario_at")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_at")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
 }
 
@@ -200,6 +200,157 @@ model ct_infraestructura_unidad {
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
   @@index([id_dt_infraestructura_ubicacion], map: "id_dt_infraestructura_ubicacion")
+}
+
+model ct_inventario_alta {
+  id_ct_inventario_alta Int       @id @default(autoincrement())
+  nombre                Int       @unique(map: "nombre")
+  estado                Boolean?  @default(true)
+  fecha_in              DateTime  @db.DateTime(0)
+  fecha_up              DateTime? @default(now()) @db.DateTime(0)
+  id_ct_usuario_in      Int
+  id_ct_usuario_up      Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_baja {
+  id_ct_inventario_baja Int       @id @default(autoincrement())
+  nombre                Int       @unique(map: "nombre")
+  estado                Boolean?  @default(true)
+  fecha_in              DateTime  @db.DateTime(0)
+  fecha_up              DateTime? @default(now()) @db.DateTime(0)
+  id_ct_usuario_in      Int
+  id_ct_usuario_up      Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_clase {
+  id_ct_inventario_clase Int                      @id @default(autoincrement())
+  nombre                 Int                      @unique(map: "nombre")
+  estado                 Boolean?                 @default(true)
+  fecha_in               DateTime                 @db.DateTime(0)
+  fecha_up               DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in       Int
+  id_ct_usuario_up       Int?
+  ct_inventario_subclase ct_inventario_subclase[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_color {
+  id_ct_inventario_color Int                      @id @default(autoincrement())
+  nombre                 Int                      @unique(map: "nombre")
+  estado                 Boolean?                 @default(true)
+  fecha_in               DateTime                 @db.DateTime(0)
+  fecha_up               DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in       Int
+  id_ct_usuario_up       Int?
+  dt_inventario_articulo dt_inventario_articulo[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_estado_fisico {
+  id_ct_inventario_estado_fisico Int                      @id @default(autoincrement())
+  nombre                         Int                      @unique(map: "nombre")
+  estado                         Boolean?                 @default(true)
+  fecha_in                       DateTime                 @db.DateTime(0)
+  fecha_up                       DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in               Int
+  id_ct_usuario_up               Int?
+  dt_inventario_articulo         dt_inventario_articulo[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_marca {
+  id_ct_inventario_material Int                      @id @default(autoincrement())
+  nombre                    Int                      @unique(map: "nombre")
+  estado                    Boolean?                 @default(true)
+  fecha_in                  DateTime                 @db.DateTime(0)
+  fecha_up                  DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in          Int
+  id_ct_usuario_up          Int?
+  dt_inventario_articulo    dt_inventario_articulo[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_material {
+  id_ct_inventario_marca Int       @id @default(autoincrement())
+  nombre                 Int       @unique(map: "nombre")
+  estado                 Boolean?  @default(true)
+  fecha_in               DateTime  @db.DateTime(0)
+  fecha_up               DateTime? @default(now()) @db.DateTime(0)
+  id_ct_usuario_in       Int
+  id_ct_usuario_up       Int?
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_proveedor {
+  id_ct_inventario_proveedor Int                      @id @default(autoincrement())
+  nombre                     Int                      @unique(map: "nombre")
+  estado                     Boolean?                 @default(true)
+  fecha_in                   DateTime                 @db.DateTime(0)
+  fecha_up                   DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in           Int
+  id_ct_usuario_up           Int?
+  dt_inventario_articulo     dt_inventario_articulo[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_subclase {
+  id_ct_inventario_subclase Int                      @id @default(autoincrement())
+  id_ct_inventario_clase    Int
+  no_subclase               Int
+  nombre                    String                   @unique(map: "nombre", length: 4) @db.VarChar(100)
+  estado                    Boolean?                 @default(true)
+  fecha_in                  DateTime                 @db.DateTime(0)
+  fecha_up                  DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in          Int
+  id_ct_usuario_up          Int?
+  ct_inventario_clase       ct_inventario_clase      @relation(fields: [id_ct_inventario_clase], references: [id_ct_inventario_clase], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_inventario_subclase_ct_inventario_clase")
+  dt_inventario_articulo    dt_inventario_articulo[]
+
+  @@index([id_ct_inventario_clase], map: "FK_ct_inventario_subclase_ct_inventario_clase")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_tipo_articulo {
+  id_ct_inventario_tipo_articulo Int                      @id @default(autoincrement())
+  nombre                         Int                      @unique(map: "nombre")
+  estado                         Boolean?                 @default(true)
+  fecha_in                       DateTime                 @db.DateTime(0)
+  fecha_up                       DateTime?                @default(now()) @db.DateTime(0)
+  id_ct_usuario_in               Int
+  id_ct_usuario_up               Int?
+  dt_inventario_articulo         dt_inventario_articulo[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
 model ct_localidad {
@@ -338,6 +489,47 @@ model dt_infraestructura_ubicacion {
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
+model dt_inventario_articulo {
+  id_dt_inventario_articulo       Int                          @id @default(autoincrement())
+  id_rl_infraestructura_jerarquia Int
+  folio_antiguo                   String?                      @db.VarChar(50)
+  folio                           String                       @default("") @db.VarChar(50)
+  no_serie                        Int
+  observaciones                   Int
+  modelo                          Int
+  fecha_registro                  DateTime                     @db.DateTime(0)
+  id_ct_inventario_subclase       Int
+  id_ct_inventario_marca          Int
+  id_ct_inventario_color          Int
+  id_ct_inventario_proveedor      Int
+  id_ct_inventario_estado_fisico  Int
+  id_ct_inventario_tipo_articulo  Int
+  cct                             String?                      @db.VarChar(11)
+  estado                          Boolean?                     @default(true)
+  fecha_in                        DateTime                     @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime?                    @db.DateTime(0)
+  id_ct_usuario_in                Int
+  id_ct_usuario_up                Int?
+  ct_inventario_color             ct_inventario_color          @relation(fields: [id_ct_inventario_color], references: [id_ct_inventario_color], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_color")
+  ct_inventario_estado_fisico     ct_inventario_estado_fisico  @relation(fields: [id_ct_inventario_estado_fisico], references: [id_ct_inventario_estado_fisico], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_estado_fisico")
+  ct_inventario_marca             ct_inventario_marca          @relation(fields: [id_ct_inventario_marca], references: [id_ct_inventario_material], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_marca")
+  ct_inventario_proveedor         ct_inventario_proveedor      @relation(fields: [id_ct_inventario_proveedor], references: [id_ct_inventario_proveedor], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_proveedor")
+  ct_inventario_subclase          ct_inventario_subclase       @relation(fields: [id_ct_inventario_subclase], references: [id_ct_inventario_subclase], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_subclase")
+  ct_inventario_tipo_articulo     ct_inventario_tipo_articulo  @relation(fields: [id_ct_inventario_tipo_articulo], references: [id_ct_inventario_tipo_articulo], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_tipo_articulo")
+  rl_infraestructura_jerarquia    rl_infraestructura_jerarquia @relation(fields: [id_rl_infraestructura_jerarquia], references: [id_rl_infraestructura_jerarquia], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_rl_infraestructura_jerarquia")
+
+  @@index([id_ct_inventario_color], map: "FK_dt_inventario_articulo_ct_inventario_color")
+  @@index([id_ct_inventario_estado_fisico], map: "FK_dt_inventario_articulo_ct_inventario_estado_fisico")
+  @@index([id_ct_inventario_marca], map: "FK_dt_inventario_articulo_ct_inventario_marca")
+  @@index([id_ct_inventario_proveedor], map: "FK_dt_inventario_articulo_ct_inventario_proveedor")
+  @@index([id_ct_inventario_subclase], map: "FK_dt_inventario_articulo_ct_inventario_subclase")
+  @@index([id_ct_inventario_tipo_articulo], map: "FK_dt_inventario_articulo_ct_inventario_tipo_articulo")
+  @@index([id_rl_infraestructura_jerarquia], map: "FK_dt_inventario_articulo_rl_infraestructura_jerarquia")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
 model rl_infraestructura_jerarquia {
   id_rl_infraestructura_jerarquia      Int                               @id @default(autoincrement())
   id_instancia                         Int
@@ -348,6 +540,7 @@ model rl_infraestructura_jerarquia {
   fecha_up                             DateTime?                         @db.DateTime(0)
   id_ct_usuario_in                     Int
   id_ct_usuario_up                     Int?
+  dt_inventario_articulo               dt_inventario_articulo[]
   ct_infraestructura_tipo_instancia    ct_infraestructura_tipo_instancia @relation(fields: [id_ct_infraestructura_tipo_instancia], references: [id_ct_infraestructura_tipo_instancia], onDelete: NoAction, onUpdate: NoAction, map: "FK_rl_infraestructura_jerarquia_ct_infraestructura_tipo")
 
   @@index([estado], map: "estado")

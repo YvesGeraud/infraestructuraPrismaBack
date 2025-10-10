@@ -46,12 +46,12 @@ CREATE TABLE `ct_infraestructura_area` (
     `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
-    `id_ct_usuario_at` INTEGER NULL,
+    `id_ct_usuario_up` INTEGER NULL,
 
     UNIQUE INDEX `nombre`(`nombre`),
     INDEX `FK_ct_infraestructura_area_dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`),
     INDEX `estado`(`estado`),
-    INDEX `id_ct_usuario_at`(`id_ct_usuario_at`),
+    INDEX `id_ct_usuario_at`(`id_ct_usuario_up`),
     INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
     PRIMARY KEY (`id_ct_infraestructura_area`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -86,12 +86,12 @@ CREATE TABLE `ct_infraestructura_direccion` (
     `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `fecha_up` DATETIME(0) NULL,
     `id_ct_usuario_in` INTEGER NOT NULL,
-    `id_ct_usuario_at` INTEGER NULL,
+    `id_ct_usuario_up` INTEGER NULL,
 
     UNIQUE INDEX `nombre`(`nombre`),
     INDEX `FK_ct_infraestructura_direccion_dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`),
     INDEX `estado`(`estado`),
-    INDEX `id_ct_usuario_at`(`id_ct_usuario_at`),
+    INDEX `id_ct_usuario_at`(`id_ct_usuario_up`),
     INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
     PRIMARY KEY (`id_ct_infraestructura_direccion`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -210,6 +210,179 @@ CREATE TABLE `ct_infraestructura_unidad` (
     INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
     INDEX `id_dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`),
     PRIMARY KEY (`id_ct_infraestructura_unidad`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_alta` (
+    `id_ct_inventario_alta` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_alta`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_baja` (
+    `id_ct_inventario_baja` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_baja`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_clase` (
+    `id_ct_inventario_clase` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_clase`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_color` (
+    `id_ct_inventario_color` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_color`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_estado_fisico` (
+    `id_ct_inventario_estado_fisico` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_estado_fisico`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_marca` (
+    `id_ct_inventario_material` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_material`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_material` (
+    `id_ct_inventario_marca` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_marca`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_proveedor` (
+    `id_ct_inventario_proveedor` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_proveedor`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_subclase` (
+    `id_ct_inventario_subclase` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_ct_inventario_clase` INTEGER NOT NULL,
+    `no_subclase` INTEGER NOT NULL,
+    `nombre` VARCHAR(100) NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`(4)),
+    INDEX `FK_ct_inventario_subclase_ct_inventario_clase`(`id_ct_inventario_clase`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_subclase`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_tipo_articulo` (
+    `id_ct_inventario_tipo_articulo` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` INTEGER NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL,
+    `fecha_up` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_tipo_articulo`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -355,6 +528,42 @@ CREATE TABLE `dt_infraestructura_ubicacion` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `dt_inventario_articulo` (
+    `id_dt_inventario_articulo` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_rl_infraestructura_jerarquia` INTEGER NOT NULL,
+    `folio_antiguo` VARCHAR(50) NULL,
+    `folio` VARCHAR(50) NOT NULL DEFAULT '',
+    `no_serie` INTEGER NOT NULL,
+    `observaciones` INTEGER NOT NULL,
+    `modelo` INTEGER NOT NULL,
+    `fecha_registro` DATETIME(0) NOT NULL,
+    `id_ct_inventario_subclase` INTEGER NOT NULL,
+    `id_ct_inventario_marca` INTEGER NOT NULL,
+    `id_ct_inventario_color` INTEGER NOT NULL,
+    `id_ct_inventario_proveedor` INTEGER NOT NULL,
+    `id_ct_inventario_estado_fisico` INTEGER NOT NULL,
+    `id_ct_inventario_tipo_articulo` INTEGER NOT NULL,
+    `cct` VARCHAR(11) NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    INDEX `FK_dt_inventario_articulo_ct_inventario_color`(`id_ct_inventario_color`),
+    INDEX `FK_dt_inventario_articulo_ct_inventario_estado_fisico`(`id_ct_inventario_estado_fisico`),
+    INDEX `FK_dt_inventario_articulo_ct_inventario_marca`(`id_ct_inventario_marca`),
+    INDEX `FK_dt_inventario_articulo_ct_inventario_proveedor`(`id_ct_inventario_proveedor`),
+    INDEX `FK_dt_inventario_articulo_ct_inventario_subclase`(`id_ct_inventario_subclase`),
+    INDEX `FK_dt_inventario_articulo_ct_inventario_tipo_articulo`(`id_ct_inventario_tipo_articulo`),
+    INDEX `FK_dt_inventario_articulo_rl_infraestructura_jerarquia`(`id_rl_infraestructura_jerarquia`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_dt_inventario_articulo`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `rl_infraestructura_jerarquia` (
     `id_rl_infraestructura_jerarquia` INTEGER NOT NULL AUTO_INCREMENT,
     `id_instancia` INTEGER NOT NULL,
@@ -403,6 +612,9 @@ ALTER TABLE `ct_infraestructura_unidad` ADD CONSTRAINT `FK_ct_infraestructura_un
 ALTER TABLE `ct_infraestructura_unidad` ADD CONSTRAINT `FK_ct_infraestructura_unidad_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
+ALTER TABLE `ct_inventario_subclase` ADD CONSTRAINT `FK_ct_inventario_subclase_ct_inventario_clase` FOREIGN KEY (`id_ct_inventario_clase`) REFERENCES `ct_inventario_clase`(`id_ct_inventario_clase`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE `ct_localidad` ADD CONSTRAINT `FK_ct_localidad_ct_municipio` FOREIGN KEY (`id_ct_municipio`) REFERENCES `ct_municipio`(`id_ct_municipio`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -413,6 +625,27 @@ ALTER TABLE `ct_refresh_token` ADD CONSTRAINT `ct_refresh_token_id_ct_usuario_fk
 
 -- AddForeignKey
 ALTER TABLE `ct_sesion` ADD CONSTRAINT `ct_sesion_id_ct_usuario_fkey` FOREIGN KEY (`id_ct_usuario`) REFERENCES `ct_usuario`(`id_ct_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_color` FOREIGN KEY (`id_ct_inventario_color`) REFERENCES `ct_inventario_color`(`id_ct_inventario_color`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_estado_fisico` FOREIGN KEY (`id_ct_inventario_estado_fisico`) REFERENCES `ct_inventario_estado_fisico`(`id_ct_inventario_estado_fisico`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_marca` FOREIGN KEY (`id_ct_inventario_marca`) REFERENCES `ct_inventario_marca`(`id_ct_inventario_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_proveedor` FOREIGN KEY (`id_ct_inventario_proveedor`) REFERENCES `ct_inventario_proveedor`(`id_ct_inventario_proveedor`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_subclase` FOREIGN KEY (`id_ct_inventario_subclase`) REFERENCES `ct_inventario_subclase`(`id_ct_inventario_subclase`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_tipo_articulo` FOREIGN KEY (`id_ct_inventario_tipo_articulo`) REFERENCES `ct_inventario_tipo_articulo`(`id_ct_inventario_tipo_articulo`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_rl_infraestructura_jerarquia` FOREIGN KEY (`id_rl_infraestructura_jerarquia`) REFERENCES `rl_infraestructura_jerarquia`(`id_rl_infraestructura_jerarquia`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `rl_infraestructura_jerarquia` ADD CONSTRAINT `FK_rl_infraestructura_jerarquia_ct_infraestructura_tipo` FOREIGN KEY (`id_ct_infraestructura_tipo_instancia`) REFERENCES `ct_infraestructura_tipo_instancia`(`id_ct_infraestructura_tipo_instancia`) ON DELETE NO ACTION ON UPDATE NO ACTION;
