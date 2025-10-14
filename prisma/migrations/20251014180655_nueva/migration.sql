@@ -1,4 +1,40 @@
 -- CreateTable
+CREATE TABLE `ct_bitacora_accion` (
+    `id_ct_bitacora_accion` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NULL,
+    `descripcion` VARCHAR(255) NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_bitacora_accion`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_bitacora_tabla` (
+    `id_ct_bitacora_tabla` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(100) NULL,
+    `descripcion` VARCHAR(255) NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `auditar` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    INDEX `auditar`(`auditar`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_bitacora_tabla`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `ct_entidad` (
     `id_ct_entidad` INTEGER NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(100) NOT NULL,
@@ -462,7 +498,7 @@ CREATE TABLE `ct_refresh_token` (
 
 -- CreateTable
 CREATE TABLE `ct_sesion` (
-    `id_ct_sesion` VARCHAR(36) NOT NULL,
+    `id_ct_sesion` INTEGER NOT NULL AUTO_INCREMENT,
     `id_ct_usuario` INTEGER NOT NULL,
     `jti` VARCHAR(36) NOT NULL,
     `ip_origen` VARCHAR(45) NULL,
@@ -503,6 +539,30 @@ CREATE TABLE `ct_usuario` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `dt_bitacora` (
+    `id_dt_bitacora` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_ct_bitacora_accion` INTEGER NOT NULL,
+    `id_ct_bitacora_tabla` INTEGER NOT NULL,
+    `id_registro_afectado` INTEGER NOT NULL,
+    `id_ct_sesion` INTEGER NOT NULL,
+    `datos_anteriores` LONGTEXT NOT NULL,
+    `datos_nuevos` LONGTEXT NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    INDEX `FK_dt_bitacora_ct_bitacora_tabla`(`id_ct_bitacora_tabla`),
+    INDEX `FK_dt_bitacora_ct_sesion`(`id_ct_sesion`),
+    INDEX `id_ct_bitacora_accion`(`id_ct_bitacora_accion`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    INDEX `id_registro_afectado`(`id_registro_afectado`),
+    PRIMARY KEY (`id_dt_bitacora`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `dt_infraestructura_ubicacion` (
     `id_dt_infraestructura_ubicacion` INTEGER NOT NULL AUTO_INCREMENT,
     `calle` VARCHAR(255) NOT NULL,
@@ -538,6 +598,7 @@ CREATE TABLE `dt_inventario_articulo` (
     `modelo` INTEGER NOT NULL,
     `fecha_registro` DATETIME(0) NOT NULL,
     `id_ct_inventario_subclase` INTEGER NOT NULL,
+    `id_ct_inventario_material` INTEGER NOT NULL,
     `id_ct_inventario_marca` INTEGER NOT NULL,
     `id_ct_inventario_color` INTEGER NOT NULL,
     `id_ct_inventario_proveedor` INTEGER NOT NULL,
@@ -553,6 +614,7 @@ CREATE TABLE `dt_inventario_articulo` (
     INDEX `FK_dt_inventario_articulo_ct_inventario_color`(`id_ct_inventario_color`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_estado_fisico`(`id_ct_inventario_estado_fisico`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_marca`(`id_ct_inventario_marca`),
+    INDEX `FK_dt_inventario_articulo_ct_inventario_material`(`id_ct_inventario_material`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_proveedor`(`id_ct_inventario_proveedor`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_subclase`(`id_ct_inventario_subclase`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_tipo_articulo`(`id_ct_inventario_tipo_articulo`),
@@ -627,6 +689,15 @@ ALTER TABLE `ct_refresh_token` ADD CONSTRAINT `ct_refresh_token_id_ct_usuario_fk
 ALTER TABLE `ct_sesion` ADD CONSTRAINT `ct_sesion_id_ct_usuario_fkey` FOREIGN KEY (`id_ct_usuario`) REFERENCES `ct_usuario`(`id_ct_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `dt_bitacora` ADD CONSTRAINT `FK_dt_bitacora_ct_bitacora_accion` FOREIGN KEY (`id_ct_bitacora_accion`) REFERENCES `ct_bitacora_accion`(`id_ct_bitacora_accion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_bitacora` ADD CONSTRAINT `FK_dt_bitacora_ct_bitacora_tabla` FOREIGN KEY (`id_ct_bitacora_tabla`) REFERENCES `ct_bitacora_tabla`(`id_ct_bitacora_tabla`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_bitacora` ADD CONSTRAINT `FK_dt_bitacora_ct_sesion` FOREIGN KEY (`id_ct_sesion`) REFERENCES `ct_sesion`(`id_ct_sesion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_color` FOREIGN KEY (`id_ct_inventario_color`) REFERENCES `ct_inventario_color`(`id_ct_inventario_color`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
@@ -634,6 +705,9 @@ ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_c
 
 -- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_marca` FOREIGN KEY (`id_ct_inventario_marca`) REFERENCES `ct_inventario_marca`(`id_ct_inventario_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_material` FOREIGN KEY (`id_ct_inventario_material`) REFERENCES `ct_inventario_material`(`id_ct_inventario_marca`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_proveedor` FOREIGN KEY (`id_ct_inventario_proveedor`) REFERENCES `ct_inventario_proveedor`(`id_ct_inventario_proveedor`) ON DELETE NO ACTION ON UPDATE NO ACTION;

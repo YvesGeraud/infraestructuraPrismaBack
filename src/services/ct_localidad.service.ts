@@ -104,14 +104,13 @@ export class CtLocalidadBaseService extends BaseService<
   // - eliminar() con manejo de errores ✅
 
   // ===========================================
-  // 📝 ACTIVAR BITÁCORA (Solo 2 líneas)
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
   // ===========================================
-  // Para activar el registro automático en dt_bitacora:
-  // 1. Descomentar las 2 líneas siguientes
-  // 2. ¡Listo! BaseService registrará TODO automáticamente
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
 
-  // protected registrarEnBitacora = true;
-  // protected nombreTablaParaBitacora = "LOCALIDAD";
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_localidad"; // Nombre exacto de la tabla
 }
 
 // 🎉 TOTAL: ¡Solo 18 líneas para CRUD completo!

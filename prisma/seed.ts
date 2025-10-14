@@ -618,8 +618,34 @@ async function main() {
     }), 
   ]);
 
-  // ===== 6. CREAR BAJAS =====
-  console.log("🏠 Creando sostenimientos...");
+// ===== 7. CREAR ALTA =====
+console.log("🏠 Creando alta...");
+
+const Alta = await Promise.all([
+  prisma.ct_inventario_alta.upsert({
+    where: { id_ct_inventario_alta: 1 },
+    update: {},
+    create: {
+      id_ct_inventario_alta: 1,
+      nombre: "COMPRA",
+      estado: true,
+      id_ct_usuario_in: 1, // admin
+    },
+  }), 
+  prisma.ct_inventario_alta.upsert({
+    where: { id_ct_inventario_alta: 2 },
+    update: {},
+    create: {
+      id_ct_inventario_alta: 2,
+      nombre: "DONACION",
+      estado: true,
+      id_ct_usuario_in: 1, // admin
+    },
+  }), 
+]);
+
+  // ===== 8. CREAR BAJAS =====
+  console.log("🏠 Creando bajas...");
 
   const Bajas = await Promise.all([
     prisma.ct_inventario_baja.upsert({
@@ -694,6 +720,58 @@ async function main() {
     }), 
   ]);
 
+  // ===== 9. CREAR ACCIONES =====
+
+  // ===== 9. CREAR ACCIONES =====
+  console.log("🏠 Creando acciones...");
+
+  const Acciones = await Promise.all([
+    prisma.ct_bitacora_accion.upsert({
+      where: { id_ct_bitacora_accion: 1 },
+      update: {},
+      create: {
+        id_ct_bitacora_accion: 1,
+        nombre: "Creación",
+        descripcion: "Creación de un registro",
+        estado: true,
+        id_ct_usuario_in: 1, // admin
+      },
+    }), 
+    prisma.ct_bitacora_accion.upsert({
+      where: { id_ct_bitacora_accion: 2 },
+      update: {},
+      create: {
+        id_ct_bitacora_accion: 2,
+        nombre: "Actualización",
+        descripcion: "Actualización de un registro",
+        estado: true,
+        id_ct_usuario_in: 1, // admin
+      },
+    }), 
+    prisma.ct_bitacora_accion.upsert({
+      where: { id_ct_bitacora_accion: 3 },
+      update: {},
+      create: {
+        id_ct_bitacora_accion: 3,
+        nombre: "Eliminación",
+        descripcion: "Eliminación de un registro",
+        estado: true,
+        id_ct_usuario_in: 1, // admin
+      },
+    }), 
+    prisma.ct_bitacora_accion.upsert({
+      where: { id_ct_bitacora_accion: 4 },
+      update: {},
+      create: {
+        id_ct_bitacora_accion: 4,
+        nombre: "Inicio de sesión",
+        descripcion: "inició sesión exitosamente",
+        estado: true,
+        id_ct_usuario_in: 1, // admin
+      },
+    }), 
+  ]);
+
   console.log("\n📊 RESUMEN DEL SEED:");
   console.log("✅ Seed completado exitosamente!");
   console.log(`👥 Usuarios creados: ${usuariosCreados.length}`);
@@ -703,7 +781,9 @@ async function main() {
   console.log(`🏠 Sostenimientos creados: ${Sostenimientos.length}`);
   console.log(`🏠 Tipos de escuelas creados: ${TiposDeEscuelas.length}`);
   console.log(`🏠 Tipos de instancias creadas: ${TiposDeInstancias.length}`);
+  console.log(`🏠 Altas creadas: ${Alta.length}`);
   console.log(`🏠 Bajas creadas: ${Bajas.length}`);
+  console.log(`🏠 Acciones creadas: ${Acciones.length}`);
   
   console.log("\n🔑 CREDENCIALES DE PRUEBA:");
   console.log("Usuario: admin | Contraseña: 123456");
