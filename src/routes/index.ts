@@ -2,6 +2,7 @@ import { Router } from "express";
 
 //import authRoutes from "./authRoutes";
 import reportesRoutes from "./reportes.routes";
+import consultarReportesRoutes from "./consultarReportes.routes";
 
 import entidadRoutes from "./ct_entidad.route";
 import municipioRoutes from "./ct_municipio.route";
@@ -15,6 +16,7 @@ const router = Router();
 // Montar las rutas con sus prefijos
 //router.use("/auth", authRoutes);
 router.use("/reportes", reportesRoutes);
+router.use("/reportes", consultarReportesRoutes);
 
 
 router.use("/ct_entidad", entidadRoutes);
