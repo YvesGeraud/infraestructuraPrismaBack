@@ -17,6 +17,19 @@ import inventarioSubclaseRoutes from "./inventario/ct_inventario_subclase.route"
 import inventarioTipoArticuloRoutes from "./inventario/ct_inventario_tipo_articulo.route";
 import dtInventarioArticuloRoutes from "./inventario/dt_inventario_articulo.route";
 
+//? INFRAESTRUCTURA
+import infraestructuraAnexoRoutes from "./infraestructura/ct_infraestructura_anexo.route";
+import infraestructuraAreaRoutes from "./infraestructura/ct_infraestructura_area.route";
+import infraestructuraDepartamentoRoutes from "./infraestructura/ct_infraestructura_departamento.route";
+import infraestructuraDireccionRoutes from "./infraestructura/ct_infraestructura_direccion.route";
+import infraestructuraEscuelaRoutes from "./infraestructura/ct_infraestructura_escuela.route";
+import infraestructuraJefeSectorRoutes from "./infraestructura/ct_infraestructura_jefe_sector.route";
+import infraestructuraSupervisorRoutes from "./infraestructura/ct_infraestructura_supervisor.route";
+import infraestructuraSostenimientoRoutes from "./infraestructura/ct_infraestructura_sostenimiento.route";
+import infraestructuraTipoEscuelaRoutes from "./infraestructura/ct_infraestructura_tipo_escuela.route";
+import infraestructuraTipoInstanciaRoutes from "./infraestructura/ct_infraestructura_tipo_instancia.route";
+import dtInfraestructuraUbicacionRoutes from "./infraestructura/dt_infraestructura_ubicacion.route";
+
 //? GENERAL
 import entidadRoutes from "./ct_entidad.route";
 import municipioRoutes from "./ct_municipio.route";
@@ -44,6 +57,19 @@ router.use("/ct_inventario_proveedor", inventarioProveedorRoutes);
 router.use("/ct_inventario_subclase", inventarioSubclaseRoutes);
 router.use("/ct_inventario_tipo_articulo", inventarioTipoArticuloRoutes);
 router.use("/dt_inventario_articulo", dtInventarioArticuloRoutes);
+
+//? INFRAESTRUCTURA
+router.use("/ct_infraestructura_anexo", infraestructuraAnexoRoutes);
+router.use("/ct_infraestructura_area", infraestructuraAreaRoutes);
+router.use("/ct_infraestructura_departamento", infraestructuraDepartamentoRoutes);
+router.use("/ct_infraestructura_direccion", infraestructuraDireccionRoutes);
+router.use("/ct_infraestructura_escuela", infraestructuraEscuelaRoutes);
+router.use("/ct_infraestructura_jefe_sector", infraestructuraJefeSectorRoutes);
+router.use("/ct_infraestructura_supervisor", infraestructuraSupervisorRoutes);
+router.use("/ct_infraestructura_sostenimiento", infraestructuraSostenimientoRoutes);
+router.use("/ct_infraestructura_tipo_escuela", infraestructuraTipoEscuelaRoutes);
+router.use("/ct_infraestructura_tipo_instancia", infraestructuraTipoInstanciaRoutes);
+router.use("/dt_infraestructura_ubicacion", dtInfraestructuraUbicacionRoutes);
 
 //? GENERAL
 router.use("/ct_entidad", entidadRoutes);
