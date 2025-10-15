@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { DtInfraestructuraUbicacionBaseService } from "../../services/infraestructura/dt_infraestructura_ubicacion.service";
 import {
@@ -16,14 +21,21 @@ export class DtInfraestructuraUbicacionBaseController extends BaseController {
   /**
    * 📦 Crear nueva ubicación
    * @route POST /api/dt_infraestructura_ubicacion
+   * 🔐 Requiere autenticación
    */
-  crearUbicacion = async (req: Request, res: Response): Promise<void> => {
+  crearUbicacion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const ubicacionData: CrearDtInfraestructuraUbicacionInput = req.body;
-        return await dtInfraestructuraUbicacionBaseService.crear(ubicacionData);
+        return await dtInfraestructuraUbicacionBaseService.crear(ubicacionData, idSesion);
       },
       "Ubicación creada exitosamente"
     );
@@ -85,8 +97,12 @@ export class DtInfraestructuraUbicacionBaseController extends BaseController {
   /**
    * 📦 Actualizar ubicación
    * @route PUT /api/dt_infraestructura_ubicacion/:id_dt_infraestructura_ubicacion
+   * 🔐 Requiere autenticación
    */
-  actualizarUbicacion = async (req: Request, res: Response): Promise<void> => {
+  actualizarUbicacion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -95,19 +111,29 @@ export class DtInfraestructuraUbicacionBaseController extends BaseController {
           dtInfraestructuraUbicacionIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const ubicacionData: ActualizarDtInfraestructuraUbicacionInput = req.body;
 
-        return await dtInfraestructuraUbicacionBaseService.actualizar(id_dt_infraestructura_ubicacion, ubicacionData);
+        return await dtInfraestructuraUbicacionBaseService.actualizar(
+          id_dt_infraestructura_ubicacion,
+          ubicacionData,
+          idSesion
+        );
       },
       "Ubicación actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar ubicación
+   * 📦 Eliminar ubicación (soft delete)
    * @route DELETE /api/dt_infraestructura_ubicacion/:id_dt_infraestructura_ubicacion
+   * 🔐 Requiere autenticación
    */
-  eliminarUbicacion = async (req: Request, res: Response): Promise<void> => {
+  eliminarUbicacion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -117,7 +143,16 @@ export class DtInfraestructuraUbicacionBaseController extends BaseController {
           req.params
         );
 
-        await dtInfraestructuraUbicacionBaseService.eliminar(id_dt_infraestructura_ubicacion);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await dtInfraestructuraUbicacionBaseService.eliminar(
+          id_dt_infraestructura_ubicacion,
+          idUsuario,
+          idSesion
+        );
       },
       "Ubicación eliminada exitosamente"
     );

@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraEscuelaBaseService } from "../../services/infraestructura/ct_infraestructura_escuela.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraEscuelaBaseController extends BaseController {
   /**
    * 📦 Crear nueva escuela
    * @route POST /api/ct_infraestructura_escuela
+   * 🔐 Requiere autenticación
    */
-  crearEscuela = async (req: Request, res: Response): Promise<void> => {
+  crearEscuela = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const escuelaData: CrearCtInfraestructuraEscuelaInput = req.body;
-        return await ctInfraestructuraEscuelaBaseService.crear(escuelaData);
+        return await ctInfraestructuraEscuelaBaseService.crear(escuelaData, idSesion);
       },
       "Escuela creada exitosamente"
     );
@@ -88,8 +100,12 @@ export class CtInfraestructuraEscuelaBaseController extends BaseController {
   /**
    * 📦 Actualizar escuela
    * @route PUT /api/ct_infraestructura_escuela/:id_ct_infraestructura_escuela
+   * 🔐 Requiere autenticación
    */
-  actualizarEscuela = async (req: Request, res: Response): Promise<void> => {
+  actualizarEscuela = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -98,19 +114,29 @@ export class CtInfraestructuraEscuelaBaseController extends BaseController {
           ctInfraestructuraEscuelaIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const escuelaData: ActualizarCtInfraestructuraEscuelaInput = req.body;
 
-        return await ctInfraestructuraEscuelaBaseService.actualizar(id_ct_infraestructura_escuela, escuelaData);
+        return await ctInfraestructuraEscuelaBaseService.actualizar(
+          id_ct_infraestructura_escuela,
+          escuelaData,
+          idSesion
+        );
       },
       "Escuela actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar escuela
+   * 📦 Eliminar escuela (soft delete)
    * @route DELETE /api/ct_infraestructura_escuela/:id_ct_infraestructura_escuela
+   * 🔐 Requiere autenticación
    */
-  eliminarEscuela = async (req: Request, res: Response): Promise<void> => {
+  eliminarEscuela = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -120,7 +146,16 @@ export class CtInfraestructuraEscuelaBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraEscuelaBaseService.eliminar(id_ct_infraestructura_escuela);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraEscuelaBaseService.eliminar(
+          id_ct_infraestructura_escuela,
+          idUsuario,
+          idSesion
+        );
       },
       "Escuela eliminada exitosamente"
     );

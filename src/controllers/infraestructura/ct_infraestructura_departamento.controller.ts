@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraDepartamentoBaseService } from "../../services/infraestructura/ct_infraestructura_departamento.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraDepartamentoBaseController extends BaseController 
   /**
    * 📦 Crear nuevo departamento
    * @route POST /api/ct_infraestructura_departamento
+   * 🔐 Requiere autenticación
    */
-  crearDepartamento = async (req: Request, res: Response): Promise<void> => {
+  crearDepartamento = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const departamentoData: CrearCtInfraestructuraDepartamentoInput = req.body;
-        return await ctInfraestructuraDepartamentoBaseService.crear(departamentoData);
+        return await ctInfraestructuraDepartamentoBaseService.crear(departamentoData, idSesion);
       },
       "Departamento creado exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInfraestructuraDepartamentoBaseController extends BaseController 
   /**
    * 📦 Actualizar departamento
    * @route PUT /api/ct_infraestructura_departamento/:id_ct_infraestructura_departamento
+   * 🔐 Requiere autenticación
    */
-  actualizarDepartamento = async (req: Request, res: Response): Promise<void> => {
+  actualizarDepartamento = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInfraestructuraDepartamentoBaseController extends BaseController 
           ctInfraestructuraDepartamentoIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const departamentoData: ActualizarCtInfraestructuraDepartamentoInput = req.body;
 
-        return await ctInfraestructuraDepartamentoBaseService.actualizar(id_ct_infraestructura_departamento, departamentoData);
+        return await ctInfraestructuraDepartamentoBaseService.actualizar(
+          id_ct_infraestructura_departamento,
+          departamentoData,
+          idSesion
+        );
       },
       "Departamento actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar departamento
+   * 📦 Eliminar departamento (soft delete)
    * @route DELETE /api/ct_infraestructura_departamento/:id_ct_infraestructura_departamento
+   * 🔐 Requiere autenticación
    */
-  eliminarDepartamento = async (req: Request, res: Response): Promise<void> => {
+  eliminarDepartamento = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInfraestructuraDepartamentoBaseController extends BaseController 
           req.params
         );
 
-        await ctInfraestructuraDepartamentoBaseService.eliminar(id_ct_infraestructura_departamento);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraDepartamentoBaseService.eliminar(
+          id_ct_infraestructura_departamento,
+          idUsuario,
+          idSesion
+        );
       },
       "Departamento eliminado exitosamente"
     );

@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraAnexoBaseService } from "../../services/infraestructura/ct_infraestructura_anexo.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraAnexoBaseController extends BaseController {
   /**
    * 📦 Crear nuevo anexo
    * @route POST /api/ct_infraestructura_anexo
+   * 🔐 Requiere autenticación
    */
-  crearAnexo = async (req: Request, res: Response): Promise<void> => {
+  crearAnexo = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const anexoData: CrearCtInfraestructuraAnexoInput = req.body;
-        return await ctInfraestructuraAnexoBaseService.crear(anexoData);
+        return await ctInfraestructuraAnexoBaseService.crear(anexoData, idSesion);
       },
       "Anexo creado exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInfraestructuraAnexoBaseController extends BaseController {
   /**
    * 📦 Actualizar anexo
    * @route PUT /api/ct_infraestructura_anexo/:id_ct_infraestructura_anexo
+   * 🔐 Requiere autenticación
    */
-  actualizarAnexo = async (req: Request, res: Response): Promise<void> => {
+  actualizarAnexo = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInfraestructuraAnexoBaseController extends BaseController {
           ctInfraestructuraAnexoIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const anexoData: ActualizarCtInfraestructuraAnexoInput = req.body;
 
-        return await ctInfraestructuraAnexoBaseService.actualizar(id_ct_infraestructura_anexo, anexoData);
+        return await ctInfraestructuraAnexoBaseService.actualizar(
+          id_ct_infraestructura_anexo,
+          anexoData,
+          idSesion
+        );
       },
       "Anexo actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar anexo
+   * 📦 Eliminar anexo (soft delete)
    * @route DELETE /api/ct_infraestructura_anexo/:id_ct_infraestructura_anexo
+   * 🔐 Requiere autenticación
    */
-  eliminarAnexo = async (req: Request, res: Response): Promise<void> => {
+  eliminarAnexo = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInfraestructuraAnexoBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraAnexoBaseService.eliminar(id_ct_infraestructura_anexo);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraAnexoBaseService.eliminar(
+          id_ct_infraestructura_anexo,
+          idUsuario,
+          idSesion
+        );
       },
       "Anexo eliminado exitosamente"
     );

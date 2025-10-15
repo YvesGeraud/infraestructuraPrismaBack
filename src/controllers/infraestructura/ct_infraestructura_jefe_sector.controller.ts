@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraJefeSectorBaseService } from "../../services/infraestructura/ct_infraestructura_jefe_sector.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraJefeSectorBaseController extends BaseController {
   /**
    * 📦 Crear nuevo jefe de sector
    * @route POST /api/ct_infraestructura_jefe_sector
+   * 🔐 Requiere autenticación
    */
-  crearJefeSector = async (req: Request, res: Response): Promise<void> => {
+  crearJefeSector = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const jefeSectorData: CrearCtInfraestructuraJefeSectorInput = req.body;
-        return await ctInfraestructuraJefeSectorBaseService.crear(jefeSectorData);
+        return await ctInfraestructuraJefeSectorBaseService.crear(jefeSectorData, idSesion);
       },
       "Jefe de sector creado exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInfraestructuraJefeSectorBaseController extends BaseController {
   /**
    * 📦 Actualizar jefe de sector
    * @route PUT /api/ct_infraestructura_jefe_sector/:id_ct_infraestructura_jefe_sector
+   * 🔐 Requiere autenticación
    */
-  actualizarJefeSector = async (req: Request, res: Response): Promise<void> => {
+  actualizarJefeSector = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInfraestructuraJefeSectorBaseController extends BaseController {
           ctInfraestructuraJefeSectorIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const jefeSectorData: ActualizarCtInfraestructuraJefeSectorInput = req.body;
 
-        return await ctInfraestructuraJefeSectorBaseService.actualizar(id_ct_infraestructura_jefe_sector, jefeSectorData);
+        return await ctInfraestructuraJefeSectorBaseService.actualizar(
+          id_ct_infraestructura_jefe_sector,
+          jefeSectorData,
+          idSesion
+        );
       },
       "Jefe de sector actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar jefe de sector
+   * 📦 Eliminar jefe de sector (soft delete)
    * @route DELETE /api/ct_infraestructura_jefe_sector/:id_ct_infraestructura_jefe_sector
+   * 🔐 Requiere autenticación
    */
-  eliminarJefeSector = async (req: Request, res: Response): Promise<void> => {
+  eliminarJefeSector = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInfraestructuraJefeSectorBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraJefeSectorBaseService.eliminar(id_ct_infraestructura_jefe_sector);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraJefeSectorBaseService.eliminar(
+          id_ct_infraestructura_jefe_sector,
+          idUsuario,
+          idSesion
+        );
       },
       "Jefe de sector eliminado exitosamente"
     );

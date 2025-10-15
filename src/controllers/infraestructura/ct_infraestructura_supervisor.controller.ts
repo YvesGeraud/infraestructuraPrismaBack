@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraSupervisorBaseService } from "../../services/infraestructura/ct_infraestructura_supervisor.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraSupervisorBaseController extends BaseController {
   /**
    * 📦 Crear nuevo supervisor
    * @route POST /api/ct_infraestructura_supervisor
+   * 🔐 Requiere autenticación
    */
-  crearSupervisor = async (req: Request, res: Response): Promise<void> => {
+  crearSupervisor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const supervisorData: CrearCtInfraestructuraSupervisorInput = req.body;
-        return await ctInfraestructuraSupervisorBaseService.crear(supervisorData);
+        return await ctInfraestructuraSupervisorBaseService.crear(supervisorData, idSesion);
       },
       "Supervisor creado exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInfraestructuraSupervisorBaseController extends BaseController {
   /**
    * 📦 Actualizar supervisor
    * @route PUT /api/ct_infraestructura_supervisor/:id_ct_infraestructura_supervisor
+   * 🔐 Requiere autenticación
    */
-  actualizarSupervisor = async (req: Request, res: Response): Promise<void> => {
+  actualizarSupervisor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInfraestructuraSupervisorBaseController extends BaseController {
           ctInfraestructuraSupervisorIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const supervisorData: ActualizarCtInfraestructuraSupervisorInput = req.body;
 
-        return await ctInfraestructuraSupervisorBaseService.actualizar(id_ct_infraestructura_supervisor, supervisorData);
+        return await ctInfraestructuraSupervisorBaseService.actualizar(
+          id_ct_infraestructura_supervisor,
+          supervisorData,
+          idSesion
+        );
       },
       "Supervisor actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar supervisor
+   * 📦 Eliminar supervisor (soft delete)
    * @route DELETE /api/ct_infraestructura_supervisor/:id_ct_infraestructura_supervisor
+   * 🔐 Requiere autenticación
    */
-  eliminarSupervisor = async (req: Request, res: Response): Promise<void> => {
+  eliminarSupervisor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInfraestructuraSupervisorBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraSupervisorBaseService.eliminar(id_ct_infraestructura_supervisor);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraSupervisorBaseService.eliminar(
+          id_ct_infraestructura_supervisor,
+          idUsuario,
+          idSesion
+        );
       },
       "Supervisor eliminado exitosamente"
     );

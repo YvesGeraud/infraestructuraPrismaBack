@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraTipoInstanciaBaseService } from "../../services/infraestructura/ct_infraestructura_tipo_instancia.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraTipoInstanciaBaseController extends BaseController
   /**
    * 📦 Crear nuevo tipo de instancia
    * @route POST /api/ct_infraestructura_tipo_instancia
+   * 🔐 Requiere autenticación
    */
-  crearTipoInstancia = async (req: Request, res: Response): Promise<void> => {
+  crearTipoInstancia = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const tipoInstanciaData: CrearCtInfraestructuraTipoInstanciaInput = req.body;
-        return await ctInfraestructuraTipoInstanciaBaseService.crear(tipoInstanciaData);
+        return await ctInfraestructuraTipoInstanciaBaseService.crear(tipoInstanciaData, idSesion);
       },
       "Tipo de instancia creado exitosamente"
     );
@@ -80,8 +92,12 @@ export class CtInfraestructuraTipoInstanciaBaseController extends BaseController
   /**
    * 📦 Actualizar tipo de instancia
    * @route PUT /api/ct_infraestructura_tipo_instancia/:id_ct_infraestructura_tipo_instancia
+   * 🔐 Requiere autenticación
    */
-  actualizarTipoInstancia = async (req: Request, res: Response): Promise<void> => {
+  actualizarTipoInstancia = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -90,19 +106,29 @@ export class CtInfraestructuraTipoInstanciaBaseController extends BaseController
           ctInfraestructuraTipoInstanciaIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const tipoInstanciaData: ActualizarCtInfraestructuraTipoInstanciaInput = req.body;
 
-        return await ctInfraestructuraTipoInstanciaBaseService.actualizar(id_ct_infraestructura_tipo_instancia, tipoInstanciaData);
+        return await ctInfraestructuraTipoInstanciaBaseService.actualizar(
+          id_ct_infraestructura_tipo_instancia,
+          tipoInstanciaData,
+          idSesion
+        );
       },
       "Tipo de instancia actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar tipo de instancia
+   * 📦 Eliminar tipo de instancia (soft delete)
    * @route DELETE /api/ct_infraestructura_tipo_instancia/:id_ct_infraestructura_tipo_instancia
+   * 🔐 Requiere autenticación
    */
-  eliminarTipoInstancia = async (req: Request, res: Response): Promise<void> => {
+  eliminarTipoInstancia = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -112,7 +138,16 @@ export class CtInfraestructuraTipoInstanciaBaseController extends BaseController
           req.params
         );
 
-        await ctInfraestructuraTipoInstanciaBaseService.eliminar(id_ct_infraestructura_tipo_instancia);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraTipoInstanciaBaseService.eliminar(
+          id_ct_infraestructura_tipo_instancia,
+          idUsuario,
+          idSesion
+        );
       },
       "Tipo de instancia eliminado exitosamente"
     );

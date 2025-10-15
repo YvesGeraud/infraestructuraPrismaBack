@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInventarioMaterialBaseService } from "../../services/inventario/ct_inventario_material.service";
 import {
@@ -16,14 +21,21 @@ export class CtInventarioMaterialBaseController extends BaseController {
   /**
    * 📦 Crear nuevo material
    * @route POST /api/ct_inventario_material
+   * 🔐 Requiere autenticación
    */
-  crearInventarioMaterial = async (req: Request, res: Response): Promise<void> => {
+  crearInventarioMaterial = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const inventarioMaterialData: CrearCtInventarioMaterialInput = req.body;
-        return await ctInventarioMaterialBaseService.crear(inventarioMaterialData);
+        return await ctInventarioMaterialBaseService.crear(inventarioMaterialData, idSesion);
       },
       "Material creado exitosamente"
     );
@@ -79,8 +91,12 @@ export class CtInventarioMaterialBaseController extends BaseController {
   /**
    * 📦 Actualizar material
    * @route PUT /api/ct_inventario_material/:id_ct_inventario_marca
+   * 🔐 Requiere autenticación
    */
-  actualizarInventarioMaterial = async (req: Request, res: Response): Promise<void> => {
+  actualizarInventarioMaterial = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -89,19 +105,29 @@ export class CtInventarioMaterialBaseController extends BaseController {
           ctInventarioMaterialIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const inventarioMaterialData: ActualizarCtInventarioMaterialInput = req.body;
 
-        return await ctInventarioMaterialBaseService.actualizar(id_ct_inventario_marca, inventarioMaterialData);
+        return await ctInventarioMaterialBaseService.actualizar(
+          id_ct_inventario_marca,
+          inventarioMaterialData,
+          idSesion
+        );
       },
       "Material actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar material
+   * 📦 Eliminar material (soft delete)
    * @route DELETE /api/ct_inventario_material/:id_ct_inventario_marca
+   * 🔐 Requiere autenticación
    */
-  eliminarInventarioMaterial = async (req: Request, res: Response): Promise<void> => {
+  eliminarInventarioMaterial = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -111,7 +137,16 @@ export class CtInventarioMaterialBaseController extends BaseController {
           req.params
         );
 
-        await ctInventarioMaterialBaseService.eliminar(id_ct_inventario_marca);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioMaterialBaseService.eliminar(
+          id_ct_inventario_marca,
+          idUsuario,
+          idSesion
+        );
       },
       "Material eliminado exitosamente"
     );

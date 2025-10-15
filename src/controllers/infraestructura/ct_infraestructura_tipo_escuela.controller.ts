@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraTipoEscuelaBaseService } from "../../services/infraestructura/ct_infraestructura_tipo_escuela.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraTipoEscuelaBaseController extends BaseController {
   /**
    * 📦 Crear nuevo tipo de escuela
    * @route POST /api/ct_infraestructura_tipo_escuela
+   * 🔐 Requiere autenticación
    */
-  crearTipoEscuela = async (req: Request, res: Response): Promise<void> => {
+  crearTipoEscuela = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const tipoEscuelaData: CrearCtInfraestructuraTipoEscuelaInput = req.body;
-        return await ctInfraestructuraTipoEscuelaBaseService.crear(tipoEscuelaData);
+        return await ctInfraestructuraTipoEscuelaBaseService.crear(tipoEscuelaData, idSesion);
       },
       "Tipo de escuela creado exitosamente"
     );
@@ -81,8 +93,12 @@ export class CtInfraestructuraTipoEscuelaBaseController extends BaseController {
   /**
    * 📦 Actualizar tipo de escuela
    * @route PUT /api/ct_infraestructura_tipo_escuela/:id_ct_infraestructura_tipo_escuela
+   * 🔐 Requiere autenticación
    */
-  actualizarTipoEscuela = async (req: Request, res: Response): Promise<void> => {
+  actualizarTipoEscuela = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -91,19 +107,29 @@ export class CtInfraestructuraTipoEscuelaBaseController extends BaseController {
           ctInfraestructuraTipoEscuelaIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const tipoEscuelaData: ActualizarCtInfraestructuraTipoEscuelaInput = req.body;
 
-        return await ctInfraestructuraTipoEscuelaBaseService.actualizar(id_ct_infraestructura_tipo_escuela, tipoEscuelaData);
+        return await ctInfraestructuraTipoEscuelaBaseService.actualizar(
+          id_ct_infraestructura_tipo_escuela,
+          tipoEscuelaData,
+          idSesion
+        );
       },
       "Tipo de escuela actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar tipo de escuela
+   * 📦 Eliminar tipo de escuela (soft delete)
    * @route DELETE /api/ct_infraestructura_tipo_escuela/:id_ct_infraestructura_tipo_escuela
+   * 🔐 Requiere autenticación
    */
-  eliminarTipoEscuela = async (req: Request, res: Response): Promise<void> => {
+  eliminarTipoEscuela = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -113,7 +139,16 @@ export class CtInfraestructuraTipoEscuelaBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraTipoEscuelaBaseService.eliminar(id_ct_infraestructura_tipo_escuela);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraTipoEscuelaBaseService.eliminar(
+          id_ct_infraestructura_tipo_escuela,
+          idUsuario,
+          idSesion
+        );
       },
       "Tipo de escuela eliminado exitosamente"
     );

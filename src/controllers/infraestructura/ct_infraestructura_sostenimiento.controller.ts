@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraSostenimientoBaseService } from "../../services/infraestructura/ct_infraestructura_sostenimiento.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraSostenimientoBaseController extends BaseController
   /**
    * 📦 Crear nuevo sostenimiento
    * @route POST /api/ct_infraestructura_sostenimiento
+   * 🔐 Requiere autenticación
    */
-  crearSostenimiento = async (req: Request, res: Response): Promise<void> => {
+  crearSostenimiento = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const sostenimientoData: CrearCtInfraestructuraSostenimientoInput = req.body;
-        return await ctInfraestructuraSostenimientoBaseService.crear(sostenimientoData);
+        return await ctInfraestructuraSostenimientoBaseService.crear(sostenimientoData, idSesion);
       },
       "Sostenimiento creado exitosamente"
     );
@@ -80,8 +92,12 @@ export class CtInfraestructuraSostenimientoBaseController extends BaseController
   /**
    * 📦 Actualizar sostenimiento
    * @route PUT /api/ct_infraestructura_sostenimiento/:id_ct_infraestructura_sostenimiento
+   * 🔐 Requiere autenticación
    */
-  actualizarSostenimiento = async (req: Request, res: Response): Promise<void> => {
+  actualizarSostenimiento = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -90,19 +106,29 @@ export class CtInfraestructuraSostenimientoBaseController extends BaseController
           ctInfraestructuraSostenimientoIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const sostenimientoData: ActualizarCtInfraestructuraSostenimientoInput = req.body;
 
-        return await ctInfraestructuraSostenimientoBaseService.actualizar(id_ct_infraestructura_sostenimiento, sostenimientoData);
+        return await ctInfraestructuraSostenimientoBaseService.actualizar(
+          id_ct_infraestructura_sostenimiento,
+          sostenimientoData,
+          idSesion
+        );
       },
       "Sostenimiento actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar sostenimiento
+   * 📦 Eliminar sostenimiento (soft delete)
    * @route DELETE /api/ct_infraestructura_sostenimiento/:id_ct_infraestructura_sostenimiento
+   * 🔐 Requiere autenticación
    */
-  eliminarSostenimiento = async (req: Request, res: Response): Promise<void> => {
+  eliminarSostenimiento = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -112,7 +138,16 @@ export class CtInfraestructuraSostenimientoBaseController extends BaseController
           req.params
         );
 
-        await ctInfraestructuraSostenimientoBaseService.eliminar(id_ct_infraestructura_sostenimiento);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraSostenimientoBaseService.eliminar(
+          id_ct_infraestructura_sostenimiento,
+          idUsuario,
+          idSesion
+        );
       },
       "Sostenimiento eliminado exitosamente"
     );

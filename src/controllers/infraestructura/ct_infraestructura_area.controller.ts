@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraAreaBaseService } from "../../services/infraestructura/ct_infraestructura_area.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraAreaBaseController extends BaseController {
   /**
    * 📦 Crear nueva área
    * @route POST /api/ct_infraestructura_area
+   * 🔐 Requiere autenticación
    */
-  crearArea = async (req: Request, res: Response): Promise<void> => {
+  crearArea = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const areaData: CrearCtInfraestructuraAreaInput = req.body;
-        return await ctInfraestructuraAreaBaseService.crear(areaData);
+        return await ctInfraestructuraAreaBaseService.crear(areaData, idSesion);
       },
       "Área creada exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInfraestructuraAreaBaseController extends BaseController {
   /**
    * 📦 Actualizar área
    * @route PUT /api/ct_infraestructura_area/:id_ct_infraestructura_area
+   * 🔐 Requiere autenticación
    */
-  actualizarArea = async (req: Request, res: Response): Promise<void> => {
+  actualizarArea = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInfraestructuraAreaBaseController extends BaseController {
           ctInfraestructuraAreaIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const areaData: ActualizarCtInfraestructuraAreaInput = req.body;
 
-        return await ctInfraestructuraAreaBaseService.actualizar(id_ct_infraestructura_area, areaData);
+        return await ctInfraestructuraAreaBaseService.actualizar(
+          id_ct_infraestructura_area,
+          areaData,
+          idSesion
+        );
       },
       "Área actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar área
+   * 📦 Eliminar área (soft delete)
    * @route DELETE /api/ct_infraestructura_area/:id_ct_infraestructura_area
+   * 🔐 Requiere autenticación
    */
-  eliminarArea = async (req: Request, res: Response): Promise<void> => {
+  eliminarArea = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInfraestructuraAreaBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraAreaBaseService.eliminar(id_ct_infraestructura_area);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraAreaBaseService.eliminar(
+          id_ct_infraestructura_area,
+          idUsuario,
+          idSesion
+        );
       },
       "Área eliminada exitosamente"
     );

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { CtLocalidadBaseController } from "../controllers/ct_localidad.controller";
 import { validarRequest } from "../middleware/validacion";
+import { verificarAutenticacion } from "../middleware/authMiddleware";
 import {
   crearCtLocalidadSchema,
   actualizarCtLocalidadSchema,
@@ -9,7 +10,7 @@ import {
   eliminarCtLocalidadSchema,
 } from "../schemas/ct_localidad.schema";
 
-//TODO ===== RUTAS PARA CT_BITACORA_ACCION CON BASE SERVICE =====
+// ===== RUTAS PARA CT_LOCALIDAD CON BASE SERVICE =====
 
 const router = Router();
 const ctLocalidadController =
@@ -29,16 +30,18 @@ router.get(
   ctLocalidadController.obtenerLocalidadPorId
 );
 
-// 📦 Crear nueva localidad
+// 📦 Crear nueva localidad (requiere autenticación)
 router.post(
   "/",
+  verificarAutenticacion,  // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({ body: crearCtLocalidadSchema }),
   ctLocalidadController.crearLocalidad
 );
 
-// 📦 Actualizar localidad existente
+// 📦 Actualizar localidad existente (requiere autenticación)
 router.put(
   "/:id_ct_localidad",
+  verificarAutenticacion,  // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({
     params: ctLocalidadIdParamSchema,
     body: actualizarCtLocalidadSchema,
@@ -46,21 +49,22 @@ router.put(
   ctLocalidadController.actualizarLocalidad
 );
 
-// 📦 Eliminar localidad
+// 📦 Eliminar localidad (requiere autenticación)
 router.delete(
   "/:id_ct_localidad",
+  verificarAutenticacion,  // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({
     params: ctLocalidadIdParamSchema,
-    body: eliminarCtLocalidadSchema,
   }),
+  // Ya no validamos eliminarCtLocalidadSchema porque id_usuario viene del JWT
   ctLocalidadController.eliminarLocalidad
 );
 
 export default router;
 
 // 🎉 API REST completa para ct_localidad:
-// GET    /api/ct_localidad          - Listar con filtros/paginación
-// GET    /api/ct_localidad/:id      - Obtener por ID
-// POST   /api/ct_localidad          - Crear
-// PUT    /api/ct_localidad/:id      - Actualizar
-// DELETE /api/ct_localidad/:id      - Eliminar
+// GET    /api/ct_localidad                  - Listar con filtros/paginación (público)
+// GET    /api/ct_localidad/:id              - Obtener por ID (público)
+// POST   /api/ct_localidad                  - Crear (🔐 requiere auth)
+// PUT    /api/ct_localidad/:id              - Actualizar (🔐 requiere auth)
+// DELETE /api/ct_localidad/:id              - Eliminar (🔐 requiere auth)

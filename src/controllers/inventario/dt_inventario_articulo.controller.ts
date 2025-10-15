@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { DtInventarioArticuloBaseService } from "../../services/inventario/dt_inventario_articulo.service";
 import {
@@ -16,14 +21,21 @@ export class DtInventarioArticuloBaseController extends BaseController {
   /**
    * 📦 Crear nuevo artículo de inventario
    * @route POST /api/dt_inventario_articulo
+   * 🔐 Requiere autenticación
    */
-  crearInventarioArticulo = async (req: Request, res: Response): Promise<void> => {
+  crearInventarioArticulo = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const inventarioArticuloData: CrearDtInventarioArticuloInput = req.body;
-        return await dtInventarioArticuloBaseService.crear(inventarioArticuloData);
+        return await dtInventarioArticuloBaseService.crear(inventarioArticuloData, idSesion);
       },
       "Artículo de inventario creado exitosamente"
     );
@@ -99,8 +111,12 @@ export class DtInventarioArticuloBaseController extends BaseController {
   /**
    * 📦 Actualizar artículo de inventario
    * @route PUT /api/dt_inventario_articulo/:id_dt_inventario_articulo
+   * 🔐 Requiere autenticación
    */
-  actualizarInventarioArticulo = async (req: Request, res: Response): Promise<void> => {
+  actualizarInventarioArticulo = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -109,19 +125,29 @@ export class DtInventarioArticuloBaseController extends BaseController {
           dtInventarioArticuloIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const inventarioArticuloData: ActualizarDtInventarioArticuloInput = req.body;
 
-        return await dtInventarioArticuloBaseService.actualizar(id_dt_inventario_articulo, inventarioArticuloData);
+        return await dtInventarioArticuloBaseService.actualizar(
+          id_dt_inventario_articulo,
+          inventarioArticuloData,
+          idSesion
+        );
       },
       "Artículo de inventario actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar artículo de inventario
+   * 📦 Eliminar artículo (soft delete) de inventario
    * @route DELETE /api/dt_inventario_articulo/:id_dt_inventario_articulo
+   * 🔐 Requiere autenticación
    */
-  eliminarInventarioArticulo = async (req: Request, res: Response): Promise<void> => {
+  eliminarInventarioArticulo = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -131,7 +157,16 @@ export class DtInventarioArticuloBaseController extends BaseController {
           req.params
         );
 
-        await dtInventarioArticuloBaseService.eliminar(id_dt_inventario_articulo);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await dtInventarioArticuloBaseService.eliminar(
+          id_dt_inventario_articulo,
+          idUsuario,
+          idSesion
+        );
       },
       "Artículo de inventario eliminado exitosamente"
     );

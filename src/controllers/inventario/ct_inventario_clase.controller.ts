@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInventarioClaseBaseService } from "../../services/inventario/ct_inventario_clase.service";
 import {
@@ -16,17 +21,19 @@ export class CtInventarioClaseBaseController extends BaseController {
   /**
    * 📦 Crear nueva clase de inventario
    * @route POST /api/ct_inventario_clase
+   * 🔐 Requiere autenticación
    */
-  crearInventarioClase = async (req: Request, res: Response): Promise<void> => {
-    await this.manejarCreacion(
-      req,
-      res,
-      async () => {
-        const inventarioClaseData: CrearCtInventarioClaseInput = req.body;
-        return await ctInventarioClaseBaseService.crear(inventarioClaseData);
-      },
-      "Clase de inventario creada exitosamente"
-    );
+  crearInventarioClase = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarCreacion(req, res, async () => {
+      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+      const idSesion = obtenerIdSesionDesdeJwt(req);
+
+      const inventarioClaseData: CrearCtInventarioClaseInput = req.body;
+      return await ctInventarioClaseBaseService.crear(inventarioClaseData, idSesion);
+    }, "Clase de inventario creada exitosamente");
   };
 
   /**
@@ -80,41 +87,57 @@ export class CtInventarioClaseBaseController extends BaseController {
   /**
    * 📦 Actualizar clase de inventario
    * @route PUT /api/ct_inventario_clase/:id_ct_inventario_clase
+   * 🔐 Requiere autenticación
    */
-  actualizarInventarioClase = async (req: Request, res: Response): Promise<void> => {
-    await this.manejarActualizacion(
-      req,
-      res,
-      async () => {
-        const { id_ct_inventario_clase } = this.validarDatosConEsquema<CtInventarioClaseIdParam>(
+  actualizarInventarioClase = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarActualizacion(req, res, async () => {
+      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+      const idSesion = obtenerIdSesionDesdeJwt(req);
+
+      const { id_ct_inventario_clase } =
+        this.validarDatosConEsquema<CtInventarioClaseIdParam>(
           ctInventarioClaseIdParamSchema,
           req.params
         );
-        const inventarioClaseData: ActualizarCtInventarioClaseInput = req.body;
+      const inventarioClaseData: ActualizarCtInventarioClaseInput = req.body;
 
-        return await ctInventarioClaseBaseService.actualizar(id_ct_inventario_clase, inventarioClaseData);
-      },
-      "Clase de inventario actualizada exitosamente"
-    );
+      return await ctInventarioClaseBaseService.actualizar(
+        id_ct_inventario_clase,
+        inventarioClaseData,
+        idSesion
+      );
+    }, "Clase de inventario actualizada exitosamente");
   };
 
   /**
-   * 📦 Eliminar clase de inventario
+   * 📦 Eliminar clase de inventario (soft delete)
    * @route DELETE /api/ct_inventario_clase/:id_ct_inventario_clase
+   * 🔐 Requiere autenticación
    */
-  eliminarInventarioClase = async (req: Request, res: Response): Promise<void> => {
-    await this.manejarEliminacion(
-      req,
-      res,
-      async () => {
-        const { id_ct_inventario_clase } = this.validarDatosConEsquema<CtInventarioClaseIdParam>(
+  eliminarInventarioClase = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarEliminacion(req, res, async () => {
+      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+      const idSesion = obtenerIdSesionDesdeJwt(req);
+      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+      const { id_ct_inventario_clase } =
+        this.validarDatosConEsquema<CtInventarioClaseIdParam>(
           ctInventarioClaseIdParamSchema,
           req.params
         );
 
-        await ctInventarioClaseBaseService.eliminar(id_ct_inventario_clase);
-      },
-      "Clase de inventario eliminada exitosamente"
-    );
+      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+      await ctInventarioClaseBaseService.eliminar(
+        id_ct_inventario_clase,
+        idUsuario,
+        idSesion
+      );
+    }, "Clase de inventario eliminada exitosamente");
   };
 }

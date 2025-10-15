@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInventarioColorBaseService } from "../../services/inventario/ct_inventario_color.service";
 import {
@@ -16,17 +21,19 @@ export class CtInventarioColorBaseController extends BaseController {
   /**
    * 📦 Crear nuevo color de inventario
    * @route POST /api/ct_inventario_color
+   * 🔐 Requiere autenticación
    */
-  crearInventarioColor = async (req: Request, res: Response): Promise<void> => {
-    await this.manejarCreacion(
-      req,
-      res,
-      async () => {
-        const inventarioColorData: CrearCtInventarioColorInput = req.body;
-        return await ctInventarioColorBaseService.crear(inventarioColorData);
-      },
-      "Color de inventario creado exitosamente"
-    );
+  crearInventarioColor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarCreacion(req, res, async () => {
+      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+      const idSesion = obtenerIdSesionDesdeJwt(req);
+
+      const inventarioColorData: CrearCtInventarioColorInput = req.body;
+      return await ctInventarioColorBaseService.crear(inventarioColorData, idSesion);
+    }, "Color de inventario creado exitosamente");
   };
 
   /**
@@ -79,41 +86,57 @@ export class CtInventarioColorBaseController extends BaseController {
   /**
    * 📦 Actualizar color de inventario
    * @route PUT /api/ct_inventario_color/:id_ct_inventario_color
+   * 🔐 Requiere autenticación
    */
-  actualizarInventarioColor = async (req: Request, res: Response): Promise<void> => {
-    await this.manejarActualizacion(
-      req,
-      res,
-      async () => {
-        const { id_ct_inventario_color } = this.validarDatosConEsquema<CtInventarioColorIdParam>(
+  actualizarInventarioColor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarActualizacion(req, res, async () => {
+      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+      const idSesion = obtenerIdSesionDesdeJwt(req);
+
+      const { id_ct_inventario_color } =
+        this.validarDatosConEsquema<CtInventarioColorIdParam>(
           ctInventarioColorIdParamSchema,
           req.params
         );
-        const inventarioColorData: ActualizarCtInventarioColorInput = req.body;
+      const inventarioColorData: ActualizarCtInventarioColorInput = req.body;
 
-        return await ctInventarioColorBaseService.actualizar(id_ct_inventario_color, inventarioColorData);
-      },
-      "Color de inventario actualizado exitosamente"
-    );
+      return await ctInventarioColorBaseService.actualizar(
+        id_ct_inventario_color,
+        inventarioColorData,
+        idSesion
+      );
+    }, "Color de inventario actualizado exitosamente");
   };
 
   /**
-   * 📦 Eliminar color de inventario
+   * 📦 Eliminar color de inventario (soft delete)
    * @route DELETE /api/ct_inventario_color/:id_ct_inventario_color
+   * 🔐 Requiere autenticación
    */
-  eliminarInventarioColor = async (req: Request, res: Response): Promise<void> => {
-    await this.manejarEliminacion(
-      req,
-      res,
-      async () => {
-        const { id_ct_inventario_color } = this.validarDatosConEsquema<CtInventarioColorIdParam>(
+  eliminarInventarioColor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarEliminacion(req, res, async () => {
+      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+      const idSesion = obtenerIdSesionDesdeJwt(req);
+      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+      const { id_ct_inventario_color } =
+        this.validarDatosConEsquema<CtInventarioColorIdParam>(
           ctInventarioColorIdParamSchema,
           req.params
         );
 
-        await ctInventarioColorBaseService.eliminar(id_ct_inventario_color);
-      },
-      "Color de inventario eliminado exitosamente"
-    );
+      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+      await ctInventarioColorBaseService.eliminar(
+        id_ct_inventario_color,
+        idUsuario,
+        idSesion
+      );
+    }, "Color de inventario eliminado exitosamente");
   };
 }

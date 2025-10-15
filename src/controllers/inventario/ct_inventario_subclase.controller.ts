@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInventarioSubclaseBaseService } from "../../services/inventario/ct_inventario_subclase.service";
 import {
@@ -16,14 +21,21 @@ export class CtInventarioSubclaseBaseController extends BaseController {
   /**
    * 📦 Crear nueva subclase
    * @route POST /api/ct_inventario_subclase
+   * 🔐 Requiere autenticación
    */
-  crearInventarioSubclase = async (req: Request, res: Response): Promise<void> => {
+  crearInventarioSubclase = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const inventarioSubclaseData: CrearCtInventarioSubclaseInput = req.body;
-        return await ctInventarioSubclaseBaseService.crear(inventarioSubclaseData);
+        return await ctInventarioSubclaseBaseService.crear(inventarioSubclaseData, idSesion);
       },
       "Subclase creada exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInventarioSubclaseBaseController extends BaseController {
   /**
    * 📦 Actualizar subclase
    * @route PUT /api/ct_inventario_subclase/:id_ct_inventario_subclase
+   * 🔐 Requiere autenticación
    */
-  actualizarInventarioSubclase = async (req: Request, res: Response): Promise<void> => {
+  actualizarInventarioSubclase = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInventarioSubclaseBaseController extends BaseController {
           ctInventarioSubclaseIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const inventarioSubclaseData: ActualizarCtInventarioSubclaseInput = req.body;
 
-        return await ctInventarioSubclaseBaseService.actualizar(id_ct_inventario_subclase, inventarioSubclaseData);
+        return await ctInventarioSubclaseBaseService.actualizar(
+          id_ct_inventario_subclase,
+          inventarioSubclaseData,
+          idSesion
+        );
       },
       "Subclase actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar subclase
+   * 📦 Eliminar subclase (soft delete)
    * @route DELETE /api/ct_inventario_subclase/:id_ct_inventario_subclase
+   * 🔐 Requiere autenticación
    */
-  eliminarInventarioSubclase = async (req: Request, res: Response): Promise<void> => {
+  eliminarInventarioSubclase = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInventarioSubclaseBaseController extends BaseController {
           req.params
         );
 
-        await ctInventarioSubclaseBaseService.eliminar(id_ct_inventario_subclase);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioSubclaseBaseService.eliminar(
+          id_ct_inventario_subclase,
+          idUsuario,
+          idSesion
+        );
       },
       "Subclase eliminada exitosamente"
     );

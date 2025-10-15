@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInfraestructuraDireccionBaseService } from "../../services/infraestructura/ct_infraestructura_direccion.service";
 import {
@@ -16,14 +21,21 @@ export class CtInfraestructuraDireccionBaseController extends BaseController {
   /**
    * 📦 Crear nueva dirección
    * @route POST /api/ct_infraestructura_direccion
+   * 🔐 Requiere autenticación
    */
-  crearDireccion = async (req: Request, res: Response): Promise<void> => {
+  crearDireccion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const direccionData: CrearCtInfraestructuraDireccionInput = req.body;
-        return await ctInfraestructuraDireccionBaseService.crear(direccionData);
+        return await ctInfraestructuraDireccionBaseService.crear(direccionData, idSesion);
       },
       "Dirección creada exitosamente"
     );
@@ -82,8 +94,12 @@ export class CtInfraestructuraDireccionBaseController extends BaseController {
   /**
    * 📦 Actualizar dirección
    * @route PUT /api/ct_infraestructura_direccion/:id_ct_infraestructura_direccion
+   * 🔐 Requiere autenticación
    */
-  actualizarDireccion = async (req: Request, res: Response): Promise<void> => {
+  actualizarDireccion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -92,19 +108,29 @@ export class CtInfraestructuraDireccionBaseController extends BaseController {
           ctInfraestructuraDireccionIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const direccionData: ActualizarCtInfraestructuraDireccionInput = req.body;
 
-        return await ctInfraestructuraDireccionBaseService.actualizar(id_ct_infraestructura_direccion, direccionData);
+        return await ctInfraestructuraDireccionBaseService.actualizar(
+          id_ct_infraestructura_direccion,
+          direccionData,
+          idSesion
+        );
       },
       "Dirección actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar dirección
+   * 📦 Eliminar dirección (soft delete)
    * @route DELETE /api/ct_infraestructura_direccion/:id_ct_infraestructura_direccion
+   * 🔐 Requiere autenticación
    */
-  eliminarDireccion = async (req: Request, res: Response): Promise<void> => {
+  eliminarDireccion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -114,7 +140,16 @@ export class CtInfraestructuraDireccionBaseController extends BaseController {
           req.params
         );
 
-        await ctInfraestructuraDireccionBaseService.eliminar(id_ct_infraestructura_direccion);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInfraestructuraDireccionBaseService.eliminar(
+          id_ct_infraestructura_direccion,
+          idUsuario,
+          idSesion
+        );
       },
       "Dirección eliminada exitosamente"
     );

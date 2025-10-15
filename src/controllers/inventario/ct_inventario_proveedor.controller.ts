@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInventarioProveedorBaseService } from "../../services/inventario/ct_inventario_proveedor.service";
 import {
@@ -16,14 +21,21 @@ export class CtInventarioProveedorBaseController extends BaseController {
   /**
    * 📦 Crear nuevo proveedor
    * @route POST /api/ct_inventario_proveedor
+   * 🔐 Requiere autenticación
    */
-  crearInventarioProveedor = async (req: Request, res: Response): Promise<void> => {
+  crearInventarioProveedor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const inventarioProveedorData: CrearCtInventarioProveedorInput = req.body;
-        return await ctInventarioProveedorBaseService.crear(inventarioProveedorData);
+        return await ctInventarioProveedorBaseService.crear(inventarioProveedorData, idSesion);
       },
       "Proveedor creado exitosamente"
     );
@@ -79,8 +91,12 @@ export class CtInventarioProveedorBaseController extends BaseController {
   /**
    * 📦 Actualizar proveedor
    * @route PUT /api/ct_inventario_proveedor/:id_ct_inventario_proveedor
+   * 🔐 Requiere autenticación
    */
-  actualizarInventarioProveedor = async (req: Request, res: Response): Promise<void> => {
+  actualizarInventarioProveedor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
@@ -89,19 +105,29 @@ export class CtInventarioProveedorBaseController extends BaseController {
           ctInventarioProveedorIdParamSchema,
           req.params
         );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
         const inventarioProveedorData: ActualizarCtInventarioProveedorInput = req.body;
 
-        return await ctInventarioProveedorBaseService.actualizar(id_ct_inventario_proveedor, inventarioProveedorData);
+        return await ctInventarioProveedorBaseService.actualizar(
+          id_ct_inventario_proveedor,
+          inventarioProveedorData,
+          idSesion
+        );
       },
       "Proveedor actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar proveedor
+   * 📦 Eliminar proveedor (soft delete)
    * @route DELETE /api/ct_inventario_proveedor/:id_ct_inventario_proveedor
+   * 🔐 Requiere autenticación
    */
-  eliminarInventarioProveedor = async (req: Request, res: Response): Promise<void> => {
+  eliminarInventarioProveedor = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
@@ -111,7 +137,16 @@ export class CtInventarioProveedorBaseController extends BaseController {
           req.params
         );
 
-        await ctInventarioProveedorBaseService.eliminar(id_ct_inventario_proveedor);
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioProveedorBaseService.eliminar(
+          id_ct_inventario_proveedor,
+          idUsuario,
+          idSesion
+        );
       },
       "Proveedor eliminado exitosamente"
     );
