@@ -89,13 +89,25 @@ export class CtMunicipioBaseService extends BaseService<
     return "id_ct_municipio";
   }
 
-  // ✨ ¡YA TIENES CRUD COMPLETO AUTOMÁTICAMENTE!
+ // ✨ ¡YA TIENES CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅
   // - obtenerPorId() ✅
   // - crear() con validaciones ✅
   // - actualizar() con verificaciones ✅
   // - eliminar() con manejo de errores ✅
+
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_municipio"; // Nombre exacto de la tabla
 }
 
 // 🎉 TOTAL: ¡Solo 18 líneas para CRUD completo!
 // Sin BaseService serían ~150 líneas 😱
+
+// 📝 CON BITÁCORA: ¡Solo +2 líneas más! (CRUD + auditoría automática)
+// Sin BaseService con bitácora serían ~350+ líneas 🚀

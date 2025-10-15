@@ -40,16 +40,10 @@ export class DtBitacoraBaseService extends BaseService<
       includes.ct_bitacora_tabla = true;
     }
 
-    // Include individual de sesión
-    if (filters?.incluir_sesion) {
-      includes.ct_sesion = true;
-    }
-
     // Include de todas las relaciones
     if (filters?.incluir_todas_relaciones) {
       includes.ct_bitacora_accion = true;
       includes.ct_bitacora_tabla = true;
-      includes.ct_sesion = true;
     }
 
     // 🎯 IMPORTANTE: Si no hay includes, retornar undefined
@@ -89,13 +83,6 @@ export class DtBitacoraBaseService extends BaseService<
       });
     }
 
-    // Filtro por sesión
-    if (filters?.id_ct_sesion) {
-      conditions.push({
-        id_ct_sesion: filters.id_ct_sesion,
-      });
-    }
-
     // Si hay condiciones, usar AND, sino where vacío
     if (conditions.length > 0) {
       where.AND = conditions;
@@ -120,7 +107,6 @@ export class DtBitacoraBaseService extends BaseService<
   // - id_ct_bitacora_accion
   // - id_ct_bitacora_tabla
   // - id_registro_afectado
-  // - id_ct_sesion
-  // Con includes opcionales de accion, tabla y sesion
+  // Con includes opcionales de accion, tabla
 }
 

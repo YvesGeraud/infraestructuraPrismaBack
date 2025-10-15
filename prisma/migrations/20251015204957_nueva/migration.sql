@@ -695,9 +695,6 @@ ALTER TABLE `dt_bitacora` ADD CONSTRAINT `FK_dt_bitacora_ct_bitacora_accion` FOR
 ALTER TABLE `dt_bitacora` ADD CONSTRAINT `FK_dt_bitacora_ct_bitacora_tabla` FOREIGN KEY (`id_ct_bitacora_tabla`) REFERENCES `ct_bitacora_tabla`(`id_ct_bitacora_tabla`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `dt_bitacora` ADD CONSTRAINT `FK_dt_bitacora_ct_sesion` FOREIGN KEY (`id_ct_sesion`) REFERENCES `ct_sesion`(`id_ct_sesion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_color` FOREIGN KEY (`id_ct_inventario_color`) REFERENCES `ct_inventario_color`(`id_ct_inventario_color`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey

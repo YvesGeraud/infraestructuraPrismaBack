@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-//import authRoutes from "./authRoutes";
+import authRoutes from "./auth.routes";
 import reportesRoutes from "./reportes.routes";
 import consultarReportesRoutes from "./consultarReportes.routes";
 
@@ -41,7 +41,7 @@ import dtBitacoraRoutes from "./dt_bitacora.route";
 const router = Router();
 
 // Montar las rutas con sus prefijos
-//router.use("/auth", authRoutes);
+router.use("/auth", authRoutes);
 router.use("/reportes", reportesRoutes);
 router.use("/reportes", consultarReportesRoutes);
 

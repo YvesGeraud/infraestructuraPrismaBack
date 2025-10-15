@@ -215,7 +215,7 @@ export const verificarAutenticacion = async (
       email: usuario.email,
       estado: usuario.estado,
       jti: payload.jti,
-      id_sesion: sesion.id_ct_sesion,
+      id_sesion: sesion.id_ct_sesion.toString(), // Convertir INT a string
       ip_origen: sesion.ip_origen,
       fecha_expiracion: sesion.fecha_expiracion,
     };

@@ -459,19 +459,18 @@ model ct_refresh_token {
 }
 
 model ct_sesion {
-  id_ct_sesion     Int           @id @default(autoincrement())
+  id_ct_sesion     Int        @id @default(autoincrement())
   id_ct_usuario    Int
-  jti              String        @unique @db.VarChar(36)
-  ip_origen        String?       @db.VarChar(45)
-  user_agent       String?       @db.VarChar(500)
-  dispositivo      String?       @db.VarChar(100)
-  ubicacion        String?       @db.VarChar(100)
-  fecha_creacion   DateTime      @default(now()) @db.DateTime(6)
-  fecha_expiracion DateTime      @db.DateTime(6)
-  fecha_ultimo_uso DateTime?     @db.DateTime(6)
-  activa           Boolean       @default(true)
-  ct_usuario       ct_usuario    @relation(fields: [id_ct_usuario], references: [id_ct_usuario], onDelete: Cascade)
-  dt_bitacora      dt_bitacora[]
+  jti              String     @unique @db.VarChar(36)
+  ip_origen        String?    @db.VarChar(45)
+  user_agent       String?    @db.VarChar(500)
+  dispositivo      String?    @db.VarChar(100)
+  ubicacion        String?    @db.VarChar(100)
+  fecha_creacion   DateTime   @default(now()) @db.DateTime(6)
+  fecha_expiracion DateTime   @db.DateTime(6)
+  fecha_ultimo_uso DateTime?  @db.DateTime(6)
+  activa           Boolean    @default(true)
+  ct_usuario       ct_usuario @relation(fields: [id_ct_usuario], references: [id_ct_usuario], onDelete: Cascade)
 
   @@index([activa])
   @@index([fecha_expiracion])
@@ -510,7 +509,6 @@ model dt_bitacora {
   id_ct_usuario_up      Int?
   ct_bitacora_accion    ct_bitacora_accion @relation(fields: [id_ct_bitacora_accion], references: [id_ct_bitacora_accion], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_bitacora_ct_bitacora_accion")
   ct_bitacora_tabla     ct_bitacora_tabla  @relation(fields: [id_ct_bitacora_tabla], references: [id_ct_bitacora_tabla], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_bitacora_ct_bitacora_tabla")
-  ct_sesion             ct_sesion          @relation(fields: [id_ct_sesion], references: [id_ct_sesion], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_bitacora_ct_sesion")
 
   @@index([id_ct_bitacora_tabla], map: "FK_dt_bitacora_ct_bitacora_tabla")
   @@index([id_ct_sesion], map: "FK_dt_bitacora_ct_sesion")

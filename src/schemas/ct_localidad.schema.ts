@@ -37,7 +37,7 @@ export const crearCtLocalidadSchema = z.object({
 export const actualizarCtLocalidadSchema = z.object({
   nombre: esquemaTextoOpcional(100),
   ambito: esquemaTextoOpcional(1),
-  id_ct_municipio: esquemaNumeroOpcional,
+  id_ct_municipio: esquemaQueryId,
   estado: esquemaEstadoOpcional,
   id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
 });

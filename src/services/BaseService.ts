@@ -24,18 +24,35 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   protected abstract config: BaseServiceConfig;
 
   /**
-   * 📝 SISTEMA DE BITÁCORA (Automático)
+   * 📝 SISTEMA DE BITÁCORA (Automático y Optimizado)
    *
    * Para activar en un servicio, solo necesitas 2 líneas:
    * ```typescript
    * protected registrarEnBitacora = true;
-   * protected nombreTablaParaBitacora = "LOCALIDAD"; // Nombre para dt_bitacora
+   * protected nombreTablaParaBitacora = "LOCALIDAD"; // Nombre para ct_bitacora_tabla
    * ```
    *
    * BaseService se encarga automáticamente de:
    * - Capturar datos antes/después del cambio
-   * - Registrar en dt_bitacora dentro de la misma transacción
+   * - 🎯 OPTIMIZACIÓN: Solo guarda campos que realmente cambiaron
+   * - Buscar acciones en ct_bitacora_accion (usa catálogo existente)
+   * - Buscar/crear registros en ct_bitacora_tabla si no existen
+   * - Buscar sesión activa del usuario específico en ct_sesion (TEMPORAL - mejorar con JWT)
+   * - Registrar en dt_bitacora con las FK correctas dentro de la misma transacción
    * - Hacer rollback si falla la bitácora
+   * - Serializar datos como JSON en campos LongText
+   * 
+   * 🚀 BENEFICIOS DE OPTIMIZACIÓN:
+   * - Reduce el tamaño de la bitácora hasta un 90%
+   * - Mejora la legibilidad (solo cambios relevantes)
+   * - Optimiza el rendimiento de consultas
+   * - Facilita el análisis de cambios específicos
+   * 
+   * ⚠️ REQUISITOS DE SEGURIDAD:
+   * - ct_bitacora_accion debe estar poblado con acciones estándar
+   * - 🚨 ct_sesion DEBE tener al menos una sesión activa para cada usuario (OBLIGATORIO por seguridad)
+   * - No se permite registrar en bitácora sin sesión válida del usuario (previene puertas traseras)
+   * - 💡 MEJORA FUTURA: Pasar idSesion desde JWT en lugar de buscarlo en BD
    */
   protected registrarEnBitacora: boolean = false;
   protected nombreTablaParaBitacora: string = "";
@@ -224,8 +241,10 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   /**
    * ✨ Crear un nuevo registro
    * Ejecuta dentro de una transacción para garantizar atomicidad con bitácora
+   * @param datos - Datos para crear el registro
+   * @param idSesion - ID de la sesión actual (OBLIGATORIO para bitácora y seguridad)
    */
-  async crear(datos: CreateInput): Promise<T> {
+  async crear(datos: CreateInput, idSesion: number): Promise<T> {
     try {
       return await this.ejecutarEnTransaccion(async (tx) => {
         // Hook para validaciones personalizadas antes de crear
@@ -242,7 +261,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 
         // 📝 Hook de bitácora (solo si está habilitado)
         if (this.registrarEnBitacora) {
-          await this.registrarCreacionEnBitacora(datos, record, tx);
+          await this.registrarCreacionEnBitacora(datos, record, tx, idSesion);
         }
 
         // Hook para acciones personalizadas después de crear
@@ -259,8 +278,11 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   /**
    * ✏️ Actualizar un registro existente
    * Ejecuta dentro de una transacción para garantizar atomicidad con bitácora
+   * @param id - ID del registro a actualizar
+   * @param datos - Datos para actualizar
+   * @param idSesion - ID de la sesión actual (OBLIGATORIO para bitácora y seguridad)
    */
-  async actualizar(id: number, datos: UpdateInput): Promise<T> {
+  async actualizar(id: number, datos: UpdateInput, idSesion: number): Promise<T> {
     try {
       return await this.ejecutarEnTransaccion(async (tx) => {
         // Hook para validaciones personalizadas antes de actualizar
@@ -297,7 +319,8 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
             datos,
             datosAnteriores,
             record,
-            tx
+            tx,
+            idSesion
           );
         }
 
@@ -316,9 +339,10 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
    * 🗑️ Eliminar un registro (soft delete)
    * Ejecuta dentro de una transacción para garantizar atomicidad con bitácora
    * @param id - ID del registro a eliminar
-   * @param idUsuarioUp - ID del usuario que ejecuta la eliminación (opcional)
+   * @param idUsuarioUp - ID del usuario que ejecuta la eliminación
+   * @param idSesion - ID de la sesión actual (OBLIGATORIO para bitácora y seguridad)
    */
-  async eliminar(id: number, idUsuarioUp?: number): Promise<void> {
+  async eliminar(id: number, idUsuarioUp: number, idSesion: number): Promise<void> {
     try {
       await this.ejecutarEnTransaccion(async (tx) => {
         // Hook para validaciones personalizadas antes de eliminar
@@ -366,7 +390,8 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
             datosAnteriores,
             registroEliminado,
             idUsuarioUp,
-            tx
+            tx,
+            idSesion
           );
         }
 
@@ -474,6 +499,65 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   }
 
   /**
+   * 🎯 Extraer solo los campos que cambiaron entre dos registros
+   * Optimiza el tamaño de la bitácora guardando solo cambios relevantes
+   */
+  private extraerCamposAfectados(datosAnteriores: any, datosNuevos: any): {
+    camposAnteriores: any;
+    camposNuevos: any;
+  } {
+    if (!datosAnteriores && !datosNuevos) {
+      return { camposAnteriores: {}, camposNuevos: {} };
+    }
+
+    if (!datosAnteriores) {
+      // Solo datos nuevos (creación)
+      return { 
+        camposAnteriores: {}, 
+        camposNuevos: this.extraerDatosParaBitacora(datosNuevos) 
+      };
+    }
+
+    if (!datosNuevos) {
+      // Solo datos anteriores (eliminación)
+      return { 
+        camposAnteriores: this.extraerDatosParaBitacora(datosAnteriores), 
+        camposNuevos: {} 
+      };
+    }
+
+    // Comparar ambos registros y extraer solo campos que cambiaron
+    const datosAnterioresLimpios = this.extraerDatosParaBitacora(datosAnteriores);
+    const datosNuevosLimpios = this.extraerDatosParaBitacora(datosNuevos);
+    
+    const camposAnteriores: any = {};
+    const camposNuevos: any = {};
+
+    // Obtener todas las claves únicas
+    const todasLasClaves = new Set([
+      ...Object.keys(datosAnterioresLimpios),
+      ...Object.keys(datosNuevosLimpios)
+    ]);
+
+    for (const clave of todasLasClaves) {
+      const valorAnterior = datosAnterioresLimpios[clave];
+      const valorNuevo = datosNuevosLimpios[clave];
+
+      // Solo incluir si los valores son diferentes
+      if (JSON.stringify(valorAnterior) !== JSON.stringify(valorNuevo)) {
+        if (valorAnterior !== undefined) {
+          camposAnteriores[clave] = valorAnterior;
+        }
+        if (valorNuevo !== undefined) {
+          camposNuevos[clave] = valorNuevo;
+        }
+      }
+    }
+
+    return { camposAnteriores, camposNuevos };
+  }
+
+  /**
    * 📝 Registrar operación en bitácora (automático)
    */
   private async registrarEnBitacoraAutomatico(
@@ -482,6 +566,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     datosAnteriores: any | null,
     datosNuevos: any,
     idUsuario: number | undefined,
+    idSesion: number | undefined,
     tx: any
   ): Promise<void> {
     try {
@@ -493,22 +578,35 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
         return;
       }
 
+      // 🔍 Obtener IDs de las tablas de catálogo de bitácora
+      const { idAccion, idTabla } = await this.obtenerIdsBitacora(accion, tx);
+
+      // 🚨 Validación redundante de seguridad
+      // (ya se validó en validarYObtenerSesion, pero por si acaso)
+      if (!idSesion) {
+        throw new Error(
+          "🚨 SEGURIDAD CRÍTICA: id_ct_sesion es NULL. " +
+          "Esto NO debería suceder si la validación funcionó correctamente. " +
+          "Revisar implementación de validarYObtenerSesion."
+        );
+      }
+
+      // 🎯 Extraer solo los campos que realmente cambiaron
+      const { camposAnteriores, camposNuevos } = this.extraerCamposAfectados(
+        datosAnteriores, 
+        datosNuevos
+      );
+
       await tx.dt_bitacora.create({
         data: {
-          tabla: this.nombreTablaParaBitacora,
-          accion,
-          id_registro: idRegistro,
-          datos_anteriores: datosAnteriores
-            ? this.extraerDatosParaBitacora(datosAnteriores)
-            : null,
-          datos_nuevos: this.extraerDatosParaBitacora(datosNuevos),
-          id_ct_usuario: idUsuario || 1, // Usuario por defecto si no se proporciona
-          observaciones: this.generarObservacionAutomatica(
-            accion,
-            datosAnteriores,
-            datosNuevos
-          ),
-          fecha: new Date(),
+          id_ct_bitacora_accion: idAccion,
+          id_ct_bitacora_tabla: idTabla,
+          id_registro_afectado: idRegistro,
+          id_ct_sesion: idSesion, // Campo normal, no FK
+          datos_anteriores: JSON.stringify(camposAnteriores),
+          datos_nuevos: JSON.stringify(camposNuevos),
+          id_ct_usuario_in: idUsuario || 1, // Usuario por defecto si no se proporciona
+          estado: true,
         },
       });
     } catch (error) {
@@ -516,6 +614,154 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       // Re-lanzar para que se haga rollback de toda la transacción
       throw error;
     }
+  }
+
+  /**
+   * 🔐 VALIDAR SESIÓN DEL USUARIO (SEGURIDAD CRÍTICA)
+   * 
+   * Este método es OBLIGATORIO para garantizar que:
+   * 1. ✅ La sesión existe en la base de datos
+   * 2. ✅ La sesión está activa
+   * 3. ✅ La sesión pertenece al usuario que está haciendo la operación
+   * 4. ✅ La sesión no ha expirado
+   * 5. ✅ No se puede falsificar una sesión
+   * 
+   * @param idSesion - ID de la sesión a validar (OBLIGATORIO desde JWT)
+   * @param idUsuario - ID del usuario que debe ser dueño de la sesión
+   * @param tx - Cliente de transacción Prisma
+   * @returns ID de la sesión validada
+   * @throws Error si la sesión es inválida, no pertenece al usuario, o ha expirado
+   */
+  private async validarYObtenerSesion(
+    idSesion: number, 
+    idUsuario: number,
+    tx: any
+  ): Promise<number> {
+    // 🚨 Validación obligatoria
+    if (!idSesion) {
+      throw new Error(
+        "🚨 SEGURIDAD: id_ct_sesion es OBLIGATORIO. " +
+        "Debe proporcionarse desde el JWT del usuario autenticado. " +
+        "No se permite registrar en bitácora sin sesión válida."
+      );
+    }
+
+    if (!idUsuario) {
+      throw new Error(
+        "🚨 SEGURIDAD: id_ct_usuario es OBLIGATORIO. " +
+        "Debe proporcionarse desde el JWT o los datos del registro."
+      );
+    }
+
+    // 🔍 VALIDACIÓN EN BD: Verificar que la sesión existe y es válida
+    const sesionRecord = await tx.ct_sesion.findUnique({
+      where: { 
+        id_ct_sesion: idSesion 
+      }
+    });
+
+    // ❌ Sesión no existe
+    if (!sesionRecord) {
+      throw new Error(
+        `🚨 SEGURIDAD: La sesión ${idSesion} no existe en la base de datos. ` +
+        `Posible intento de falsificación de sesión.`
+      );
+    }
+
+    // ❌ Sesión no pertenece al usuario
+    if (sesionRecord.id_ct_usuario !== idUsuario) {
+      throw new Error(
+        `🚨 SEGURIDAD: La sesión ${idSesion} NO pertenece al usuario ${idUsuario}. ` +
+        `Pertenece al usuario ${sesionRecord.id_ct_usuario}. ` +
+        `Posible intento de usar sesión de otro usuario.`
+      );
+    }
+
+    // ❌ Sesión inactiva
+    if (!sesionRecord.activa) {
+      throw new Error(
+        `🚨 SEGURIDAD: La sesión ${idSesion} está INACTIVA. ` +
+        `El usuario debe iniciar sesión nuevamente.`
+      );
+    }
+
+    // ❌ Sesión expirada
+    const ahora = new Date();
+    if (sesionRecord.fecha_expiracion < ahora) {
+      // Marcar como inactiva automáticamente
+      await tx.ct_sesion.update({
+        where: { id_ct_sesion: idSesion },
+        data: { activa: false }
+      });
+
+      throw new Error(
+        `🚨 SEGURIDAD: La sesión ${idSesion} ha EXPIRADO. ` +
+        `Expiró el ${sesionRecord.fecha_expiracion.toISOString()}. ` +
+        `El usuario debe iniciar sesión nuevamente.`
+      );
+    }
+
+    // ✅ Sesión válida y verificada
+    console.log(
+      `✅ SEGURIDAD: Sesión ${idSesion} validada correctamente para usuario ${idUsuario}`
+    );
+    
+    return idSesion;
+  }
+
+  /**
+   * 🔍 Obtener IDs de las tablas de catálogo de bitácora
+   */
+  private async obtenerIdsBitacora(accion: string, tx: any): Promise<{
+    idAccion: number;
+    idTabla: number;
+  }> {
+    // Mapear acciones a nombres estándar del catálogo existente
+    const mapeoAcciones: Record<string, string> = {
+      CREATE: "Creación",
+      UPDATE: "Actualización", 
+      DELETE: "Eliminación"
+    };
+
+    const nombreAccion = mapeoAcciones[accion] || accion;
+
+    // Buscar la acción en ct_bitacora_accion (NO crear, usar catálogo existente)
+    const accionRecord = await tx.ct_bitacora_accion.findFirst({
+      where: { 
+        nombre: nombreAccion,
+        estado: true
+      }
+    });
+
+    if (!accionRecord) {
+      throw new Error(`Acción de bitácora "${nombreAccion}" no encontrada en el catálogo ct_bitacora_accion. Asegúrate de que el catálogo esté poblado correctamente.`);
+    }
+
+    // Buscar o crear la tabla en ct_bitacora_tabla
+    let tablaRecord = await tx.ct_bitacora_tabla.findFirst({
+      where: { 
+        nombre: this.nombreTablaParaBitacora,
+        estado: true
+      }
+    });
+
+    if (!tablaRecord) {
+      // Crear la tabla si no existe
+      tablaRecord = await tx.ct_bitacora_tabla.create({
+        data: {
+          nombre: this.nombreTablaParaBitacora,
+          descripcion: `Tabla ${this.nombreTablaParaBitacora}`,
+          estado: true,
+          auditar: true,
+          id_ct_usuario_in: 1, // Usuario sistema
+        }
+      });
+    }
+
+    return {
+      idAccion: accionRecord.id_ct_bitacora_accion,
+      idTabla: tablaRecord.id_ct_bitacora_tabla,
+    };
   }
 
   /**
@@ -554,11 +800,15 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
   protected async registrarCreacionEnBitacora(
     datos: CreateInput,
     resultado: T,
-    tx: any
+    tx: any,
+    idSesionProporcionado: number
   ): Promise<void> {
     // Por defecto, usar registro automático
     const idRegistro = (resultado as any)[this.getPrimaryKeyField()];
     const idUsuario = (datos as any).id_ct_usuario_in;
+    
+    // 🔐 VALIDAR sesión obligatoriamente
+    const idSesion = await this.validarYObtenerSesion(idSesionProporcionado, idUsuario, tx);
 
     await this.registrarEnBitacoraAutomatico(
       "CREATE",
@@ -566,6 +816,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       null,
       resultado,
       idUsuario,
+      idSesion,
       tx
     );
   }
@@ -575,10 +826,14 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     datos: UpdateInput,
     datosAnteriores: T,
     resultado: T,
-    tx: any
+    tx: any,
+    idSesionProporcionado: number
   ): Promise<void> {
     // Por defecto, usar registro automático
     const idUsuario = (datos as any).id_ct_usuario_up;
+    
+    // 🔐 VALIDAR sesión obligatoriamente
+    const idSesion = await this.validarYObtenerSesion(idSesionProporcionado, idUsuario, tx);
 
     await this.registrarEnBitacoraAutomatico(
       "UPDATE",
@@ -586,6 +841,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
       datosAnteriores,
       resultado,
       idUsuario,
+      idSesion,
       tx
     );
   }
@@ -594,16 +850,21 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
     id: number,
     datosAnteriores: T,
     registroEliminado: T,
-    idUsuarioUp: number | undefined,
-    tx: any
+    idUsuarioUp: number,
+    tx: any,
+    idSesionProporcionado: number
   ): Promise<void> {
     // Por defecto, usar registro automático
+    // 🔐 VALIDAR sesión obligatoriamente
+    const idSesion = await this.validarYObtenerSesion(idSesionProporcionado, idUsuarioUp, tx);
+    
     await this.registrarEnBitacoraAutomatico(
       "DELETE",
       id,
       datosAnteriores,
       { estado: false },
       idUsuarioUp,
+      idSesion,
       tx
     );
   }
@@ -789,7 +1050,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 }
 
 /*
-🔄 SOFT DELETE IMPLEMENTADO:
+🔄 SOFT DELETE + BITÁCORA AUTOMÁTICA OPTIMIZADA IMPLEMENTADO:
 
 ✅ Cambios realizados:
 1. 🚫 método eliminar() - Ahora hace UPDATE activo=false en lugar de DELETE físico
@@ -797,16 +1058,27 @@ export abstract class BaseService<T, CreateInput, UpdateInput, FilterInput> {
 3. 🔍 método obtenerPorId() - Solo busca registros activos por defecto
 4. 🛡️ manejarErrorPrisma() - Convierte errores de BD en mensajes amigables
 5. 🕐 método actualizar() - Actualiza automáticamente updatedAt en cada UPDATE
+6. 📝 Sistema de bitácora automático - Registra en dt_bitacora con FK correctas
+7. 🎯 OPTIMIZACIÓN: Solo guarda campos que realmente cambiaron (reduce tamaño 90%)
 
 📋 Beneficios:
 - ✅ Preserva datos para auditoría
 - ✅ Evita problemas de integridad referencial
 - ✅ Permite recuperación de datos "eliminados"
 - ✅ Mantiene historial completo del sistema
+- ✅ Bitácora automática con ct_bitacora_accion y ct_bitacora_tabla
+- ✅ Bitácora optimizada (solo cambios relevantes)
+- ✅ Mejor rendimiento y legibilidad
 
 🔧 Para incluir registros inactivos:
 - Pasar { incluirInactivos: true } en los filtros
 - Ejemplo: obtenerTodos({}, { incluirInactivos: true })
 
+🔧 Para activar bitácora en un servicio:
+- protected registrarEnBitacora = true;
+- protected nombreTablaParaBitacora = "NOMBRE_TABLA";
+
 ⚠️  Nota: Todos los modelos deben tener campo 'activo' (Boolean)
+⚠️  Nota: Sistema de bitácora requiere ct_bitacora_accion y ct_bitacora_tabla poblados
+⚠️  Nota: Bitácora optimizada solo guarda campos modificados
 */

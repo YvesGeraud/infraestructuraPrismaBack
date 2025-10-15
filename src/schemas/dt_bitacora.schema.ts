@@ -27,7 +27,6 @@ export const crearDtBitacoraSchema = z.object({
   id_ct_bitacora_accion: esquemaNumeroRequerido(1, 100000),
   id_ct_bitacora_tabla: esquemaNumeroRequerido(1, 100000),
   id_registro_afectado: esquemaNumeroRequerido(1, 2147483647), // Int max
-  id_ct_sesion: esquemaNumeroRequerido(1, 2147483647),
   datos_anteriores: esquemaTextoRequerido(0, 16777215), // LongText max
   datos_nuevos: esquemaTextoRequerido(0, 16777215), // LongText max
   estado: esquemaEstadoRequerido,
@@ -39,7 +38,6 @@ export const actualizarDtBitacoraSchema = z.object({
   id_ct_bitacora_accion: esquemaNumeroOpcional(1, 100000),
   id_ct_bitacora_tabla: esquemaNumeroOpcional(1, 100000),
   id_registro_afectado: esquemaNumeroOpcional(1, 2147483647),
-  id_ct_sesion: esquemaNumeroOpcional(1, 2147483647),
   datos_anteriores: esquemaTextoOpcional(16777215),
   datos_nuevos: esquemaTextoOpcional(16777215),
   estado: esquemaEstadoOpcional,
@@ -55,7 +53,6 @@ export const dtBitacoraFiltrosSchema = z.object({
   id_ct_bitacora_accion: esquemaQueryNumeroOpcional,
   id_ct_bitacora_tabla: esquemaQueryNumeroOpcional,
   id_registro_afectado: esquemaQueryNumeroOpcional,
-  id_ct_sesion: esquemaQueryNumeroOpcional,
   estado: esquemaQueryBoolean,
   id_ct_usuario_in: esquemaQueryId,
   fecha_in: esquemaFechaOpcional,
@@ -63,7 +60,6 @@ export const dtBitacoraFiltrosSchema = z.object({
   //? Filtros de includes
   incluir_accion: esquemaQueryBoolean,
   incluir_tabla: esquemaQueryBoolean,
-  incluir_sesion: esquemaQueryBoolean,
   incluir_todas_relaciones: esquemaQueryBoolean,
 
   //? Filtros para incluir inactivos
@@ -115,8 +111,8 @@ export type EliminarDtBitacoraInput = z.infer<typeof eliminarDtBitacoraSchema>;
 
 📝 Nota sobre dt_bitacora:
 - Esta tabla registra todos los cambios realizados en el sistema
-- Incluye relaciones con ct_bitacora_accion, ct_bitacora_tabla y ct_sesion
+- Incluye relaciones con ct_bitacora_accion, ct_bitacora_tabla
 - Los campos datos_anteriores y datos_nuevos son LongText (hasta 16MB)
-- Permite filtrar por acción, tabla, sesión y registro afectado
+- Permite filtrar por acción, tabla y registro afectado
 */
 

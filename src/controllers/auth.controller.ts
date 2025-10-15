@@ -354,7 +354,7 @@ export class AuthController {
       // Verificar que la sesión pertenece al usuario actual
       const sesion = await prisma.ct_sesion.findFirst({
         where: {
-          id_ct_sesion: sessionId,
+          id_ct_sesion: parseInt(sessionId), // Convertir string a INT
           id_ct_usuario: idUsuario,
           activa: true,
         },
@@ -374,12 +374,12 @@ export class AuthController {
       // Cerrar la sesión y revocar refresh tokens asociados
       await prisma.$transaction([
         prisma.ct_sesion.update({
-          where: { id_ct_sesion: sessionId },
+          where: { id_ct_sesion: parseInt(sessionId) }, // Convertir string a INT
           data: { activa: false },
         }),
         prisma.ct_refresh_token.updateMany({
           where: {
-            id_ct_sesion: sessionId,
+            id_ct_sesion: sessionId, // Este campo es STRING en ct_refresh_token
             revocado: false,
             usado: false,
           },

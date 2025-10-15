@@ -129,9 +129,8 @@ export class AuthService {
 
       const usuario = validacion.usuario;
 
-      // 2. 🆔 GENERAR IDENTIFICADORES ÚNICOS
+      // 2. 🆔 GENERAR JWT ID ÚNICO
       const jti = uuidv4(); // JWT ID único
-      const sesionId = uuidv4(); // ID de sesión único
 
       // 3. 🎫 GENERAR JWT CON JTI
       const payload: PayloadJwt = {
@@ -155,7 +154,6 @@ export class AuthService {
 
       const sesion = await prisma.ct_sesion.create({
         data: {
-          id_ct_sesion: sesionId,
           id_ct_usuario: usuario.id_ct_usuario,
           jti,
           ip_origen: infoDispositivo.ip,
@@ -167,9 +165,10 @@ export class AuthService {
       });
 
       // 5. 🔄 GENERAR REFRESH TOKEN
+      // Convertir id_ct_sesion (INT) a string para el refresh token
       const refreshToken = await this.generarRefreshToken(
         usuario.id_ct_usuario,
-        sesionId
+        sesion.id_ct_sesion.toString()
       );
 
       // 6. ✅ ACTUALIZAR ESTADÍSTICAS DE USUARIO
@@ -202,7 +201,7 @@ export class AuthService {
             expiraEn: this.parseTimeToSeconds(jwtConfig.expiresIn),
           },
           sesion: {
-            id_sesion: sesionId,
+            id_sesion: sesion.id_ct_sesion.toString(),
             jti,
             fecha_expiracion: fechaExpiracion,
             ip_origen: infoDispositivo.ip,
@@ -338,9 +337,13 @@ export class AuthService {
             fecha_uso: new Date(),
           },
         }),
-        // Actualizar sesión con nuevo JTI
+        // Actualizar sesión con nuevo JTI (convertir string a number)
         prisma.ct_sesion.update({
-          where: { id_ct_sesion: refreshTokenRecord.id_ct_sesion || "" },
+          where: { 
+            id_ct_sesion: refreshTokenRecord.id_ct_sesion 
+              ? parseInt(refreshTokenRecord.id_ct_sesion) 
+              : 0 
+          },
           data: {
             jti: nuevoJti,
             fecha_ultimo_uso: new Date(),
@@ -428,12 +431,12 @@ export class AuthService {
         tokensRevocados = tokensResult.count;
       } else {
         // 2B. 🎯 LOGOUT ESPECÍFICO - Solo la sesión actual
-        const sesionId = input.sesionId || sesionActual.id_ct_sesion;
+        const sesionId = input.sesionId || sesionActual.id_ct_sesion.toString();
 
         const [sesionesResult, tokensResult] = await prisma.$transaction([
           prisma.ct_sesion.updateMany({
             where: {
-              id_ct_sesion: sesionId,
+              id_ct_sesion: parseInt(sesionId),
               id_ct_usuario: sesionActual.id_ct_usuario,
               activa: true,
             },
@@ -530,7 +533,7 @@ export class AuthService {
         datos: {
           usuario: sesion.ct_usuario,
           sesionActual: {
-            id_sesion: sesion.id_ct_sesion,
+            id_sesion: sesion.id_ct_sesion.toString(),
             jti: sesion.jti,
             fecha_creacion: sesion.fecha_creacion,
             fecha_expiracion: sesion.fecha_expiracion,
@@ -665,6 +668,7 @@ export class AuthService {
    * 🔄 GENERAR REFRESH TOKEN
    *
    * Crea un nuevo refresh token asociado a una sesión
+   * @param idSesion debe ser string porque ct_refresh_token.id_ct_sesion es VARCHAR(36)
    */
   private static async generarRefreshToken(
     idUsuario: number,

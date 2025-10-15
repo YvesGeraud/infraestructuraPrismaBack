@@ -210,6 +210,18 @@ const startServer = async () => {
       console.log(`🔍 Monitoreo del pool iniciado correctamente`);
     }
 
+    // Inicializar limpieza automática de sesiones expiradas
+    const { inicializarLimpiezaSesiones } = await import(
+      "./middleware/authMiddleware"
+    );
+    inicializarLimpiezaSesiones();
+
+    // Inicializar limpieza automática de rate limit
+    const { inicializarLimpiezaRateLimit } = await import(
+      "./middleware/authRateLimiter"
+    );
+    inicializarLimpiezaRateLimit();
+
     // Iniciar servidor
     app.listen(serverConfig.port, () => {
       console.log("✅ ===== SERVIDOR INICIADO CORRECTAMENTE =====");
