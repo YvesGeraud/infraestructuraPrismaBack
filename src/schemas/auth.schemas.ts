@@ -34,13 +34,21 @@ export const esquemaLogin = z.object({
 
 /**
  * Esquema para validar refresh token
- * @deprecated Refresh tokens han sido eliminados del sistema
+ * Usa el accessToken actual como refreshToken
  */
 export const esquemaRefreshToken = z.object({
   refreshToken: z
     .string()
     .min(1, "El refresh token es requerido")
-    .uuid("El refresh token debe ser un UUID válido"),
+    .refine((token) => {
+      try {
+        // Verificar que sea un JWT válido (tiene 3 partes separadas por puntos)
+        const parts = token.split(".");
+        return parts.length === 3;
+      } catch {
+        return false;
+      }
+    }, "El refresh token debe ser un JWT válido"),
 });
 
 /**
