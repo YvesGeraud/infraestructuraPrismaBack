@@ -6,9 +6,7 @@ import {
   crearCtLocalidadSchema,
   actualizarCtLocalidadSchema,
   ctLocalidadIdParamSchema,
-  ctLocalidadFiltrosSchema,
-  eliminarCtLocalidadSchema,
-} from "../schemas/ct_localidad.schema";
+  ctLocalidadFiltrosSchema} from "../schemas/ct_localidad.schema";
 
 // ===== RUTAS PARA CT_LOCALIDAD CON BASE SERVICE =====
 
@@ -44,8 +42,7 @@ router.put(
   verificarAutenticacion,  // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({
     params: ctLocalidadIdParamSchema,
-    body: actualizarCtLocalidadSchema,
-  }),
+    body: actualizarCtLocalidadSchema}),
   ctLocalidadController.actualizarLocalidad
 );
 
@@ -54,8 +51,7 @@ router.delete(
   "/:id_ct_localidad",
   verificarAutenticacion,  // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({
-    params: ctLocalidadIdParamSchema,
-  }),
+    params: ctLocalidadIdParamSchema}),
   // Ya no validamos eliminarCtLocalidadSchema porque id_usuario viene del JWT
   ctLocalidadController.eliminarLocalidad
 );

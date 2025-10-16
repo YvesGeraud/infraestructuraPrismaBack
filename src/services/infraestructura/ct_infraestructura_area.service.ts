@@ -89,6 +89,15 @@ export class CtInfraestructuraAreaBaseService extends BaseService<
     return "id_ct_infraestructura_area";
   }
 
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_infraestructura_area"; // Nombre exacto de la tabla
+
   // ✨ ¡CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅
   // - obtenerPorId() ✅

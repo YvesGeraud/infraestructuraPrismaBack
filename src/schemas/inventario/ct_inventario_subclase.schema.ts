@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -26,9 +25,7 @@ export const crearCtInventarioSubclaseSchema = z.object({
   id_ct_inventario_clase: esquemaNumeroRequerido(1, 100000),
   no_subclase: esquemaNumeroRequerido(1, 9999),
   nombre: esquemaTextoRequerido(2, 100),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar una subclase
 export const actualizarCtInventarioSubclaseSchema = z.object({
@@ -74,12 +71,10 @@ export const ctInventarioSubclaseIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInventarioSubclaseSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInventarioSubclaseIdParam = z.infer<typeof ctInventarioSubclaseIdParamSchema>;
 
-export type EliminarCtInventarioSubclaseInput = z.infer<typeof eliminarCtInventarioSubclaseSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

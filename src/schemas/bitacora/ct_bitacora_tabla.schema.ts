@@ -13,8 +13,7 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
-} from "./commonSchemas";
+} from "../commonSchemas";
 
 //TODO ===== SCHEMAS PARA CT_BITACORA_TABLA =====
 
@@ -23,8 +22,8 @@ export const crearCtBitacoraTablaSchema = z.object({
   nombre: esquemaTextoRequerido(2, 100),
   descripcion: esquemaTextoOpcional(255),
   estado: esquemaEstadoRequerido,
+  // id_ct_usuario_in se obtiene automáticamente del JWT
   auditar: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar una tabla de bitácora
@@ -57,12 +56,16 @@ export const ctBitacoraTablaFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearCtBitacoraTablaInput = z.infer<typeof crearCtBitacoraTablaSchema>;
+export type CrearCtBitacoraTablaInput = z.infer<
+  typeof crearCtBitacoraTablaSchema
+>;
 export type ActualizarCtBitacoraTablaInput = z.infer<
   typeof actualizarCtBitacoraTablaSchema
 >;
 
-export type BuscarCtBitacoraTablaInput = z.infer<typeof ctBitacoraTablaFiltrosSchema>;
+export type BuscarCtBitacoraTablaInput = z.infer<
+  typeof ctBitacoraTablaFiltrosSchema
+>;
 
 //? Esquema para parámetros de URL (ID de tabla de bitácora)
 export const ctBitacoraTablaIdParamSchema = z.object({
@@ -70,12 +73,12 @@ export const ctBitacoraTablaIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtBitacoraTablaSchema = esquemaDeleteConUsuario;
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
+export type CtBitacoraTablaIdParam = z.infer<
+  typeof ctBitacoraTablaIdParamSchema
+>;
 
-export type CtBitacoraTablaIdParam = z.infer<typeof ctBitacoraTablaIdParamSchema>;
-
-export type EliminarCtBitacoraTablaInput = z.infer<typeof eliminarCtBitacoraTablaSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 
@@ -95,4 +98,3 @@ export type EliminarCtBitacoraTablaInput = z.infer<typeof eliminarCtBitacoraTabl
 - esquemaParamId - Para parámetros de URL
 - esquemaDeleteConUsuario - Para eliminación con auditoría
 */
-

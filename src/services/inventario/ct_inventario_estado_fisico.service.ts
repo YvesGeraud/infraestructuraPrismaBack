@@ -67,6 +67,15 @@ export class CtInventarioEstadoFisicoBaseService extends BaseService<
     return "id_ct_inventario_estado_fisico";
   }
 
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_inventario_estado_fisico"; // Nombre exacto de la tabla
+
   // ✨ ¡CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅
   // - obtenerPorId() ✅

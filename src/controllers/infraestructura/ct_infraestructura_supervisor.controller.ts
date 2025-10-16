@@ -33,9 +33,10 @@ export class CtInfraestructuraSupervisorBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const supervisorData: CrearCtInfraestructuraSupervisorInput = req.body;
 
-        const supervisorData: CrearCtInfraestructuraSupervisorInput = req.body;
-        return await ctInfraestructuraSupervisorBaseService.crear(supervisorData, idSesion);
+         return await ctInfraestructuraSupervisorBaseService.crear(supervisorData, idSesion, idUsuario);
       },
       "Supervisor creado exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInfraestructuraSupervisorBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const supervisorData: ActualizarCtInfraestructuraSupervisorInput = req.body;
 
-        return await ctInfraestructuraSupervisorBaseService.actualizar(
-          id_ct_infraestructura_supervisor,
-          supervisorData,
-          idSesion
-        );
+        return await ctInfraestructuraSupervisorBaseService.actualizar(id_ct_infraestructura_supervisor, supervisorData, idSesion, idUsuario);
       },
       "Supervisor actualizado exitosamente"
     );

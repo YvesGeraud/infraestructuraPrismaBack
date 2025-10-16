@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -24,9 +23,7 @@ import {
 //? Esquema para crear un nuevo tipo de instancia
 export const crearCtInfraestructuraTipoInstanciaSchema = z.object({
   nombre: esquemaTextoRequerido(1, 50),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar un tipo de instancia
 export const actualizarCtInfraestructuraTipoInstanciaSchema = z.object({
@@ -68,12 +65,10 @@ export const ctInfraestructuraTipoInstanciaIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInfraestructuraTipoInstanciaSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInfraestructuraTipoInstanciaIdParam = z.infer<typeof ctInfraestructuraTipoInstanciaIdParamSchema>;
 
-export type EliminarCtInfraestructuraTipoInstanciaInput = z.infer<typeof eliminarCtInfraestructuraTipoInstanciaSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

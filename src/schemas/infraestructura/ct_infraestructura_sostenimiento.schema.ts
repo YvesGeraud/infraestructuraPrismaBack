@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -24,9 +23,7 @@ import {
 //? Esquema para crear un nuevo sostenimiento
 export const crearCtInfraestructuraSostenimientoSchema = z.object({
   sostenimiento: esquemaTextoRequerido(1, 50),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar un sostenimiento
 export const actualizarCtInfraestructuraSostenimientoSchema = z.object({
@@ -68,12 +65,10 @@ export const ctInfraestructuraSostenimientoIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInfraestructuraSostenimientoSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInfraestructuraSostenimientoIdParam = z.infer<typeof ctInfraestructuraSostenimientoIdParamSchema>;
 
-export type EliminarCtInfraestructuraSostenimientoInput = z.infer<typeof eliminarCtInfraestructuraSostenimientoSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

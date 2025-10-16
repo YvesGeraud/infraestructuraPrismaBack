@@ -33,9 +33,10 @@ export class DtInventarioArticuloBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioArticuloData: CrearDtInventarioArticuloInput = req.body;
 
-        const inventarioArticuloData: CrearDtInventarioArticuloInput = req.body;
-        return await dtInventarioArticuloBaseService.crear(inventarioArticuloData, idSesion);
+         return await dtInventarioArticuloBaseService.crear(inventarioArticuloData, idSesion, idUsuario);
       },
       "Artículo de inventario creado exitosamente"
     );
@@ -127,13 +128,10 @@ export class DtInventarioArticuloBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const inventarioArticuloData: ActualizarDtInventarioArticuloInput = req.body;
 
-        return await dtInventarioArticuloBaseService.actualizar(
-          id_dt_inventario_articulo,
-          inventarioArticuloData,
-          idSesion
-        );
+        return await dtInventarioArticuloBaseService.actualizar(id_dt_inventario_articulo, inventarioArticuloData, idSesion, idUsuario);
       },
       "Artículo de inventario actualizado exitosamente"
     );

@@ -181,9 +181,10 @@ export const esquemaLimiteQuery = z
   .pipe(z.number().int().min(1).max(100));
 
 //? Esquema para el body de DELETE con auditoría
-export const esquemaDeleteConUsuario = z.object({
-  id_ct_usuario_up: esquemaUsuarioCreacion,
-});
+// Ya no se usa - id_ct_usuario_up se obtiene del JWT
+// export const esquemaDeleteConUsuario = z.object({
+//   id_ct_usuario_up: esquemaUsuarioCreacion,
+// });
 
 //TODO ===== TIPOS INFERIDOS =====
 export type PaginationInput = z.infer<typeof paginationSchema>;

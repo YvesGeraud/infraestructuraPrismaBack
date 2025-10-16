@@ -3,13 +3,13 @@
  * Registra todos los cambios realizados en las tablas auditadas del sistema
  */
 
-import { BaseService } from "./BaseService";
+import { BaseService } from "../BaseService";
 import { dt_bitacora } from "@prisma/client";
 import {
   CrearDtBitacoraInput,
   ActualizarDtBitacoraInput,
   BuscarDtBitacoraInput,
-} from "../schemas/dt_bitacora.schema";
+} from "../../schemas/bitacora/dt_bitacora.schema";
 
 //TODO ===== SERVICIO PARA DT_BITACORA CON BASE SERVICE =====
 
@@ -96,17 +96,25 @@ export class DtBitacoraBaseService extends BaseService<
     return "id_dt_bitacora";
   }
 
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "dt_bitacora"; // Nombre exacto de la tabla
+
   // ✨ ¡CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅
   // - obtenerPorId() ✅
   // - crear() con validaciones ✅
   // - actualizar() con verificaciones ✅
   // - eliminar() con manejo de errores ✅
-  
+
   // 📝 Los filtros ya permiten buscar por:
   // - id_ct_bitacora_accion
   // - id_ct_bitacora_tabla
   // - id_registro_afectado
   // Con includes opcionales de accion, tabla
 }
-

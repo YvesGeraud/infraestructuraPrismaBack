@@ -34,9 +34,9 @@ import dtInfraestructuraUbicacionRoutes from "./infraestructura/dt_infraestructu
 import entidadRoutes from "./ct_entidad.route";
 import municipioRoutes from "./ct_municipio.route";
 import localidadRoutes from "./ct_localidad.route";
-import bitacoraAccionRoutes from "./ct_bitacora.route";
-import bitacoraTablaRoutes from "./ct_bitacora_tabla.route";
-import dtBitacoraRoutes from "./dt_bitacora.route";
+import bitacoraAccionRoutes from "./bitacora/ct_bitacora.route";
+import bitacoraTablaRoutes from "./bitacora/ct_bitacora_tabla.route";
+import dtBitacoraRoutes from "./bitacora/dt_bitacora.route";
 
 const router = Router();
 
@@ -61,14 +61,26 @@ router.use("/dt_inventario_articulo", dtInventarioArticuloRoutes);
 //? INFRAESTRUCTURA
 router.use("/ct_infraestructura_anexo", infraestructuraAnexoRoutes);
 router.use("/ct_infraestructura_area", infraestructuraAreaRoutes);
-router.use("/ct_infraestructura_departamento", infraestructuraDepartamentoRoutes);
+router.use(
+  "/ct_infraestructura_departamento",
+  infraestructuraDepartamentoRoutes
+);
 router.use("/ct_infraestructura_direccion", infraestructuraDireccionRoutes);
 router.use("/ct_infraestructura_escuela", infraestructuraEscuelaRoutes);
 router.use("/ct_infraestructura_jefe_sector", infraestructuraJefeSectorRoutes);
 router.use("/ct_infraestructura_supervisor", infraestructuraSupervisorRoutes);
-router.use("/ct_infraestructura_sostenimiento", infraestructuraSostenimientoRoutes);
-router.use("/ct_infraestructura_tipo_escuela", infraestructuraTipoEscuelaRoutes);
-router.use("/ct_infraestructura_tipo_instancia", infraestructuraTipoInstanciaRoutes);
+router.use(
+  "/ct_infraestructura_sostenimiento",
+  infraestructuraSostenimientoRoutes
+);
+router.use(
+  "/ct_infraestructura_tipo_escuela",
+  infraestructuraTipoEscuelaRoutes
+);
+router.use(
+  "/ct_infraestructura_tipo_instancia",
+  infraestructuraTipoInstanciaRoutes
+);
 router.use("/dt_infraestructura_ubicacion", dtInfraestructuraUbicacionRoutes);
 
 //? GENERAL

@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -29,9 +28,7 @@ export const crearCtInfraestructuraEscuelaSchema = z.object({
   nombre: esquemaTextoRequerido(2, 255),
   id_ct_sostenimiento: esquemaNumeroRequerido(0, 2147483647),
   id_dt_infraestructura_ubicacion: esquemaNumeroRequerido(0, 2147483647),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar una escuela
 export const actualizarCtInfraestructuraEscuelaSchema = z.object({
@@ -86,12 +83,10 @@ export const ctInfraestructuraEscuelaIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInfraestructuraEscuelaSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInfraestructuraEscuelaIdParam = z.infer<typeof ctInfraestructuraEscuelaIdParamSchema>;
 
-export type EliminarCtInfraestructuraEscuelaInput = z.infer<typeof eliminarCtInfraestructuraEscuelaSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

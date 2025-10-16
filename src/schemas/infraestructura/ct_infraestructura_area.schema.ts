@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -27,7 +26,6 @@ export const crearCtInfraestructuraAreaSchema = z.object({
   cct: esquemaTextoRequerido(11, 11),
   id_dt_infraestructura_ubicacion: esquemaNumeroRequerido(1, 2147483647),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar un área
@@ -36,7 +34,7 @@ export const actualizarCtInfraestructuraAreaSchema = z.object({
   cct: esquemaTextoOpcional(11),
   id_dt_infraestructura_ubicacion: esquemaNumeroOpcional(1, 2147483647),
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  // id_ct_usuario_up se obtiene automáticamente del JWT
   fecha_up: esquemaFechaOpcional,
 });
 
@@ -61,12 +59,16 @@ export const ctInfraestructuraAreaFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearCtInfraestructuraAreaInput = z.infer<typeof crearCtInfraestructuraAreaSchema>;
+export type CrearCtInfraestructuraAreaInput = z.infer<
+  typeof crearCtInfraestructuraAreaSchema
+>;
 export type ActualizarCtInfraestructuraAreaInput = z.infer<
   typeof actualizarCtInfraestructuraAreaSchema
 >;
 
-export type BuscarCtInfraestructuraAreaInput = z.infer<typeof ctInfraestructuraAreaFiltrosSchema>;
+export type BuscarCtInfraestructuraAreaInput = z.infer<
+  typeof ctInfraestructuraAreaFiltrosSchema
+>;
 
 //? Esquema para parámetros de URL (ID de área)
 export const ctInfraestructuraAreaIdParamSchema = z.object({
@@ -74,12 +76,12 @@ export const ctInfraestructuraAreaIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInfraestructuraAreaSchema = esquemaDeleteConUsuario;
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
+export type CtInfraestructuraAreaIdParam = z.infer<
+  typeof ctInfraestructuraAreaIdParamSchema
+>;
 
-export type CtInfraestructuraAreaIdParam = z.infer<typeof ctInfraestructuraAreaIdParamSchema>;
-
-export type EliminarCtInfraestructuraAreaInput = z.infer<typeof eliminarCtInfraestructuraAreaSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

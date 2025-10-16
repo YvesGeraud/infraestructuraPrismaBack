@@ -179,7 +179,36 @@ export const verificarAutenticacion = async (
       });
     }
 
-    // 6. 👤 VERIFICAR ESTADO DEL USUARIO
+    // 6. 🌐 VALIDAR IP DE SESIÓN (Seguridad adicional)
+    const ipActual =
+      (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+      req.socket.remoteAddress ||
+      "unknown";
+
+    // ⚠️ ADVERTENCIA: Si la IP cambió, puede ser robo de token
+    if (sesion.ip_origen && sesion.ip_origen !== ipActual) {
+      console.warn(
+        `⚠️  ADVERTENCIA DE SEGURIDAD: IP cambió para sesión ${sesion.jti}`,
+        `\n   IP original: ${sesion.ip_origen}`,
+        `\n   IP actual: ${ipActual}`,
+        `\n   Usuario: ${sesion.ct_usuario.usuario}`
+      );
+
+      // OPCIÓN 1: Solo advertir (recomendado para desarrollo)
+      // Permitir la sesión pero loguear el cambio de IP
+
+      // OPCIÓN 2: Rechazar la sesión (más seguro para producción)
+      // Descomenta las siguientes líneas para activar:
+      /*
+      return enviarRespuestaError(res, "IP de sesión no coincide", 401, {
+        codigo: "IP_CAMBIADA",
+        motivo: "La IP de origen cambió desde el inicio de sesión",
+        ayuda: "Por seguridad, inicia sesión nuevamente",
+      });
+      */
+    }
+
+    // 7. 👤 VERIFICAR ESTADO DEL USUARIO
     const usuario = sesion.ct_usuario;
 
     if (!usuario.estado) {

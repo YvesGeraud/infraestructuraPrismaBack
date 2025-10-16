@@ -33,9 +33,10 @@ export class CtInfraestructuraJefeSectorBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const jefeSectorData: CrearCtInfraestructuraJefeSectorInput = req.body;
 
-        const jefeSectorData: CrearCtInfraestructuraJefeSectorInput = req.body;
-        return await ctInfraestructuraJefeSectorBaseService.crear(jefeSectorData, idSesion);
+         return await ctInfraestructuraJefeSectorBaseService.crear(jefeSectorData, idSesion, idUsuario);
       },
       "Jefe de sector creado exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInfraestructuraJefeSectorBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const jefeSectorData: ActualizarCtInfraestructuraJefeSectorInput = req.body;
 
-        return await ctInfraestructuraJefeSectorBaseService.actualizar(
-          id_ct_infraestructura_jefe_sector,
-          jefeSectorData,
-          idSesion
-        );
+        return await ctInfraestructuraJefeSectorBaseService.actualizar(id_ct_infraestructura_jefe_sector, jefeSectorData, idSesion, idUsuario);
       },
       "Jefe de sector actualizado exitosamente"
     );

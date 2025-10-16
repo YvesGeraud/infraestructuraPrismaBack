@@ -33,9 +33,10 @@ export class DtInfraestructuraUbicacionBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const ubicacionData: CrearDtInfraestructuraUbicacionInput = req.body;
 
-        const ubicacionData: CrearDtInfraestructuraUbicacionInput = req.body;
-        return await dtInfraestructuraUbicacionBaseService.crear(ubicacionData, idSesion);
+         return await dtInfraestructuraUbicacionBaseService.crear(ubicacionData, idSesion, idUsuario);
       },
       "Ubicación creada exitosamente"
     );
@@ -113,13 +114,10 @@ export class DtInfraestructuraUbicacionBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const ubicacionData: ActualizarDtInfraestructuraUbicacionInput = req.body;
 
-        return await dtInfraestructuraUbicacionBaseService.actualizar(
-          id_dt_infraestructura_ubicacion,
-          ubicacionData,
-          idSesion
-        );
+        return await dtInfraestructuraUbicacionBaseService.actualizar(id_dt_infraestructura_ubicacion, ubicacionData, idSesion, idUsuario);
       },
       "Ubicación actualizada exitosamente"
     );

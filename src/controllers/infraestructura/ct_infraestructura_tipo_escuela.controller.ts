@@ -33,9 +33,10 @@ export class CtInfraestructuraTipoEscuelaBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const tipoEscuelaData: CrearCtInfraestructuraTipoEscuelaInput = req.body;
 
-        const tipoEscuelaData: CrearCtInfraestructuraTipoEscuelaInput = req.body;
-        return await ctInfraestructuraTipoEscuelaBaseService.crear(tipoEscuelaData, idSesion);
+         return await ctInfraestructuraTipoEscuelaBaseService.crear(tipoEscuelaData, idSesion, idUsuario);
       },
       "Tipo de escuela creado exitosamente"
     );
@@ -109,13 +110,10 @@ export class CtInfraestructuraTipoEscuelaBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const tipoEscuelaData: ActualizarCtInfraestructuraTipoEscuelaInput = req.body;
 
-        return await ctInfraestructuraTipoEscuelaBaseService.actualizar(
-          id_ct_infraestructura_tipo_escuela,
-          tipoEscuelaData,
-          idSesion
-        );
+        return await ctInfraestructuraTipoEscuelaBaseService.actualizar(id_ct_infraestructura_tipo_escuela, tipoEscuelaData, idSesion, idUsuario);
       },
       "Tipo de escuela actualizado exitosamente"
     );

@@ -33,9 +33,10 @@ export class CtInventarioProveedorBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioProveedorData: CrearCtInventarioProveedorInput = req.body;
 
-        const inventarioProveedorData: CrearCtInventarioProveedorInput = req.body;
-        return await ctInventarioProveedorBaseService.crear(inventarioProveedorData, idSesion);
+         return await ctInventarioProveedorBaseService.crear(inventarioProveedorData, idSesion, idUsuario);
       },
       "Proveedor creado exitosamente"
     );
@@ -107,13 +108,10 @@ export class CtInventarioProveedorBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const inventarioProveedorData: ActualizarCtInventarioProveedorInput = req.body;
 
-        return await ctInventarioProveedorBaseService.actualizar(
-          id_ct_inventario_proveedor,
-          inventarioProveedorData,
-          idSesion
-        );
+        return await ctInventarioProveedorBaseService.actualizar(id_ct_inventario_proveedor, inventarioProveedorData, idSesion, idUsuario);
       },
       "Proveedor actualizado exitosamente"
     );

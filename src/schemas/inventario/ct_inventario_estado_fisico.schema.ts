@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
 } from "../commonSchemas";
 
 //TODO ===== SCHEMAS PARA CT_INVENTARIO_ESTADO_FISICO =====
@@ -21,9 +20,7 @@ import {
 //? Esquema para crear un nuevo estado físico
 export const crearCtInventarioEstadoFisicoSchema = z.object({
   nombre: esquemaTextoRequerido(2, 50),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar un estado físico
 export const actualizarCtInventarioEstadoFisicoSchema = z.object({
@@ -64,12 +61,10 @@ export const ctInventarioEstadoFisicoIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInventarioEstadoFisicoSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInventarioEstadoFisicoIdParam = z.infer<typeof ctInventarioEstadoFisicoIdParamSchema>;
 
-export type EliminarCtInventarioEstadoFisicoInput = z.infer<typeof eliminarCtInventarioEstadoFisicoSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

@@ -33,9 +33,10 @@ export class CtInfraestructuraSostenimientoBaseController extends BaseController
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const sostenimientoData: CrearCtInfraestructuraSostenimientoInput = req.body;
 
-        const sostenimientoData: CrearCtInfraestructuraSostenimientoInput = req.body;
-        return await ctInfraestructuraSostenimientoBaseService.crear(sostenimientoData, idSesion);
+         return await ctInfraestructuraSostenimientoBaseService.crear(sostenimientoData, idSesion, idUsuario);
       },
       "Sostenimiento creado exitosamente"
     );
@@ -108,13 +109,10 @@ export class CtInfraestructuraSostenimientoBaseController extends BaseController
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const sostenimientoData: ActualizarCtInfraestructuraSostenimientoInput = req.body;
 
-        return await ctInfraestructuraSostenimientoBaseService.actualizar(
-          id_ct_infraestructura_sostenimiento,
-          sostenimientoData,
-          idSesion
-        );
+        return await ctInfraestructuraSostenimientoBaseService.actualizar(id_ct_infraestructura_sostenimiento, sostenimientoData, idSesion, idUsuario);
       },
       "Sostenimiento actualizado exitosamente"
     );

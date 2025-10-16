@@ -27,13 +27,23 @@ export class CtInventarioBajaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarCreacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarCreacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioBajaData: CrearCtInventarioBajaInput = req.body;
 
-      const inventarioBajaData: CrearCtInventarioBajaInput = req.body;
-      return await ctInventarioBajaBaseService.crear(inventarioBajaData, idSesion);
-    }, "Inventario baja creada exitosamente");
+        return await ctInventarioBajaBaseService.crear(
+          inventarioBajaData,
+          idSesion,
+          idUsuario
+        );
+      },
+      "Inventario baja creada exitosamente"
+    );
   };
 
   /**
@@ -48,12 +58,15 @@ export class CtInventarioBajaBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_inventario_baja } = this.validarDatosConEsquema<CtInventarioBajaIdParam>(
-          ctInventarioBajaIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_baja } =
+          this.validarDatosConEsquema<CtInventarioBajaIdParam>(
+            ctInventarioBajaIdParamSchema,
+            req.params
+          );
 
-            return await ctInventarioBajaBaseService.obtenerPorId(id_ct_inventario_baja);
+        return await ctInventarioBajaBaseService.obtenerPorId(
+          id_ct_inventario_baja
+        );
       },
       "Inventario baja obtenida exitosamente"
     );
@@ -81,7 +94,10 @@ export class CtInventarioBajaBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-                return await ctInventarioBajaBaseService.obtenerTodos(filters, pagination);
+        return await ctInventarioBajaBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Inventario baja obtenidas exitosamente"
     );
@@ -96,23 +112,29 @@ export class CtInventarioBajaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarActualizacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarActualizacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_baja } =
+          this.validarDatosConEsquema<CtInventarioBajaIdParam>(
+            ctInventarioBajaIdParamSchema,
+            req.params
+          );
+        const inventarioBajaData: ActualizarCtInventarioBajaInput = req.body;
 
-      const { id_ct_inventario_baja } =
-        this.validarDatosConEsquema<CtInventarioBajaIdParam>(
-          ctInventarioBajaIdParamSchema,
-          req.params
+        return await ctInventarioBajaBaseService.actualizar(
+          id_ct_inventario_baja,
+          inventarioBajaData,
+          idUsuario,
+          idSesion
         );
-      const inventarioBajaData: ActualizarCtInventarioBajaInput = req.body;
-
-      return await ctInventarioBajaBaseService.actualizar(
-        id_ct_inventario_baja,
-        inventarioBajaData,
-        idSesion
-      );
-    }, "Inventario baja actualizada exitosamente");
+      },
+      "Inventario baja actualizada exitosamente"
+    );
   };
 
   /**
@@ -124,24 +146,27 @@ export class CtInventarioBajaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarEliminacion(req, res, async () => {
-      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
-      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+    await this.manejarEliminacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_baja } =
+          this.validarDatosConEsquema<CtInventarioBajaIdParam>(
+            ctInventarioBajaIdParamSchema,
+            req.params
+          );
 
-      const { id_ct_inventario_baja } =
-        this.validarDatosConEsquema<CtInventarioBajaIdParam>(
-          ctInventarioBajaIdParamSchema,
-          req.params
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioBajaBaseService.eliminar(
+          id_ct_inventario_baja,
+          idUsuario,
+          idSesion
         );
-
-      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
-      await ctInventarioBajaBaseService.eliminar(
-        id_ct_inventario_baja,
-        idUsuario,
-        idSesion
-      );
-    }, "Inventario baja eliminada exitosamente");
+      },
+      "Inventario baja eliminada exitosamente"
+    );
   };
 }
-

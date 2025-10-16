@@ -33,9 +33,14 @@ export class CtEntidadBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const entidadData: CrearCtEntidadInput = req.body;
 
-        const entidadData: CrearCtEntidadInput = req.body;
-        return await ctEntidadBaseService.crear(entidadData, idSesion);
+        return await ctEntidadBaseService.crear(
+          entidadData,
+          idSesion,
+          idUsuario
+        );
       },
       "Entidad creada exitosamente"
     );
@@ -103,8 +108,8 @@ export class CtEntidadBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
-        const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
           ctEntidadIdParamSchema,
           req.params
         );
@@ -113,7 +118,8 @@ export class CtEntidadBaseController extends BaseController {
         return await ctEntidadBaseService.actualizar(
           id_ct_entidad,
           entidadData,
-          idSesion
+          idSesion,
+          idUsuario
         );
       },
       "Entidad actualizada exitosamente"
@@ -136,8 +142,7 @@ export class CtEntidadBaseController extends BaseController {
         // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-
-        const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
+const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
           ctEntidadIdParamSchema,
           req.params
         );

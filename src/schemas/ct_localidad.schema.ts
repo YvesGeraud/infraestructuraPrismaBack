@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaQueryNumeroRequerido,
   paginationSchema,
@@ -30,7 +29,6 @@ export const crearCtLocalidadSchema = z.object({
   ambito: esquemaTextoRequerido(1, 1),
   id_ct_municipio: esquemaNumeroRequerido(1, 100000),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar una capitulo
@@ -39,7 +37,7 @@ export const actualizarCtLocalidadSchema = z.object({
   ambito: esquemaTextoOpcional(1),
   id_ct_municipio: esquemaQueryId,
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  // id_ct_usuario_up se obtiene automáticamente del JWT
 });
 
 //? Schema para filtros y paginación de capitulos
@@ -77,13 +75,13 @@ export const ctLocalidadIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtLocalidadSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtLocalidadIdParam = z.infer<typeof ctLocalidadIdParamSchema>;
 
-export type EliminarCtLocalidadInput = z.infer<
-  typeof eliminarCtLocalidadSchema
->;
+// Ya no se usa - DELETE no requiere body
+// export type EliminarCtLocalidadInput = z.infer<
+//   typeof eliminarCtLocalidadSchema
+// >;
 
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES

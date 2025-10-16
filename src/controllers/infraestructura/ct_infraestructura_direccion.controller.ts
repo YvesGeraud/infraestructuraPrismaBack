@@ -33,9 +33,10 @@ export class CtInfraestructuraDireccionBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const direccionData: CrearCtInfraestructuraDireccionInput = req.body;
 
-        const direccionData: CrearCtInfraestructuraDireccionInput = req.body;
-        return await ctInfraestructuraDireccionBaseService.crear(direccionData, idSesion);
+         return await ctInfraestructuraDireccionBaseService.crear(direccionData, idSesion, idUsuario);
       },
       "Dirección creada exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInfraestructuraDireccionBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const direccionData: ActualizarCtInfraestructuraDireccionInput = req.body;
 
-        return await ctInfraestructuraDireccionBaseService.actualizar(
-          id_ct_infraestructura_direccion,
-          direccionData,
-          idSesion
-        );
+        return await ctInfraestructuraDireccionBaseService.actualizar(id_ct_infraestructura_direccion, direccionData, idSesion, idUsuario);
       },
       "Dirección actualizada exitosamente"
     );

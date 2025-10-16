@@ -3,13 +3,13 @@
  * Catálogo de tablas que pueden ser auditadas en el sistema
  */
 
-import { BaseService } from "./BaseService";
+import { BaseService } from "../BaseService";
 import { ct_bitacora_tabla } from "@prisma/client";
 import {
   CrearCtBitacoraTablaInput,
   ActualizarCtBitacoraTablaInput,
   BuscarCtBitacoraTablaInput,
-} from "../schemas/ct_bitacora_tabla.schema";
+} from "../../schemas/bitacora/ct_bitacora_tabla.schema";
 
 //TODO ===== SERVICIO PARA CT_BITACORA_TABLA CON BASE SERVICE =====
 
@@ -83,6 +83,15 @@ export class CtBitacoraTablaBaseService extends BaseService<
     return "id_ct_bitacora_tabla";
   }
 
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_bitacora_tabla"; // Nombre exacto de la tabla
+
   // ✨ ¡CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅
   // - obtenerPorId() ✅
@@ -90,4 +99,3 @@ export class CtBitacoraTablaBaseService extends BaseService<
   // - actualizar() con verificaciones ✅
   // - eliminar() con manejo de errores ✅
 }
-

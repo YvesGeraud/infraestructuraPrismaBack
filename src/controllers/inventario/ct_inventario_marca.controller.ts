@@ -27,30 +27,46 @@ export class CtInventarioMarcaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarCreacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarCreacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
 
-      const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
-      return await ctInventarioMarcaBaseService.crear(inventarioMarcaData, idSesion);
-    }, "Marca creada exitosamente");
+        return await ctInventarioMarcaBaseService.crear(
+          inventarioMarcaData,
+          idSesion,
+          idUsuario
+        );
+      },
+      "Marca creada exitosamente"
+    );
   };
 
   /**
    * 📦 Obtener marca por ID
    * @route GET /api/ct_inventario_marca/:id_ct_inventario_material
    */
-  obtenerInventarioMarcaPorId = async (req: Request, res: Response): Promise<void> => {
+  obtenerInventarioMarcaPorId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_inventario_material } = this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
-          ctInventarioMarcaIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_material } =
+          this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
+            ctInventarioMarcaIdParamSchema,
+            req.params
+          );
 
-        return await ctInventarioMarcaBaseService.obtenerPorId(id_ct_inventario_material);
+        return await ctInventarioMarcaBaseService.obtenerPorId(
+          id_ct_inventario_material
+        );
       },
       "Marca obtenida exitosamente"
     );
@@ -77,7 +93,10 @@ export class CtInventarioMarcaBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-        return await ctInventarioMarcaBaseService.obtenerTodos(filters, pagination);
+        return await ctInventarioMarcaBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Marcas obtenidas exitosamente"
     );
@@ -92,23 +111,29 @@ export class CtInventarioMarcaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarActualizacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarActualizacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_material } =
+          this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
+            ctInventarioMarcaIdParamSchema,
+            req.params
+          );
+        const inventarioMarcaData: ActualizarCtInventarioMarcaInput = req.body;
 
-      const { id_ct_inventario_material } =
-        this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
-          ctInventarioMarcaIdParamSchema,
-          req.params
+        return await ctInventarioMarcaBaseService.actualizar(
+          id_ct_inventario_material,
+          inventarioMarcaData,
+          idSesion,
+          idUsuario
         );
-      const inventarioMarcaData: ActualizarCtInventarioMarcaInput = req.body;
-
-      return await ctInventarioMarcaBaseService.actualizar(
-        id_ct_inventario_material,
-        inventarioMarcaData,
-        idSesion
-      );
-    }, "Marca actualizada exitosamente");
+      },
+      "Marca actualizada exitosamente"
+    );
   };
 
   /**
@@ -120,23 +145,27 @@ export class CtInventarioMarcaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarEliminacion(req, res, async () => {
-      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
-      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+    await this.manejarEliminacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_material } =
+          this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
+            ctInventarioMarcaIdParamSchema,
+            req.params
+          );
 
-      const { id_ct_inventario_material } =
-        this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
-          ctInventarioMarcaIdParamSchema,
-          req.params
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioMarcaBaseService.eliminar(
+          id_ct_inventario_material,
+          idUsuario,
+          idSesion
         );
-
-      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
-      await ctInventarioMarcaBaseService.eliminar(
-        id_ct_inventario_material,
-        idUsuario,
-        idSesion
-      );
-    }, "Marca eliminada exitosamente");
+      },
+      "Marca eliminada exitosamente"
+    );
   };
 }

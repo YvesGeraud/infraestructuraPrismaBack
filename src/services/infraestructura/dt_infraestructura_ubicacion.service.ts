@@ -107,6 +107,15 @@ export class DtInfraestructuraUbicacionBaseService extends BaseService<
     return "id_dt_infraestructura_ubicacion";
   }
 
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "dt_infraestructura_ubicacion"; // Nombre exacto de la tabla
+
   // ✨ ¡CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅
   // - obtenerPorId() ✅

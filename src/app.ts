@@ -18,6 +18,7 @@ import {
 } from "./config/database";
 import { env, serverConfig } from "./config/env";
 import apiRoutes from "./routes";
+import { SesionCleanupService } from "./services/sesion-cleanup.service";
 
 // Crear aplicación Express
 const app = express();
@@ -140,6 +141,35 @@ app.get(`${serverConfig.host}health`, async (req, res) => {
 
 // Rutas de la API
 
+// 🔐 MIDDLEWARE GLOBAL DE AUTENTICACIÓN JWT
+// Protege TODAS las rutas excepto las públicas (login, registro, health)
+import { verificarAutenticacion } from "./middleware/authMiddleware";
+
+// Rutas públicas (sin autenticación)
+const rutasPublicas = [
+  `${serverConfig.host}api/auth/login`,
+  `${serverConfig.host}api/auth/registro`,
+  `${serverConfig.host}api/auth/refresh`,
+  `${serverConfig.host}health`,
+];
+
+// Aplicar autenticación solo a rutas que NO sean públicas
+app.use((req, res, next) => {
+  // Permitir rutas públicas
+  if (rutasPublicas.some((ruta) => req.path.startsWith(ruta))) {
+    return next();
+  }
+
+  // Permitir GET sin autenticación (para consultas públicas)
+  // Comenta esta línea si quieres que los GET también requieran JWT
+  if (req.method === "GET") {
+    return next();
+  }
+
+  // Para POST, PUT, DELETE, PATCH: Requiere JWT
+  verificarAutenticacion(req, res, next);
+});
+
 app.use(`${serverConfig.host}api`, apiRoutes);
 
 // Ruta de prueba para verificar Prisma
@@ -240,11 +270,9 @@ const startServer = async () => {
       console.log(`🔍 Monitoreo del pool iniciado correctamente`);
     }
 
-    // Inicializar limpieza automática de sesiones expiradas
-    const { inicializarLimpiezaSesiones } = await import(
-      "./middleware/authMiddleware"
-    );
-    inicializarLimpiezaSesiones();
+    // 🧹 Iniciar limpieza automática de sesiones expiradas
+    SesionCleanupService.iniciarLimpiezaAutomatica();
+    console.log(`🧹 Limpieza automática de sesiones configurada`);
 
     // Inicializar limpieza automática de rate limit
     const { inicializarLimpiezaRateLimit } = await import(

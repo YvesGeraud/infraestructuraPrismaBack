@@ -33,9 +33,10 @@ export class CtInfraestructuraAreaBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const areaData: CrearCtInfraestructuraAreaInput = req.body;
 
-        const areaData: CrearCtInfraestructuraAreaInput = req.body;
-        return await ctInfraestructuraAreaBaseService.crear(areaData, idSesion);
+         return await ctInfraestructuraAreaBaseService.crear(areaData, idSesion, idUsuario);
       },
       "Área creada exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInfraestructuraAreaBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const areaData: ActualizarCtInfraestructuraAreaInput = req.body;
 
-        return await ctInfraestructuraAreaBaseService.actualizar(
-          id_ct_infraestructura_area,
-          areaData,
-          idSesion
-        );
+        return await ctInfraestructuraAreaBaseService.actualizar(id_ct_infraestructura_area, areaData, idSesion, idUsuario);
       },
       "Área actualizada exitosamente"
     );

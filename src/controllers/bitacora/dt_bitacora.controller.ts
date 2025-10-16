@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
-import { RequestAutenticado } from "../middleware/authMiddleware";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
 import {
   obtenerIdSesionDesdeJwt,
   obtenerIdUsuarioDesdeJwt,
-} from "../utils/bitacoraUtils";
-import { BaseController } from "./BaseController";
-import { DtBitacoraBaseService } from "../services/dt_bitacora.service";
+} from "../../utils/bitacoraUtils";
+import { BaseController } from "../BaseController";
+import { DtBitacoraBaseService } from "../../services/bitacora/dt_bitacora.service";
 import {
   CrearDtBitacoraInput,
   ActualizarDtBitacoraInput,
   dtBitacoraIdParamSchema,
   DtBitacoraIdParam,
-} from "../schemas/dt_bitacora.schema";
-import { PaginationInput } from "../schemas/commonSchemas";
+} from "../../schemas/bitacora/dt_bitacora.schema";
+import { PaginationInput } from "../../schemas/commonSchemas";
 
 //TODO ===== CONTROLADOR PARA DT_BITACORA CON BASE SERVICE =====
 const dtBitacoraBaseService = new DtBitacoraBaseService();
@@ -33,9 +33,14 @@ export class DtBitacoraBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const bitacoraData: CrearDtBitacoraInput = req.body;
-        return await dtBitacoraBaseService.crear(bitacoraData, idSesion);
+
+        return await dtBitacoraBaseService.crear(
+          bitacoraData,
+          idSesion,
+          idUsuario
+        );
       },
       "Registro de bitácora creado exitosamente"
     );
@@ -111,7 +116,7 @@ export class DtBitacoraBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const { id_dt_bitacora } =
           this.validarDatosConEsquema<DtBitacoraIdParam>(
             dtBitacoraIdParamSchema,
@@ -122,7 +127,8 @@ export class DtBitacoraBaseController extends BaseController {
         return await dtBitacoraBaseService.actualizar(
           id_dt_bitacora,
           bitacoraData,
-          idSesion
+          idSesion,
+          idUsuario
         );
       },
       "Registro de bitácora actualizado exitosamente"
@@ -145,7 +151,6 @@ export class DtBitacoraBaseController extends BaseController {
         // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-
         const { id_dt_bitacora } =
           this.validarDatosConEsquema<DtBitacoraIdParam>(
             dtBitacoraIdParamSchema,

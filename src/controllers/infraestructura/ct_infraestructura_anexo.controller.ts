@@ -33,9 +33,10 @@ export class CtInfraestructuraAnexoBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const anexoData: CrearCtInfraestructuraAnexoInput = req.body;
 
-        const anexoData: CrearCtInfraestructuraAnexoInput = req.body;
-        return await ctInfraestructuraAnexoBaseService.crear(anexoData, idSesion);
+         return await ctInfraestructuraAnexoBaseService.crear(anexoData, idSesion, idUsuario);
       },
       "Anexo creado exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInfraestructuraAnexoBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const anexoData: ActualizarCtInfraestructuraAnexoInput = req.body;
 
-        return await ctInfraestructuraAnexoBaseService.actualizar(
-          id_ct_infraestructura_anexo,
-          anexoData,
-          idSesion
-        );
+        return await ctInfraestructuraAnexoBaseService.actualizar(id_ct_infraestructura_anexo, anexoData, idSesion, idUsuario);
       },
       "Anexo actualizado exitosamente"
     );

@@ -15,7 +15,8 @@ import {
 import { PaginationInput } from "../../schemas/commonSchemas";
 
 //TODO ===== CONTROLADOR PARA CT_INVENTARIO_ESTADO_FISICO CON BASE SERVICE =====
-const ctInventarioEstadoFisicoBaseService = new CtInventarioEstadoFisicoBaseService();
+const ctInventarioEstadoFisicoBaseService =
+  new CtInventarioEstadoFisicoBaseService();
 
 export class CtInventarioEstadoFisicoBaseController extends BaseController {
   /**
@@ -33,9 +34,15 @@ export class CtInventarioEstadoFisicoBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioEstadoFisicoData: CrearCtInventarioEstadoFisicoInput =
+          req.body;
 
-        const inventarioEstadoFisicoData: CrearCtInventarioEstadoFisicoInput = req.body;
-        return await ctInventarioEstadoFisicoBaseService.crear(inventarioEstadoFisicoData, idSesion);
+        return await ctInventarioEstadoFisicoBaseService.crear(
+          inventarioEstadoFisicoData,
+          idSesion,
+          idUsuario
+        );
       },
       "Estado físico creado exitosamente"
     );
@@ -45,17 +52,23 @@ export class CtInventarioEstadoFisicoBaseController extends BaseController {
    * 📦 Obtener estado físico por ID
    * @route GET /api/ct_inventario_estado_fisico/:id_ct_inventario_estado_fisico
    */
-  obtenerInventarioEstadoFisicoPorId = async (req: Request, res: Response): Promise<void> => {
+  obtenerInventarioEstadoFisicoPorId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_inventario_estado_fisico } = this.validarDatosConEsquema<CtInventarioEstadoFisicoIdParam>(
-          ctInventarioEstadoFisicoIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_estado_fisico } =
+          this.validarDatosConEsquema<CtInventarioEstadoFisicoIdParam>(
+            ctInventarioEstadoFisicoIdParamSchema,
+            req.params
+          );
 
-        return await ctInventarioEstadoFisicoBaseService.obtenerPorId(id_ct_inventario_estado_fisico);
+        return await ctInventarioEstadoFisicoBaseService.obtenerPorId(
+          id_ct_inventario_estado_fisico
+        );
       },
       "Estado físico obtenido exitosamente"
     );
@@ -82,7 +95,10 @@ export class CtInventarioEstadoFisicoBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-        return await ctInventarioEstadoFisicoBaseService.obtenerTodos(filters, pagination);
+        return await ctInventarioEstadoFisicoBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Estados físicos obtenidos exitosamente"
     );
@@ -101,18 +117,24 @@ export class CtInventarioEstadoFisicoBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_inventario_estado_fisico } = this.validarDatosConEsquema<CtInventarioEstadoFisicoIdParam>(
-          ctInventarioEstadoFisicoIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_estado_fisico } =
+          this.validarDatosConEsquema<CtInventarioEstadoFisicoIdParam>(
+            ctInventarioEstadoFisicoIdParamSchema,
+            req.params
+          );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-        const inventarioEstadoFisicoData: ActualizarCtInventarioEstadoFisicoInput = req.body;
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
+
+        const inventarioEstadoFisicoData: ActualizarCtInventarioEstadoFisicoInput =
+          req.body;
 
         return await ctInventarioEstadoFisicoBaseService.actualizar(
           id_ct_inventario_estado_fisico,
           inventarioEstadoFisicoData,
-          idSesion
+          idSesion,
+          idUsuario
         );
       },
       "Estado físico actualizado exitosamente"
@@ -132,10 +154,11 @@ export class CtInventarioEstadoFisicoBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_inventario_estado_fisico } = this.validarDatosConEsquema<CtInventarioEstadoFisicoIdParam>(
-          ctInventarioEstadoFisicoIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_estado_fisico } =
+          this.validarDatosConEsquema<CtInventarioEstadoFisicoIdParam>(
+            ctInventarioEstadoFisicoIdParamSchema,
+            req.params
+          );
 
         // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);

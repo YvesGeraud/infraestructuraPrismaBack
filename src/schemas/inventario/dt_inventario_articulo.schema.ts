@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -40,7 +39,6 @@ export const crearDtInventarioArticuloSchema = z.object({
   id_ct_inventario_tipo_articulo: esquemaNumeroRequerido(1, 2147483647),
   cct: esquemaTextoOpcional(11),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar un artículo de inventario
@@ -61,7 +59,7 @@ export const actualizarDtInventarioArticuloSchema = z.object({
   id_ct_inventario_tipo_articulo: esquemaNumeroOpcional(1, 2147483647),
   cct: esquemaTextoOpcional(11),
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  // id_ct_usuario_up se obtiene automáticamente del JWT
   fecha_up: esquemaFechaOpcional,
 });
 
@@ -106,12 +104,16 @@ export const dtInventarioArticuloFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearDtInventarioArticuloInput = z.infer<typeof crearDtInventarioArticuloSchema>;
+export type CrearDtInventarioArticuloInput = z.infer<
+  typeof crearDtInventarioArticuloSchema
+>;
 export type ActualizarDtInventarioArticuloInput = z.infer<
   typeof actualizarDtInventarioArticuloSchema
 >;
 
-export type BuscarDtInventarioArticuloInput = z.infer<typeof dtInventarioArticuloFiltrosSchema>;
+export type BuscarDtInventarioArticuloInput = z.infer<
+  typeof dtInventarioArticuloFiltrosSchema
+>;
 
 //? Esquema para parámetros de URL (ID de artículo de inventario)
 export const dtInventarioArticuloIdParamSchema = z.object({
@@ -119,12 +121,12 @@ export const dtInventarioArticuloIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarDtInventarioArticuloSchema = esquemaDeleteConUsuario;
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
+export type DtInventarioArticuloIdParam = z.infer<
+  typeof dtInventarioArticuloIdParamSchema
+>;
 
-export type DtInventarioArticuloIdParam = z.infer<typeof dtInventarioArticuloIdParamSchema>;
-
-export type EliminarDtInventarioArticuloInput = z.infer<typeof eliminarDtInventarioArticuloSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

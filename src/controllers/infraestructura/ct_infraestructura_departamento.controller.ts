@@ -33,9 +33,10 @@ export class CtInfraestructuraDepartamentoBaseController extends BaseController 
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const departamentoData: CrearCtInfraestructuraDepartamentoInput = req.body;
 
-        const departamentoData: CrearCtInfraestructuraDepartamentoInput = req.body;
-        return await ctInfraestructuraDepartamentoBaseService.crear(departamentoData, idSesion);
+         return await ctInfraestructuraDepartamentoBaseService.crear(departamentoData, idSesion, idUsuario);
       },
       "Departamento creado exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInfraestructuraDepartamentoBaseController extends BaseController 
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const departamentoData: ActualizarCtInfraestructuraDepartamentoInput = req.body;
 
-        return await ctInfraestructuraDepartamentoBaseService.actualizar(
-          id_ct_infraestructura_departamento,
-          departamentoData,
-          idSesion
-        );
+        return await ctInfraestructuraDepartamentoBaseService.actualizar(id_ct_infraestructura_departamento, departamentoData, idSesion, idUsuario);
       },
       "Departamento actualizado exitosamente"
     );

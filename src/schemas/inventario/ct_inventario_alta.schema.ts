@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaQueryNumeroRequerido,
   paginationSchema,
@@ -28,14 +27,13 @@ import {
 export const crearCtInventarioAltaSchema = z.object({
   nombre: esquemaTextoRequerido(2, 100),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar una capitulo
 export const actualizarCtInventarioAltaSchema = z.object({
   nombre: esquemaTextoOpcional(100),
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  // id_ct_usuario_up se obtiene automáticamente del JWT
   fecha_up: esquemaFechaOpcional,
 });
 
@@ -74,15 +72,15 @@ export const ctInventarioAltaIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInventarioAltaSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInventarioAltaIdParam = z.infer<
   typeof ctInventarioAltaIdParamSchema
 >;
 
-export type EliminarCtInventarioAltaInput = z.infer<
-  typeof eliminarCtInventarioAltaSchema
->;
+// Ya no se usa - DELETE no requiere body
+// export type EliminarCtInventarioAltaInput = z.infer<
+//   typeof eliminarCtInventarioAltaSchema
+// >;
 
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES

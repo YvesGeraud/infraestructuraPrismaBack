@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaQueryNumeroRequerido,
   paginationSchema,
@@ -30,7 +29,8 @@ export const crearCtMunicipioSchema = z.object({
   nombre: esquemaTextoRequerido(2, 100),
   id_ct_entidad: esquemaNumeroRequerido(1, 100000),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
+  // id_ct_usuario_in se obtiene automáticamente del JWT
+  // id_ct_usuario_in se obtiene automáticamente del JWT
 });
 
 //? Esquema para actualizar una capitulo
@@ -39,7 +39,7 @@ export const actualizarCtMunicipioSchema = z.object({
   nombre: esquemaTextoOpcional(100),
   id_ct_entidad: esquemaNumeroOpcional(1, 100000),
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  //? id_ct_usuario_up se obtiene automáticamente del JWT
   fecha_up: esquemaFechaOpcional,
 });
 
@@ -52,7 +52,7 @@ export const ctMunicipioFiltrosSchema = z.object({
   nombre: esquemaQueryTexto,
   id_ct_entidad: esquemaQueryNumeroOpcional,
   estado: esquemaQueryBoolean,
-  id_ct_usuario_in: esquemaQueryId,
+  //? id_ct_usuario_in se obtiene automáticamente del JWT
   fecha_in: esquemaFechaOpcional,
   incluir_ct_entidad: esquemaQueryBoolean,
 
@@ -77,11 +77,13 @@ export const ctMunicipioIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtMunicipioSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtMunicipioIdParam = z.infer<typeof ctMunicipioIdParamSchema>;
 
-export type EliminarCtMunicipioInput = z.infer<typeof eliminarCtMunicipioSchema>;
+// Ya no se usa - DELETE no requiere body
+// export type EliminarCtMunicipioInput = z.infer<
+//   typeof eliminarCtMunicipioSchema
+// >;
 
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES

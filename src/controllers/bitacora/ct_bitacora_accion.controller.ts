@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
-import { RequestAutenticado } from "../middleware/authMiddleware";
+import { RequestAutenticado } from "../../middleware/authMiddleware";
 import {
   obtenerIdSesionDesdeJwt,
   obtenerIdUsuarioDesdeJwt,
-} from "../utils/bitacoraUtils";
-import { BaseController } from "./BaseController";
-import { CtBitacoraAccionBaseService } from "../services/ct_bitacora_accion.service";
+} from "../../utils/bitacoraUtils";
+import { BaseController } from "../BaseController";
+import { CtBitacoraAccionBaseService } from "../../services/bitacora/ct_bitacora_accion.service";
 import {
   CrearCtBitacoraAccionInput,
   ActualizarCtBitacoraAccionInput,
   ctBitacoraAccionIdParamSchema,
   CtBitacoraAccionIdParam,
-} from "../schemas/ct_bitacora_accion.schema";
-import { PaginationInput } from "../schemas/commonSchemas";
+} from "../../schemas/bitacora/ct_bitacora_accion.schema";
+import { PaginationInput } from "../../schemas/commonSchemas";
 
 //TODO ===== CONTROLADOR PARA CT_BITACORA_ACCION CON BASE SERVICE =====
 const ctBitacoraAccionBaseService = new CtBitacoraAccionBaseService();
@@ -33,9 +33,14 @@ export class CtBitacoraAccionBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const entidadData: CrearCtBitacoraAccionInput = req.body;
-        return await ctBitacoraAccionBaseService.crear(entidadData, idSesion);
+
+        return await ctBitacoraAccionBaseService.crear(
+          entidadData,
+          idSesion,
+          idUsuario
+        );
       },
       "Acción creada exitosamente"
     );
@@ -109,7 +114,7 @@ export class CtBitacoraAccionBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const { id_ct_bitacora_accion } =
           this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
             ctBitacoraAccionIdParamSchema,
@@ -120,7 +125,8 @@ export class CtBitacoraAccionBaseController extends BaseController {
         return await ctBitacoraAccionBaseService.actualizar(
           id_ct_bitacora_accion,
           accionData,
-          idSesion
+          idSesion,
+          idUsuario
         );
       },
       "Acción actualizada exitosamente"
@@ -143,7 +149,6 @@ export class CtBitacoraAccionBaseController extends BaseController {
         // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-
         const { id_ct_bitacora_accion } =
           this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
             ctBitacoraAccionIdParamSchema,

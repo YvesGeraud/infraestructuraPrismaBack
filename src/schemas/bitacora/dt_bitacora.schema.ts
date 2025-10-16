@@ -13,12 +13,11 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaQueryNumeroRequerido,
   esquemaQueryNumeroOpcional,
   esquemaNumeroOpcional,
-} from "./commonSchemas";
+} from "../commonSchemas";
 
 //TODO ===== SCHEMAS PARA DT_BITACORA =====
 
@@ -30,7 +29,6 @@ export const crearDtBitacoraSchema = z.object({
   datos_anteriores: esquemaTextoRequerido(0, 16777215), // LongText max
   datos_nuevos: esquemaTextoRequerido(0, 16777215), // LongText max
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar un registro de bitácora
@@ -41,7 +39,7 @@ export const actualizarDtBitacoraSchema = z.object({
   datos_anteriores: esquemaTextoOpcional(16777215),
   datos_nuevos: esquemaTextoOpcional(16777215),
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  // id_ct_usuario_up se obtiene automáticamente del JWT
   fecha_up: esquemaFechaOpcional,
 });
 
@@ -56,7 +54,7 @@ export const dtBitacoraFiltrosSchema = z.object({
   estado: esquemaQueryBoolean,
   id_ct_usuario_in: esquemaQueryId,
   fecha_in: esquemaFechaOpcional,
-  
+
   //? Filtros de includes
   incluir_accion: esquemaQueryBoolean,
   incluir_tabla: esquemaQueryBoolean,
@@ -83,12 +81,10 @@ export const dtBitacoraIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarDtBitacoraSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type DtBitacoraIdParam = z.infer<typeof dtBitacoraIdParamSchema>;
 
-export type EliminarDtBitacoraInput = z.infer<typeof eliminarDtBitacoraSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 
@@ -115,4 +111,3 @@ export type EliminarDtBitacoraInput = z.infer<typeof eliminarDtBitacoraSchema>;
 - Los campos datos_anteriores y datos_nuevos son LongText (hasta 16MB)
 - Permite filtrar por acción, tabla y registro afectado
 */
-

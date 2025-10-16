@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
 } from "../commonSchemas";
 
 //TODO ===== SCHEMAS PARA CT_INVENTARIO_PROVEEDOR =====
@@ -21,9 +20,7 @@ import {
 //? Esquema para crear un nuevo proveedor
 export const crearCtInventarioProveedorSchema = z.object({
   nombre: esquemaTextoRequerido(2, 50),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar un proveedor
 export const actualizarCtInventarioProveedorSchema = z.object({
@@ -64,12 +61,10 @@ export const ctInventarioProveedorIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInventarioProveedorSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInventarioProveedorIdParam = z.infer<typeof ctInventarioProveedorIdParamSchema>;
 
-export type EliminarCtInventarioProveedorInput = z.infer<typeof eliminarCtInventarioProveedorSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

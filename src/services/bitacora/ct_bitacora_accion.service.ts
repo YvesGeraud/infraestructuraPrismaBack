@@ -3,13 +3,13 @@
  * ¡Prueba de que solo necesitas ~15 líneas para un CRUD completo!
  */
 
-import { BaseService } from "./BaseService";
+import { BaseService } from "../BaseService";
 import { ct_bitacora_accion } from "@prisma/client";
 import {
   CrearCtBitacoraAccionInput,
   ActualizarCtBitacoraAccionInput,
   BuscarCtBitacoraAccionInput,
-} from "../schemas/ct_bitacora_accion.schema";
+} from "../../schemas/bitacora/ct_bitacora_accion.schema";
 
 //TODO ===== SERVICIO PARA CT_MARCA CON BASE SERVICE =====
 
@@ -59,8 +59,17 @@ export class CtBitacoraAccionBaseService extends BaseService<
 
   // 🔧 Sobrescribir campo PK (3 líneas)
   protected getPrimaryKeyField(): string {
-      return "id_ct_bitacora_accion";
+    return "id_ct_bitacora_accion";
   }
+
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_bitacora_accion"; // Nombre exacto de la tabla
 
   // ✨ ¡YA TIENES CRUD COMPLETO AUTOMÁTICAMENTE!
   // - obtenerTodos() con paginación ✅

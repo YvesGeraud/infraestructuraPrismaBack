@@ -27,30 +27,46 @@ export class CtInventarioColorBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarCreacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarCreacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioColorData: CrearCtInventarioColorInput = req.body;
 
-      const inventarioColorData: CrearCtInventarioColorInput = req.body;
-      return await ctInventarioColorBaseService.crear(inventarioColorData, idSesion);
-    }, "Color de inventario creado exitosamente");
+        return await ctInventarioColorBaseService.crear(
+          inventarioColorData,
+          idSesion,
+          idUsuario
+        );
+      },
+      "Color de inventario creado exitosamente"
+    );
   };
 
   /**
    * 📦 Obtener color de inventario por ID
    * @route GET /api/ct_inventario_color/:id_ct_inventario_color
    */
-  obtenerInventarioColorPorId = async (req: Request, res: Response): Promise<void> => {
+  obtenerInventarioColorPorId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_inventario_color } = this.validarDatosConEsquema<CtInventarioColorIdParam>(
-          ctInventarioColorIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_color } =
+          this.validarDatosConEsquema<CtInventarioColorIdParam>(
+            ctInventarioColorIdParamSchema,
+            req.params
+          );
 
-        return await ctInventarioColorBaseService.obtenerPorId(id_ct_inventario_color);
+        return await ctInventarioColorBaseService.obtenerPorId(
+          id_ct_inventario_color
+        );
       },
       "Color de inventario obtenido exitosamente"
     );
@@ -77,7 +93,10 @@ export class CtInventarioColorBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-        return await ctInventarioColorBaseService.obtenerTodos(filters, pagination);
+        return await ctInventarioColorBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Colores de inventario obtenidos exitosamente"
     );
@@ -92,23 +111,29 @@ export class CtInventarioColorBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarActualizacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarActualizacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_color } =
+          this.validarDatosConEsquema<CtInventarioColorIdParam>(
+            ctInventarioColorIdParamSchema,
+            req.params
+          );
+        const inventarioColorData: ActualizarCtInventarioColorInput = req.body;
 
-      const { id_ct_inventario_color } =
-        this.validarDatosConEsquema<CtInventarioColorIdParam>(
-          ctInventarioColorIdParamSchema,
-          req.params
+        return await ctInventarioColorBaseService.actualizar(
+          id_ct_inventario_color,
+          inventarioColorData,
+          idSesion,
+          idUsuario
         );
-      const inventarioColorData: ActualizarCtInventarioColorInput = req.body;
-
-      return await ctInventarioColorBaseService.actualizar(
-        id_ct_inventario_color,
-        inventarioColorData,
-        idSesion
-      );
-    }, "Color de inventario actualizado exitosamente");
+      },
+      "Color de inventario actualizado exitosamente"
+    );
   };
 
   /**
@@ -120,23 +145,27 @@ export class CtInventarioColorBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarEliminacion(req, res, async () => {
-      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
-      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+    await this.manejarEliminacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_color } =
+          this.validarDatosConEsquema<CtInventarioColorIdParam>(
+            ctInventarioColorIdParamSchema,
+            req.params
+          );
 
-      const { id_ct_inventario_color } =
-        this.validarDatosConEsquema<CtInventarioColorIdParam>(
-          ctInventarioColorIdParamSchema,
-          req.params
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioColorBaseService.eliminar(
+          id_ct_inventario_color,
+          idUsuario,
+          idSesion
         );
-
-      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
-      await ctInventarioColorBaseService.eliminar(
-        id_ct_inventario_color,
-        idUsuario,
-        idSesion
-      );
-    }, "Color de inventario eliminado exitosamente");
+      },
+      "Color de inventario eliminado exitosamente"
+    );
   };
 }

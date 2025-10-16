@@ -176,14 +176,21 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   protected async registrarCreacionEnBitacora(
     datos: CrearLocalidadInput,
     resultado: ct_localidad,
+    tx: any,
     idSesion: number,
-    tx: any
+    idUsuario: number
   ): Promise<void> {
     // Si necesitas lógica personalizada, puedes sobrescribir este método
     // Por ejemplo, agregar información adicional a la bitácora
 
     // Llamar al método base para el registro automático
-    await super.registrarCreacionEnBitacora(datos, resultado, idSesion, tx);
+    await super.registrarCreacionEnBitacora(
+      datos,
+      resultado,
+      tx,
+      idSesion,
+      idUsuario
+    );
 
     // Agregar lógica personalizada aquí si es necesario
     console.log(

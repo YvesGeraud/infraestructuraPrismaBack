@@ -2,18 +2,14 @@ import { Request, Response } from "express";
 import { RequestAutenticado } from "../middleware/authMiddleware";
 import {
   obtenerIdSesionDesdeJwt,
-  obtenerIdUsuarioDesdeJwt,
-} from "../utils/bitacoraUtils";
+  obtenerIdUsuarioDesdeJwt} from "../utils/bitacoraUtils";
 import { BaseController } from "./BaseController";
 import { CtLocalidadBaseService } from "../services/ct_localidad.service";
 import {
   CrearCtLocalidadInput,
   ActualizarCtLocalidadInput,
   ctLocalidadIdParamSchema,
-  CtLocalidadIdParam,
-  EliminarCtLocalidadInput,
-  eliminarCtLocalidadSchema,
-} from "../schemas/ct_localidad.schema";
+  CtLocalidadIdParam} from "../schemas/ct_localidad.schema";
 import { PaginationInput } from "../schemas/commonSchemas";
 
 // ===== CONTROLADOR PARA CT_LOCALIDAD CON BASE SERVICE =====
@@ -29,13 +25,23 @@ export class CtLocalidadBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarCreacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarCreacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const localidadData: CrearCtLocalidadInput = req.body;
 
-      const localidadData: CrearCtLocalidadInput = req.body;
-      return await ctLocalidadBaseService.crear(localidadData, idSesion);
-    }, "Localidad creada exitosamente");
+        return await ctLocalidadBaseService.crear(
+          localidadData,
+          idSesion,
+          idUsuario
+        );
+      },
+      "Localidad creada exitosamente"
+    );
   };
 
   /**
@@ -50,12 +56,13 @@ export class CtLocalidadBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_localidad } = this.validarDatosConEsquema<CtLocalidadIdParam>(
-          ctLocalidadIdParamSchema,
-          req.params
-        );
+        const { id_ct_localidad } =
+          this.validarDatosConEsquema<CtLocalidadIdParam>(
+            ctLocalidadIdParamSchema,
+            req.params
+          );
 
-            return await ctLocalidadBaseService.obtenerPorId(id_ct_localidad);
+        return await ctLocalidadBaseService.obtenerPorId(id_ct_localidad);
       },
       "Localidad obtenida exitosamente"
     );
@@ -83,7 +90,7 @@ export class CtLocalidadBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-                return await ctLocalidadBaseService.obtenerTodos(filters, pagination);
+        return await ctLocalidadBaseService.obtenerTodos(filters, pagination);
       },
       "Localidades obtenidas exitosamente"
     );
@@ -98,23 +105,29 @@ export class CtLocalidadBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarActualizacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarActualizacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_localidad } =
+          this.validarDatosConEsquema<CtLocalidadIdParam>(
+            ctLocalidadIdParamSchema,
+            req.params
+          );
+        const localidadData: ActualizarCtLocalidadInput = req.body;
 
-      const { id_ct_localidad } =
-        this.validarDatosConEsquema<CtLocalidadIdParam>(
-          ctLocalidadIdParamSchema,
-          req.params
+        return await ctLocalidadBaseService.actualizar(
+          id_ct_localidad,
+          localidadData,
+          idSesion,
+          idUsuario
         );
-      const localidadData: ActualizarCtLocalidadInput = req.body;
-
-      return await ctLocalidadBaseService.actualizar(
-        id_ct_localidad,
-        localidadData,
-        idSesion
-      );
-    }, "Localidad actualizada exitosamente");
+      },
+      "Localidad actualizada exitosamente"
+    );
   };
 
   /**
@@ -126,24 +139,27 @@ export class CtLocalidadBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarEliminacion(req, res, async () => {
-      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
-      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+    await this.manejarEliminacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_localidad } =
+          this.validarDatosConEsquema<CtLocalidadIdParam>(
+            ctLocalidadIdParamSchema,
+            req.params
+          );
 
-      const { id_ct_localidad } =
-        this.validarDatosConEsquema<CtLocalidadIdParam>(
-          ctLocalidadIdParamSchema,
-          req.params
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctLocalidadBaseService.eliminar(
+          id_ct_localidad,
+          idUsuario,
+          idSesion
         );
-
-      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
-      await ctLocalidadBaseService.eliminar(
-        id_ct_localidad,
-        idUsuario,
-        idSesion
-      );
-    }, "Localidad eliminada exitosamente");
+      },
+      "Localidad eliminada exitosamente"
+    );
   };
 }
-

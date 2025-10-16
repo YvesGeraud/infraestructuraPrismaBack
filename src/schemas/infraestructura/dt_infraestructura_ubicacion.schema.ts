@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -31,9 +30,7 @@ export const crearDtInfraestructuraUbicacionSchema = z.object({
   id_ct_codigo_postal: esquemaNumeroRequerido(1, 2147483647),
   latitud: esquemaNumeroOpcional(-90, 90),
   longitud: esquemaNumeroOpcional(-180, 180),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar una ubicación
 export const actualizarDtInfraestructuraUbicacionSchema = z.object({
@@ -87,12 +84,10 @@ export const dtInfraestructuraUbicacionIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarDtInfraestructuraUbicacionSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type DtInfraestructuraUbicacionIdParam = z.infer<typeof dtInfraestructuraUbicacionIdParamSchema>;
 
-export type EliminarDtInfraestructuraUbicacionInput = z.infer<typeof eliminarDtInfraestructuraUbicacionSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

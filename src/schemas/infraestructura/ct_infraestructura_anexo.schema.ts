@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -27,7 +26,6 @@ export const crearCtInfraestructuraAnexoSchema = z.object({
   cct: esquemaTextoRequerido(11, 11),
   id_dt_infraestructura_ubicacion: esquemaNumeroRequerido(1, 2147483647),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar un anexo
@@ -36,7 +34,7 @@ export const actualizarCtInfraestructuraAnexoSchema = z.object({
   cct: esquemaTextoOpcional(11),
   id_dt_infraestructura_ubicacion: esquemaNumeroOpcional(1, 2147483647),
   estado: esquemaEstadoOpcional,
-  id_ct_usuario_up: esquemaUsuarioCreacion, // Requerido para actualización
+  // id_ct_usuario_up se obtiene automáticamente del JWT
   fecha_up: esquemaFechaOpcional,
 });
 
@@ -61,12 +59,16 @@ export const ctInfraestructuraAnexoFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearCtInfraestructuraAnexoInput = z.infer<typeof crearCtInfraestructuraAnexoSchema>;
+export type CrearCtInfraestructuraAnexoInput = z.infer<
+  typeof crearCtInfraestructuraAnexoSchema
+>;
 export type ActualizarCtInfraestructuraAnexoInput = z.infer<
   typeof actualizarCtInfraestructuraAnexoSchema
 >;
 
-export type BuscarCtInfraestructuraAnexoInput = z.infer<typeof ctInfraestructuraAnexoFiltrosSchema>;
+export type BuscarCtInfraestructuraAnexoInput = z.infer<
+  typeof ctInfraestructuraAnexoFiltrosSchema
+>;
 
 //? Esquema para parámetros de URL (ID de anexo)
 export const ctInfraestructuraAnexoIdParamSchema = z.object({
@@ -74,12 +76,12 @@ export const ctInfraestructuraAnexoIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInfraestructuraAnexoSchema = esquemaDeleteConUsuario;
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
+export type CtInfraestructuraAnexoIdParam = z.infer<
+  typeof ctInfraestructuraAnexoIdParamSchema
+>;
 
-export type CtInfraestructuraAnexoIdParam = z.infer<typeof ctInfraestructuraAnexoIdParamSchema>;
-
-export type EliminarCtInfraestructuraAnexoInput = z.infer<typeof eliminarCtInfraestructuraAnexoSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

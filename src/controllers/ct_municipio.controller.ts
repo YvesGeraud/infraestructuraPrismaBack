@@ -31,11 +31,15 @@ export class CtMunicipioBaseController extends BaseController {
       req,
       res,
       async () => {
-        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        // 🔐 Extraer id_sesion y id_usuario desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
-        const municipioData: CrearCtMunicipioInput = req.body;
-        return await ctMunicipioBaseService.crear(municipioData, idSesion);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const municipioData: CrearCtMunicipioInput = req.body;
+        return await ctMunicipioBaseService.crear(
+          municipioData,
+          idSesion,
+          idUsuario
+        );
       },
       "Municipio creado exitosamente"
     );
@@ -105,10 +109,10 @@ export class CtMunicipioBaseController extends BaseController {
       req,
       res,
       async () => {
-        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        // 🔐 Extraer id_sesion y id_usuario desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
-
-        const { id_ct_municipio } =
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_municipio } =
           this.validarDatosConEsquema<CtMunicipioIdParam>(
             ctMunicipioIdParamSchema,
             req.params
@@ -118,7 +122,8 @@ export class CtMunicipioBaseController extends BaseController {
         return await ctMunicipioBaseService.actualizar(
           id_ct_municipio,
           municipioData,
-          idSesion
+          idSesion,
+          idUsuario
         );
       },
       "Municipio actualizado exitosamente"
@@ -141,8 +146,7 @@ export class CtMunicipioBaseController extends BaseController {
         // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-
-        const { id_ct_municipio } =
+const { id_ct_municipio } =
           this.validarDatosConEsquema<CtMunicipioIdParam>(
             ctMunicipioIdParamSchema,
             req.params
@@ -151,8 +155,8 @@ export class CtMunicipioBaseController extends BaseController {
         // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
         await ctMunicipioBaseService.eliminar(
           id_ct_municipio,
-          idUsuario,
-          idSesion
+          idSesion,
+          idUsuario
         );
       },
       "Municipio eliminado exitosamente"

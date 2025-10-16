@@ -33,9 +33,10 @@ export class CtInventarioSubclaseBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioSubclaseData: CrearCtInventarioSubclaseInput = req.body;
 
-        const inventarioSubclaseData: CrearCtInventarioSubclaseInput = req.body;
-        return await ctInventarioSubclaseBaseService.crear(inventarioSubclaseData, idSesion);
+         return await ctInventarioSubclaseBaseService.crear(inventarioSubclaseData, idSesion, idUsuario);
       },
       "Subclase creada exitosamente"
     );
@@ -110,13 +111,10 @@ export class CtInventarioSubclaseBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const inventarioSubclaseData: ActualizarCtInventarioSubclaseInput = req.body;
 
-        return await ctInventarioSubclaseBaseService.actualizar(
-          id_ct_inventario_subclase,
-          inventarioSubclaseData,
-          idSesion
-        );
+        return await ctInventarioSubclaseBaseService.actualizar(id_ct_inventario_subclase, inventarioSubclaseData, idSesion, idUsuario);
       },
       "Subclase actualizada exitosamente"
     );

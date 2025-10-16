@@ -33,9 +33,10 @@ export class CtInfraestructuraTipoInstanciaBaseController extends BaseController
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const tipoInstanciaData: CrearCtInfraestructuraTipoInstanciaInput = req.body;
 
-        const tipoInstanciaData: CrearCtInfraestructuraTipoInstanciaInput = req.body;
-        return await ctInfraestructuraTipoInstanciaBaseService.crear(tipoInstanciaData, idSesion);
+         return await ctInfraestructuraTipoInstanciaBaseService.crear(tipoInstanciaData, idSesion, idUsuario);
       },
       "Tipo de instancia creado exitosamente"
     );
@@ -108,13 +109,10 @@ export class CtInfraestructuraTipoInstanciaBaseController extends BaseController
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const tipoInstanciaData: ActualizarCtInfraestructuraTipoInstanciaInput = req.body;
 
-        return await ctInfraestructuraTipoInstanciaBaseService.actualizar(
-          id_ct_infraestructura_tipo_instancia,
-          tipoInstanciaData,
-          idSesion
-        );
+        return await ctInfraestructuraTipoInstanciaBaseService.actualizar(id_ct_infraestructura_tipo_instancia, tipoInstanciaData, idSesion, idUsuario);
       },
       "Tipo de instancia actualizado exitosamente"
     );

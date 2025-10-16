@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { CtBitacoraAccionBaseController } from "../controllers/ct_bitacora_accion.controller";
-import { validarRequest } from "../middleware/validacion";
+import { CtBitacoraAccionBaseController } from "../../controllers/bitacora/ct_bitacora_accion.controller";
+import { validarRequest } from "../../middleware/validacion";
 import {
   crearCtBitacoraAccionSchema,
   actualizarCtBitacoraAccionSchema,
   ctBitacoraAccionIdParamSchema,
   ctBitacoraAccionFiltrosSchema,
-} from "../schemas/ct_bitacora_accion.schema";
+} from "../../schemas/bitacora/ct_bitacora_accion.schema";
 
 //TODO ===== RUTAS PARA CT_BITACORA_ACCION CON BASE SERVICE =====
 

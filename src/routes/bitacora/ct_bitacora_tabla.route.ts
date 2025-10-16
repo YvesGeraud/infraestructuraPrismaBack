@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { CtBitacoraTablaBaseController } from "../controllers/ct_bitacora_tabla.controller";
-import { validarRequest } from "../middleware/validacion";
+import { CtBitacoraTablaBaseController } from "../../controllers/bitacora/ct_bitacora_tabla.controller";
+import { validarRequest } from "../../middleware/validacion";
 import {
   crearCtBitacoraTablaSchema,
   actualizarCtBitacoraTablaSchema,
   ctBitacoraTablaIdParamSchema,
   ctBitacoraTablaFiltrosSchema,
-} from "../schemas/ct_bitacora_tabla.schema";
+} from "../../schemas/bitacora/ct_bitacora_tabla.schema";
 
 //TODO ===== RUTAS PARA CT_BITACORA_TABLA CON BASE SERVICE =====
 
@@ -59,4 +59,3 @@ export default router;
 // POST   /api/ct_bitacora_tabla     - Crear
 // PUT    /api/ct_bitacora_tabla/:id - Actualizar
 // DELETE /api/ct_bitacora_tabla/:id - Eliminar
-

@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { DtBitacoraBaseController } from "../controllers/dt_bitacora.controller";
-import { validarRequest } from "../middleware/validacion";
+import { DtBitacoraBaseController } from "../../controllers/bitacora/dt_bitacora.controller";
+import { validarRequest } from "../../middleware/validacion";
 import {
   crearDtBitacoraSchema,
   actualizarDtBitacoraSchema,
   dtBitacoraIdParamSchema,
   dtBitacoraFiltrosSchema,
-} from "../schemas/dt_bitacora.schema";
+} from "../../schemas/bitacora/dt_bitacora.schema";
 
 //TODO ===== RUTAS PARA DT_BITACORA CON BASE SERVICE =====
 
@@ -69,4 +69,3 @@ export default router;
 // - incluir_tabla: Incluir datos de la tabla
 // - incluir_sesion: Incluir datos de la sesión
 // - incluir_todas_relaciones: Incluir todas las relaciones
-

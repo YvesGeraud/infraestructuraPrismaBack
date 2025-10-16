@@ -13,7 +13,6 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaNumeroOpcional,
   esquemaQueryNumeroOpcional,
@@ -26,9 +25,7 @@ export const crearCtInfraestructuraJefeSectorSchema = z.object({
   nombre: esquemaTextoRequerido(2, 255),
   cct: esquemaTextoRequerido(11, 11),
   id_dt_infraestructura_ubicacion: esquemaNumeroRequerido(0, 2147483647),
-  estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
-});
+  estado: esquemaEstadoRequerido,});
 
 //? Esquema para actualizar un jefe de sector
 export const actualizarCtInfraestructuraJefeSectorSchema = z.object({
@@ -74,12 +71,10 @@ export const ctInfraestructuraJefeSectorIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtInfraestructuraJefeSectorSchema = esquemaDeleteConUsuario;
-
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
 export type CtInfraestructuraJefeSectorIdParam = z.infer<typeof ctInfraestructuraJefeSectorIdParamSchema>;
 
-export type EliminarCtInfraestructuraJefeSectorInput = z.infer<typeof eliminarCtInfraestructuraJefeSectorSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 

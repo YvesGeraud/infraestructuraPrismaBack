@@ -27,30 +27,46 @@ export class CtInventarioClaseBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarCreacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarCreacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioClaseData: CrearCtInventarioClaseInput = req.body;
 
-      const inventarioClaseData: CrearCtInventarioClaseInput = req.body;
-      return await ctInventarioClaseBaseService.crear(inventarioClaseData, idSesion);
-    }, "Clase de inventario creada exitosamente");
+        return await ctInventarioClaseBaseService.crear(
+          inventarioClaseData,
+          idSesion,
+          idUsuario
+        );
+      },
+      "Clase de inventario creada exitosamente"
+    );
   };
 
   /**
    * 📦 Obtener clase de inventario por ID
    * @route GET /api/ct_inventario_clase/:id_ct_inventario_clase
    */
-  obtenerInventarioClasePorId = async (req: Request, res: Response): Promise<void> => {
+  obtenerInventarioClasePorId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_inventario_clase } = this.validarDatosConEsquema<CtInventarioClaseIdParam>(
-          ctInventarioClaseIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_clase } =
+          this.validarDatosConEsquema<CtInventarioClaseIdParam>(
+            ctInventarioClaseIdParamSchema,
+            req.params
+          );
 
-        return await ctInventarioClaseBaseService.obtenerPorId(id_ct_inventario_clase);
+        return await ctInventarioClaseBaseService.obtenerPorId(
+          id_ct_inventario_clase
+        );
       },
       "Clase de inventario obtenida exitosamente"
     );
@@ -78,7 +94,10 @@ export class CtInventarioClaseBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-        return await ctInventarioClaseBaseService.obtenerTodos(filters, pagination);
+        return await ctInventarioClaseBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Clases de inventario obtenidas exitosamente"
     );
@@ -93,23 +112,29 @@ export class CtInventarioClaseBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarActualizacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarActualizacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_clase } =
+          this.validarDatosConEsquema<CtInventarioClaseIdParam>(
+            ctInventarioClaseIdParamSchema,
+            req.params
+          );
+        const inventarioClaseData: ActualizarCtInventarioClaseInput = req.body;
 
-      const { id_ct_inventario_clase } =
-        this.validarDatosConEsquema<CtInventarioClaseIdParam>(
-          ctInventarioClaseIdParamSchema,
-          req.params
+        return await ctInventarioClaseBaseService.actualizar(
+          id_ct_inventario_clase,
+          inventarioClaseData,
+          idUsuario,
+          idSesion
         );
-      const inventarioClaseData: ActualizarCtInventarioClaseInput = req.body;
-
-      return await ctInventarioClaseBaseService.actualizar(
-        id_ct_inventario_clase,
-        inventarioClaseData,
-        idSesion
-      );
-    }, "Clase de inventario actualizada exitosamente");
+      },
+      "Clase de inventario actualizada exitosamente"
+    );
   };
 
   /**
@@ -121,23 +146,27 @@ export class CtInventarioClaseBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarEliminacion(req, res, async () => {
-      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
-      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+    await this.manejarEliminacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const { id_ct_inventario_clase } =
+          this.validarDatosConEsquema<CtInventarioClaseIdParam>(
+            ctInventarioClaseIdParamSchema,
+            req.params
+          );
 
-      const { id_ct_inventario_clase } =
-        this.validarDatosConEsquema<CtInventarioClaseIdParam>(
-          ctInventarioClaseIdParamSchema,
-          req.params
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioClaseBaseService.eliminar(
+          id_ct_inventario_clase,
+          idUsuario,
+          idSesion
         );
-
-      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
-      await ctInventarioClaseBaseService.eliminar(
-        id_ct_inventario_clase,
-        idUsuario,
-        idSesion
-      );
-    }, "Clase de inventario eliminada exitosamente");
+      },
+      "Clase de inventario eliminada exitosamente"
+    );
   };
 }

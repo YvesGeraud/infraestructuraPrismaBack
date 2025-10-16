@@ -2,18 +2,14 @@ import { Request, Response } from "express";
 import { RequestAutenticado } from "../../middleware/authMiddleware";
 import {
   obtenerIdSesionDesdeJwt,
-  obtenerIdUsuarioDesdeJwt,
-} from "../../utils/bitacoraUtils";
+  obtenerIdUsuarioDesdeJwt} from "../../utils/bitacoraUtils";
 import { BaseController } from "../BaseController";
 import { CtInventarioAltaBaseService } from "../../services/inventario/ct_inventario_alta.service";
 import {
   CrearCtInventarioAltaInput,
   ActualizarCtInventarioAltaInput,
   ctInventarioAltaIdParamSchema,
-  CtInventarioAltaIdParam,
-  EliminarCtInventarioAltaInput,
-  eliminarCtInventarioAltaSchema,
-} from "../../schemas/inventario/ct_inventario_alta.schema";
+  CtInventarioAltaIdParam} from "../../schemas/inventario/ct_inventario_alta.schema";
 import { PaginationInput } from "../../schemas/commonSchemas";
 
 // ===== CONTROLADOR PARA CT_INVENTARIO_ALTA CON BASE SERVICE =====
@@ -29,13 +25,23 @@ export class CtInventarioAltaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarCreacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarCreacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+        const inventarioAltaData: CrearCtInventarioAltaInput = req.body;
 
-      const inventarioAltaData: CrearCtInventarioAltaInput = req.body;
-      return await ctInventarioAltaBaseService.crear(inventarioAltaData, idSesion);
-    }, "Inventario alta creada exitosamente");
+        return await ctInventarioAltaBaseService.crear(
+          inventarioAltaData,
+          idSesion,
+          idUsuario
+        );
+      },
+      "Inventario alta creada exitosamente"
+    );
   };
 
   /**
@@ -50,12 +56,15 @@ export class CtInventarioAltaBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_ct_inventario_alta } = this.validarDatosConEsquema<CtInventarioAltaIdParam>(
-          ctInventarioAltaIdParamSchema,
-          req.params
-        );
+        const { id_ct_inventario_alta } =
+          this.validarDatosConEsquema<CtInventarioAltaIdParam>(
+            ctInventarioAltaIdParamSchema,
+            req.params
+          );
 
-            return await ctInventarioAltaBaseService.obtenerPorId(id_ct_inventario_alta);
+        return await ctInventarioAltaBaseService.obtenerPorId(
+          id_ct_inventario_alta
+        );
       },
       "Inventario alta obtenida exitosamente"
     );
@@ -83,7 +92,10 @@ export class CtInventarioAltaBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-                return await ctInventarioAltaBaseService.obtenerTodos(filters, pagination);
+        return await ctInventarioAltaBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Inventario alta obtenidas exitosamente"
     );
@@ -98,23 +110,29 @@ export class CtInventarioAltaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarActualizacion(req, res, async () => {
-      // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
+    await this.manejarActualizacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+        const { id_ct_inventario_alta } =
+          this.validarDatosConEsquema<CtInventarioAltaIdParam>(
+            ctInventarioAltaIdParamSchema,
+            req.params
+          );
+        const inventarioAltaData: ActualizarCtInventarioAltaInput = req.body;
 
-      const { id_ct_inventario_alta } =
-        this.validarDatosConEsquema<CtInventarioAltaIdParam>(
-          ctInventarioAltaIdParamSchema,
-          req.params
+        return await ctInventarioAltaBaseService.actualizar(
+          id_ct_inventario_alta,
+          inventarioAltaData,
+          idSesion,
+          idUsuario
         );
-      const inventarioAltaData: ActualizarCtInventarioAltaInput = req.body;
-
-      return await ctInventarioAltaBaseService.actualizar(
-        id_ct_inventario_alta,
-        inventarioAltaData,
-        idSesion
-      );
-    }, "Inventario alta actualizada exitosamente");
+      },
+      "Inventario alta actualizada exitosamente"
+    );
   };
 
   /**
@@ -126,24 +144,27 @@ export class CtInventarioAltaBaseController extends BaseController {
     req: RequestAutenticado,
     res: Response
   ): Promise<void> => {
-    await this.manejarEliminacion(req, res, async () => {
-      // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
-      const idSesion = obtenerIdSesionDesdeJwt(req);
-      const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+    await this.manejarEliminacion(
+      req,
+      res,
+      async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+        const { id_ct_inventario_alta } =
+          this.validarDatosConEsquema<CtInventarioAltaIdParam>(
+            ctInventarioAltaIdParamSchema,
+            req.params
+          );
 
-      const { id_ct_inventario_alta } =
-        this.validarDatosConEsquema<CtInventarioAltaIdParam>(
-          ctInventarioAltaIdParamSchema,
-          req.params
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctInventarioAltaBaseService.eliminar(
+          id_ct_inventario_alta,
+          idUsuario,
+          idSesion
         );
-
-      // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
-      await ctInventarioAltaBaseService.eliminar(
-        id_ct_inventario_alta,
-        idUsuario,
-        idSesion
-      );
-    }, "Inventario alta eliminada exitosamente");
+      },
+      "Inventario alta eliminada exitosamente"
+    );
   };
 }
-

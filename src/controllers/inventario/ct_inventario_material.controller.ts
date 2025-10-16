@@ -33,9 +33,10 @@ export class CtInventarioMaterialBaseController extends BaseController {
       async () => {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+const inventarioMaterialData: CrearCtInventarioMaterialInput = req.body;
 
-        const inventarioMaterialData: CrearCtInventarioMaterialInput = req.body;
-        return await ctInventarioMaterialBaseService.crear(inventarioMaterialData, idSesion);
+         return await ctInventarioMaterialBaseService.crear(inventarioMaterialData, idSesion, idUsuario);
       },
       "Material creado exitosamente"
     );
@@ -107,13 +108,10 @@ export class CtInventarioMaterialBaseController extends BaseController {
         );
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
         const inventarioMaterialData: ActualizarCtInventarioMaterialInput = req.body;
 
-        return await ctInventarioMaterialBaseService.actualizar(
-          id_ct_inventario_marca,
-          inventarioMaterialData,
-          idSesion
-        );
+        return await ctInventarioMaterialBaseService.actualizar(id_ct_inventario_marca, inventarioMaterialData, idSesion, idUsuario);
       },
       "Material actualizado exitosamente"
     );

@@ -13,14 +13,13 @@ import {
   esquemaPaginaQuery,
   esquemaLimiteQuery,
   esquemaParamId,
-  esquemaDeleteConUsuario,
   esquemaNumeroRequerido,
   esquemaQueryNumeroRequerido,
   paginationSchema,
   idParamSchema,
   esquemaQueryNumeroOpcional,
   esquemaNumeroOpcional,
-} from "./commonSchemas";
+} from "../commonSchemas";
 
 //TODO ===== SCHEMAS PARA CT_BITACORA_ACCION =====
 
@@ -29,7 +28,6 @@ export const crearCtBitacoraAccionSchema = z.object({
   nombre: esquemaTextoRequerido(2, 100),
   descripcion: esquemaTextoRequerido(2, 255),
   estado: esquemaEstadoRequerido,
-  id_ct_usuario_in: esquemaUsuarioCreacion,
 });
 
 //? Esquema para actualizar una accion
@@ -60,12 +58,16 @@ export const ctBitacoraAccionFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearCtBitacoraAccionInput = z.infer<typeof crearCtBitacoraAccionSchema>;
+export type CrearCtBitacoraAccionInput = z.infer<
+  typeof crearCtBitacoraAccionSchema
+>;
 export type ActualizarCtBitacoraAccionInput = z.infer<
   typeof actualizarCtBitacoraAccionSchema
 >;
 
-export type BuscarCtBitacoraAccionInput = z.infer<typeof ctBitacoraAccionFiltrosSchema>;
+export type BuscarCtBitacoraAccionInput = z.infer<
+  typeof ctBitacoraAccionFiltrosSchema
+>;
 
 //? Esquema para parámetros de URL (ID de capitulo)
 export const ctBitacoraAccionIdParamSchema = z.object({
@@ -73,12 +75,12 @@ export const ctBitacoraAccionIdParamSchema = z.object({
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
-export const eliminarCtBitacoraAccionSchema = esquemaDeleteConUsuario;
+// Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
+export type CtBitacoraAccionIdParam = z.infer<
+  typeof ctBitacoraAccionIdParamSchema
+>;
 
-export type CtBitacoraAccionIdParam = z.infer<typeof ctBitacoraAccionIdParamSchema>;
-
-export type EliminarCtBitacoraAccionInput = z.infer<typeof eliminarCtBitacoraAccionSchema>;
-
+// Ya no se usa - DELETE no requiere body
 /*
 🎉 SCHEMA REFACTORIZADO CON ESQUEMAS BASE REUTILIZABLES
 
