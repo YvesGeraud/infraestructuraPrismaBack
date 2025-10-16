@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../utils/bitacoraUtils";
 import { BaseController } from "./BaseController";
-    import { CtEntidadBaseService } from "../services/ct_entidad.service";
+import { CtEntidadBaseService } from "../services/ct_entidad.service";
 import {
   CrearCtEntidadInput,
   ActualizarCtEntidadInput,
@@ -10,28 +15,35 @@ import {
 import { PaginationInput } from "../schemas/commonSchemas";
 
 //TODO ===== CONTROLADOR PARA CT_ENTIDAD CON BASE SERVICE =====
-    const ctEntidadBaseService = new CtEntidadBaseService();
+const ctEntidadBaseService = new CtEntidadBaseService();
 
 export class CtEntidadBaseController extends BaseController {
   /**
    * 📦 Crear nueva entidad
-   * @route POST /api/inventario/marca
+   * @route POST /api/ct_entidad
+   * 🔐 Requiere autenticación
    */
-  crearEntidad = async (req: Request, res: Response): Promise<void> => {
+  crearEntidad = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const entidadData: CrearCtEntidadInput = req.body;
-        return await ctEntidadBaseService.crear(entidadData);
+        return await ctEntidadBaseService.crear(entidadData, idSesion);
       },
-        "Entidad creada exitosamente"
+      "Entidad creada exitosamente"
     );
   };
 
   /**
    * 📦 Obtener entidad por ID
-   * @route GET /api/inventario/entidad/:id_entidad
+   * @route GET /api/ct_entidad/:id_ct_entidad
    */
   obtenerEntidadPorId = async (req: Request, res: Response): Promise<void> => {
     await this.manejarOperacion(
@@ -43,7 +55,7 @@ export class CtEntidadBaseController extends BaseController {
           req.params
         );
 
-            return await ctEntidadBaseService.obtenerPorId(id_ct_entidad);
+        return await ctEntidadBaseService.obtenerPorId(id_ct_entidad);
       },
       "Entidad obtenida exitosamente"
     );
@@ -51,10 +63,10 @@ export class CtEntidadBaseController extends BaseController {
 
   /**
    * 📦 Obtener todas las entidades con filtros y paginación
-   * @route GET /api/inventario/entidad
+   * @route GET /api/ct_entidad
    *
    * Query parameters soportados:
-   * - descripcion: Filtrar por descripción (búsqueda parcial)
+   * - nombre: Filtrar por nombre (búsqueda parcial)
    * - pagina: Número de página (default: 1)
    * - limite: Elementos por página (default: 10)
    */
@@ -78,40 +90,60 @@ export class CtEntidadBaseController extends BaseController {
 
   /**
    * 📦 Actualizar entidad
-   * @route PUT /api/inventario/marca/:id_marca
+   * @route PUT /api/ct_entidad/:id_ct_entidad
+   * 🔐 Requiere autenticación
    */
-  actualizarEntidad = async (req: Request, res: Response): Promise<void> => {
+  actualizarEntidad = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
       async () => {
-            const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
+        const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
           ctEntidadIdParamSchema,
           req.params
         );
         const entidadData: ActualizarCtEntidadInput = req.body;
 
-        return await ctEntidadBaseService.actualizar(id_ct_entidad, entidadData);
+        return await ctEntidadBaseService.actualizar(
+          id_ct_entidad,
+          entidadData,
+          idSesion
+        );
       },
       "Entidad actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar entidad
-   * @route DELETE /api/inventario/marca/:id_marca
+   * 📦 Eliminar entidad (soft delete)
+   * @route DELETE /api/ct_entidad/:id_ct_entidad
+   * 🔐 Requiere autenticación
    */
-  eliminarEntidad = async (req: Request, res: Response): Promise<void> => {
+  eliminarEntidad = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
+
         const { id_ct_entidad } = this.validarDatosConEsquema<CtEntidadIdParam>(
-            ctEntidadIdParamSchema,
+          ctEntidadIdParamSchema,
           req.params
         );
 
-        await ctEntidadBaseService.eliminar(id_ct_entidad);
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctEntidadBaseService.eliminar(id_ct_entidad, idUsuario, idSesion);
       },
       "Entidad eliminada exitosamente"
     );

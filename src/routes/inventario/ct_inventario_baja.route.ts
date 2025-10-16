@@ -17,7 +17,7 @@ const ctInventarioBajaController = new CtInventarioBajaBaseController();
 router.get(
   "/",
   validarRequest({ query: ctInventarioBajaFiltrosSchema }),
-  ctInventarioBajaController.obtenerTodasLasInventarioBajas
+  ctInventarioBajaController.obtenerTodasLasInventarioBaja
 );
 
 // 📦 Obtener causa de baja específica por ID

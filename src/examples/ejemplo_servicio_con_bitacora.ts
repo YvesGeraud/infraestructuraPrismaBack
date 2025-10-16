@@ -1,6 +1,6 @@
 /**
  * @fileoverview EJEMPLO: Cómo usar BaseService con sistema de bitácora automático
- * 
+ *
  * Este archivo muestra cómo implementar un servicio que registra automáticamente
  * todas las operaciones CRUD en la bitácora del sistema.
  */
@@ -30,7 +30,7 @@ type FiltrosLocalidadInput = {
 
 /**
  * 🎯 EJEMPLO: Servicio con bitácora automática
- * 
+ *
  * Solo necesitas 2 líneas para activar la bitácora completa:
  * 1. protected registrarEnBitacora = true;
  * 2. protected nombreTablaParaBitacora = "NOMBRE_TABLA";
@@ -55,7 +55,7 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   // ⚠️ REQUISITOS DE SEGURIDAD PARA LA BITÁCORA:
   // - ct_bitacora_accion debe estar poblado con acciones estándar:
   //   * "Creación" (ID: 1)
-  //   * "Actualización" (ID: 2) 
+  //   * "Actualización" (ID: 2)
   //   * "Eliminación" (ID: 3)
   // - 🚨 ct_sesion DEBE tener al menos una sesión activa (OBLIGATORIO por seguridad)
   // - No se permite registrar en bitácora sin sesión válida (previene puertas traseras)
@@ -63,7 +63,7 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   // 🎯 Campos a excluir de la bitácora (datos sensibles)
   protected camposExcluidosBitacora = [
     "password", // Ya incluido por defecto
-    "token",    // Ya incluido por defecto
+    "token", // Ya incluido por defecto
     // Agregar campos específicos de tu modelo si es necesario
   ];
 
@@ -113,7 +113,7 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   }
 
   // 🎯 HOOKS OPCIONALES para personalizar comportamiento
-  
+
   /**
    * Hook ejecutado antes de crear un registro
    * Útil para validaciones personalizadas
@@ -121,9 +121,9 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   protected async antesDeCrear(datos: CrearLocalidadInput): Promise<void> {
     // Ejemplo: Validar que el municipio existe
     const municipio = await this.model.findUnique({
-      where: { id_municipio: datos.id_municipio }
+      where: { id_municipio: datos.id_municipio },
     });
-    
+
     if (!municipio) {
       throw new Error("El municipio especificado no existe");
     }
@@ -134,8 +134,10 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
    * Útil para acciones post-creación
    */
   protected async despuesDeCrear(record: ct_localidad): Promise<void> {
-        console.log(`✅ Localidad "${record.nombre}" creada con ID ${record.id_ct_localidad}`);
-    
+    console.log(
+      `✅ Localidad "${record.nombre}" creada con ID ${record.id_ct_localidad}`
+    );
+
     // Ejemplo: Enviar notificación, actualizar cache, etc.
     // await this.notificarCreacion(record);
   }
@@ -143,25 +145,30 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   /**
    * Hook ejecutado antes de actualizar un registro
    */
-  protected async antesDeActualizar(id: number, datos: ActualizarLocalidadInput): Promise<void> {
+  protected async antesDeActualizar(
+    id: number,
+    datos: ActualizarLocalidadInput
+  ): Promise<void> {
     // Ejemplo: Validar que no se está desactivando la única localidad activa del municipio
     if (datos.id_municipio) {
       const localidadesActivas = await this.model.count({
-        where: { 
+        where: {
           id_municipio: datos.id_municipio,
           activo: true,
-          id_localidad: { not: id }
-        }
+          id_localidad: { not: id },
+        },
       });
-      
+
       if (localidadesActivas === 0) {
-        throw new Error("No se puede desactivar la única localidad activa del municipio");
+        throw new Error(
+          "No se puede desactivar la única localidad activa del municipio"
+        );
       }
     }
   }
 
   // 📝 PERSONALIZAR BITÁCORA (opcional)
-  
+
   /**
    * Hook para personalizar el registro de creación en bitácora
    * Por defecto, BaseService maneja esto automáticamente
@@ -169,16 +176,19 @@ export class EjemploLocalidadConBitacoraService extends BaseService<
   protected async registrarCreacionEnBitacora(
     datos: CrearLocalidadInput,
     resultado: ct_localidad,
+    idSesion: number,
     tx: any
   ): Promise<void> {
     // Si necesitas lógica personalizada, puedes sobrescribir este método
     // Por ejemplo, agregar información adicional a la bitácora
-    
+
     // Llamar al método base para el registro automático
-    await super.registrarCreacionEnBitacora(datos, resultado, tx);
-    
+    await super.registrarCreacionEnBitacora(datos, resultado, idSesion, tx);
+
     // Agregar lógica personalizada aquí si es necesario
-    console.log(`📝 Bitácora: Localidad "${resultado.nombre}" registrada en auditoría`);
+    console.log(
+      `📝 Bitácora: Localidad "${resultado.nombre}" registrada en auditoría`
+    );
   }
 }
 

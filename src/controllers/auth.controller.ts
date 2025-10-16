@@ -86,8 +86,8 @@ export class AuthController {
    *
    * POST /api/auth/refresh
    *
-   * Renueva el access token usando un refresh token válido
-   * Implementa rotación de refresh tokens para mayor seguridad
+   * Renueva el access token validando la sesión activa
+   * Sin usar tabla ct_refresh_token - solo valida JWT + sesión en BD
    */
   async refreshToken(req: Request, res: Response): Promise<void> {
     try {
@@ -96,7 +96,7 @@ export class AuthController {
       console.log(
         `🔄 Solicitud de refresh token: ${input.refreshToken.substring(
           0,
-          8
+          20
         )}...`
       );
 
@@ -136,16 +136,18 @@ export class AuthController {
   async logout(req: RequestAutenticado, res: Response): Promise<void> {
     try {
       const input: LogoutInput = req.body;
-      const jtiActual = req.user.jti;
+      const jtiActual = req.user!.jti; // ! garantizado por middleware
 
       console.log(
-        `🚪 Solicitud de logout: Usuario ${req.user.usuario} (JTI: ${jtiActual})`
+        `🚪 Solicitud de logout: Usuario ${
+          req.user!.usuario
+        } (JTI: ${jtiActual})`
       );
 
       const resultado = await AuthService.logout(input, jtiActual);
 
       console.log(
-        `✅ Logout exitoso: ${resultado.datos.sesionesTerminadas} sesiones cerradas, ${resultado.datos.tokensRevocados} tokens revocados`
+        `✅ Logout exitoso: ${resultado.datos.sesionesTerminadas} sesiones cerradas`
       );
 
       enviarRespuestaExitosa(res, {
@@ -182,7 +184,7 @@ export class AuthController {
     res: Response
   ): Promise<void> {
     try {
-      const jti = req.user.jti;
+      const jti = req.user!.jti; // ! garantizado por middleware
 
       console.log(`👤 Solicitud de usuario actual: JTI ${jti}`);
 
@@ -220,7 +222,7 @@ export class AuthController {
   async verificarToken(req: RequestAutenticado, res: Response): Promise<void> {
     try {
       // Si llegamos aquí, el token ya fue validado por el middleware
-      const usuario = req.user;
+      const usuario = req.user!; // ! garantizado por middleware
 
       console.log(
         `✅ Token verificado: Usuario ${usuario.usuario} (JTI: ${usuario.jti})`
@@ -270,10 +272,10 @@ export class AuthController {
     res: Response
   ): Promise<void> {
     try {
-      const idUsuario = req.user.id_ct_usuario;
+      const idUsuario = req.user!.id_ct_usuario; // ! garantizado por middleware
 
       console.log(
-        `📊 Solicitud de sesiones activas: Usuario ${req.user.usuario}`
+        `📊 Solicitud de sesiones activas: Usuario ${req.user!.usuario}`
       );
 
       // Importar Prisma aquí para evitar dependencias circulares
@@ -306,7 +308,7 @@ export class AuthController {
       // Marcar la sesión actual
       const sesionesConMarcado = sesiones.map((sesion) => ({
         ...sesion,
-        esActual: sesion.jti === req.user.jti,
+        esActual: sesion.jti === req.user!.jti, // ! garantizado por middleware
       }));
 
       enviarRespuestaExitosa(res, {
@@ -340,11 +342,13 @@ export class AuthController {
     res: Response
   ): Promise<void> {
     try {
-      const sessionId = req.params.sessionId;
-      const idUsuario = req.user.id_ct_usuario;
+      const sessionId = parseInt(req.params.sessionId); // Convertir a Int desde el inicio
+      const idUsuario = req.user!.id_ct_usuario; // ! garantizado por middleware
 
       console.log(
-        `🗑️ Cerrando sesión específica: ${sessionId} para usuario ${req.user.usuario}`
+        `🗑️ Cerrando sesión específica: ${sessionId} para usuario ${
+          req.user!.usuario
+        }`
       );
 
       // Importar Prisma aquí para evitar dependencias circulares
@@ -354,7 +358,7 @@ export class AuthController {
       // Verificar que la sesión pertenece al usuario actual
       const sesion = await prisma.ct_sesion.findFirst({
         where: {
-          id_ct_sesion: parseInt(sessionId), // Convertir string a INT
+          id_ct_sesion: sessionId,
           id_ct_usuario: idUsuario,
           activa: true,
         },
@@ -371,31 +375,18 @@ export class AuthController {
         );
       }
 
-      // Cerrar la sesión y revocar refresh tokens asociados
-      await prisma.$transaction([
-        prisma.ct_sesion.update({
-          where: { id_ct_sesion: parseInt(sessionId) }, // Convertir string a INT
-          data: { activa: false },
-        }),
-        prisma.ct_refresh_token.updateMany({
-          where: {
-            id_ct_sesion: sessionId, // Este campo es STRING en ct_refresh_token
-            revocado: false,
-            usado: false,
-          },
-          data: {
-            revocado: true,
-            motivo_revocacion: "logout_remoto",
-          },
-        }),
-      ]);
+      // Cerrar la sesión
+      await prisma.ct_sesion.update({
+        where: { id_ct_sesion: sessionId },
+        data: { activa: false },
+      });
 
       console.log(`✅ Sesión cerrada exitosamente: ${sessionId}`);
 
       enviarRespuestaExitosa(res, {
         datos: {
           sesionCerrada: sessionId,
-          eraActual: sesion.jti === req.user.jti,
+          eraActual: sesion.jti === req.user!.jti, // ! garantizado por middleware
         },
         mensaje: "Sesión cerrada exitosamente",
       });

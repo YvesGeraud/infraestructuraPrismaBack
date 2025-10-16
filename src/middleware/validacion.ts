@@ -18,6 +18,22 @@ export interface EsquemasValidacion {
 export const validarRequest = (esquemas: EsquemasValidacion) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // 🐛 DEBUG: Ver qué está llegando
+      if (esquemas.body) {
+        console.log(
+          "🔍 DEBUG validarRequest - Content-Type:",
+          req.headers["content-type"]
+        );
+        console.log(
+          "🔍 DEBUG validarRequest - req.body:",
+          JSON.stringify(req.body, null, 2)
+        );
+        console.log(
+          "🔍 DEBUG validarRequest - req.body keys:",
+          Object.keys(req.body)
+        );
+      }
+
       // Validar body si está presente
       if (esquemas.body) {
         req.body = await esquemas.body.parseAsync(req.body);

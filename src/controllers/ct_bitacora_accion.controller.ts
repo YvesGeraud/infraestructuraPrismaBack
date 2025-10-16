@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../utils/bitacoraUtils";
 import { BaseController } from "./BaseController";
-    import { CtBitacoraAccionBaseService } from "../services/ct_bitacora_accion.service";
+import { CtBitacoraAccionBaseService } from "../services/ct_bitacora_accion.service";
 import {
   CrearCtBitacoraAccionInput,
   ActualizarCtBitacoraAccionInput,
@@ -9,52 +14,62 @@ import {
 } from "../schemas/ct_bitacora_accion.schema";
 import { PaginationInput } from "../schemas/commonSchemas";
 
-//TODO ===== CONTROLADOR PARA CT_ENTIDAD CON BASE SERVICE =====
-    const ctBitacoraAccionBaseService = new CtBitacoraAccionBaseService();
+//TODO ===== CONTROLADOR PARA CT_BITACORA_ACCION CON BASE SERVICE =====
+const ctBitacoraAccionBaseService = new CtBitacoraAccionBaseService();
 
 export class CtBitacoraAccionBaseController extends BaseController {
   /**
-   * 📦 Crear nueva entidad
-   * @route POST /api/inventario/marca
+   * 📦 Crear nueva acción de bitácora
+   * @route POST /api/ct_bitacora_accion
+   * 🔐 Requiere autenticación
    */
-  crearAccion = async (req: Request, res: Response): Promise<void> => {
+  crearAccion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const entidadData: CrearCtBitacoraAccionInput = req.body;
-        return await ctBitacoraAccionBaseService.crear(entidadData);
+        return await ctBitacoraAccionBaseService.crear(entidadData, idSesion);
       },
-        "Accion creada exitosamente"
+      "Acción creada exitosamente"
     );
   };
 
   /**
-   * 📦 Obtener accion por ID
-   * @route GET /api/inventario/accion/:id_accion
+   * 📦 Obtener acción por ID
+   * @route GET /api/ct_bitacora_accion/:id_ct_bitacora_accion
    */
   obtenerAccionPorId = async (req: Request, res: Response): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_bitacora_accion } = this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
-          ctBitacoraAccionIdParamSchema,
-          req.params
-        );
+        const { id_ct_bitacora_accion } =
+          this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
+            ctBitacoraAccionIdParamSchema,
+            req.params
+          );
 
-            return await ctBitacoraAccionBaseService.obtenerPorId(id_ct_bitacora_accion);
+        return await ctBitacoraAccionBaseService.obtenerPorId(
+          id_ct_bitacora_accion
+        );
       },
-      "Accion obtenida exitosamente"
+      "Acción obtenida exitosamente"
     );
   };
 
   /**
    * 📦 Obtener todas las acciones con filtros y paginación
-   * @route GET /api/inventario/accion
+   * @route GET /api/ct_bitacora_accion
    *
    * Query parameters soportados:
-   * - descripcion: Filtrar por descripción (búsqueda parcial)
+   * - nombre: Filtrar por nombre (búsqueda parcial)
    * - pagina: Número de página (default: 1)
    * - limite: Elementos por página (default: 10)
    */
@@ -70,50 +85,79 @@ export class CtBitacoraAccionBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-        return await ctBitacoraAccionBaseService.obtenerTodos(filters, pagination);
+        return await ctBitacoraAccionBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Acciones obtenidas exitosamente"
     );
   };
 
   /**
-   * 📦 Actualizar entidad
-   * @route PUT /api/inventario/marca/:id_marca
+   * 📦 Actualizar acción de bitácora
+   * @route PUT /api/ct_bitacora_accion/:id_ct_bitacora_accion
+   * 🔐 Requiere autenticación
    */
-  actualizarAccion = async (req: Request, res: Response): Promise<void> => {
+  actualizarAccion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
       async () => {
-            const { id_ct_bitacora_accion } = this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
-          ctBitacoraAccionIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
+        const { id_ct_bitacora_accion } =
+          this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
+            ctBitacoraAccionIdParamSchema,
+            req.params
+          );
         const accionData: ActualizarCtBitacoraAccionInput = req.body;
 
-        return await ctBitacoraAccionBaseService.actualizar(id_ct_bitacora_accion, accionData);
+        return await ctBitacoraAccionBaseService.actualizar(
+          id_ct_bitacora_accion,
+          accionData,
+          idSesion
+        );
       },
-      "Accion actualizada exitosamente"
+      "Acción actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar entidad
-   * @route DELETE /api/inventario/marca/:id_marca
+   * 📦 Eliminar acción (soft delete)
+   * @route DELETE /api/ct_bitacora_accion/:id_ct_bitacora_accion
+   * 🔐 Requiere autenticación
    */
-  eliminarAccion = async (req: Request, res: Response): Promise<void> => {
+  eliminarAccion = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
       async () => {
-        const { id_ct_bitacora_accion } = this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
-            ctBitacoraAccionIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
 
-        await ctBitacoraAccionBaseService.eliminar(id_ct_bitacora_accion);
+        const { id_ct_bitacora_accion } =
+          this.validarDatosConEsquema<CtBitacoraAccionIdParam>(
+            ctBitacoraAccionIdParamSchema,
+            req.params
+          );
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctBitacoraAccionBaseService.eliminar(
+          id_ct_bitacora_accion,
+          idUsuario,
+          idSesion
+        );
       },
-      "Accion eliminada exitosamente"
+      "Acción eliminada exitosamente"
     );
   };
 }

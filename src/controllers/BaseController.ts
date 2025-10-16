@@ -70,7 +70,7 @@ export abstract class BaseController {
       body: req.body,
       params: req.params,
       query: req.query,
-      usuario: req.usuario?.email || "No autenticado",
+      usuario: req.user?.email || req.usuario?.email || "No autenticado", // Soportar ambos sistemas durante migración
     });
 
     if (error instanceof Error) {

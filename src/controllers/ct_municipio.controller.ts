@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../utils/bitacoraUtils";
 import { BaseController } from "./BaseController";
-    import { CtMunicipioBaseService } from "../services/ct_municipio.service";
+import { CtMunicipioBaseService } from "../services/ct_municipio.service";
 import {
   CrearCtMunicipioInput,
   ActualizarCtMunicipioInput,
@@ -10,51 +15,62 @@ import {
 import { PaginationInput } from "../schemas/commonSchemas";
 
 //TODO ===== CONTROLADOR PARA CT_MUNICIPIO CON BASE SERVICE =====
-    const ctMunicipioBaseService = new CtMunicipioBaseService();
+const ctMunicipioBaseService = new CtMunicipioBaseService();
 
 export class CtMunicipioBaseController extends BaseController {
   /**
    * 📦 Crear nuevo municipio
-   * @route POST /api/inventario/marca
+   * @route POST /api/ct_municipio
+   * 🔐 Requiere autenticación
    */
-  crearMunicipio = async (req: Request, res: Response): Promise<void> => {
+  crearMunicipio = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const municipioData: CrearCtMunicipioInput = req.body;
-        return await ctMunicipioBaseService.crear(municipioData);
+        return await ctMunicipioBaseService.crear(municipioData, idSesion);
       },
-        "Municipio creado exitosamente"
+      "Municipio creado exitosamente"
     );
   };
 
   /**
    * 📦 Obtener municipio por ID
-   * @route GET /api/inventario/entidad/:id_entidad
+   * @route GET /api/ct_municipio/:id_ct_municipio
    */
-  obtenerMunicipioPorId = async (req: Request, res: Response): Promise<void> => {
+  obtenerMunicipioPorId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_municipio } = this.validarDatosConEsquema<CtMunicipioIdParam>(
-          ctMunicipioIdParamSchema,
-          req.params
-        );
+        const { id_ct_municipio } =
+          this.validarDatosConEsquema<CtMunicipioIdParam>(
+            ctMunicipioIdParamSchema,
+            req.params
+          );
 
-            return await ctMunicipioBaseService.obtenerPorId(id_ct_municipio);
+        return await ctMunicipioBaseService.obtenerPorId(id_ct_municipio);
       },
       "Municipio obtenido exitosamente"
     );
   };
 
   /**
-   * 📦 Obtener todas las municipios con filtros y paginación
-   * @route GET /api/inventario/entidad
+   * 📦 Obtener todos los municipios con filtros y paginación
+   * @route GET /api/ct_municipio
    *
    * Query parameters soportados:
-   * - descripcion: Filtrar por descripción (búsqueda parcial)
+   * - nombre: Filtrar por nombre (búsqueda parcial)
    * - pagina: Número de página (default: 1)
    * - limite: Elementos por página (default: 10)
    */
@@ -78,42 +94,68 @@ export class CtMunicipioBaseController extends BaseController {
 
   /**
    * 📦 Actualizar municipio
-   * @route PUT /api/inventario/marca/:id_marca
+   * @route PUT /api/ct_municipio/:id_ct_municipio
+   * 🔐 Requiere autenticación
    */
-  actualizarMunicipio = async (req: Request, res: Response): Promise<void> => {
+  actualizarMunicipio = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
       async () => {
-            const { id_ct_municipio } = this.validarDatosConEsquema<CtMunicipioIdParam>(
-          ctMunicipioIdParamSchema,
-          req.params
-        );
-            const municipioData: ActualizarCtMunicipioInput = req.body;
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
 
-        return await ctMunicipioBaseService.actualizar(id_ct_municipio, municipioData);
+        const { id_ct_municipio } =
+          this.validarDatosConEsquema<CtMunicipioIdParam>(
+            ctMunicipioIdParamSchema,
+            req.params
+          );
+        const municipioData: ActualizarCtMunicipioInput = req.body;
+
+        return await ctMunicipioBaseService.actualizar(
+          id_ct_municipio,
+          municipioData,
+          idSesion
+        );
       },
-      "Municipio actualizada exitosamente"
+      "Municipio actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar municipio
-   * @route DELETE /api/inventario/marca/:id_marca
+   * 📦 Eliminar municipio (soft delete)
+   * @route DELETE /api/ct_municipio/:id_ct_municipio
+   * 🔐 Requiere autenticación
    */
-  eliminarMunicipio = async (req: Request, res: Response): Promise<void> => {
+  eliminarMunicipio = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
       async () => {
-        const { id_ct_municipio } = this.validarDatosConEsquema<CtMunicipioIdParam>(
-            ctMunicipioIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
 
-        await ctMunicipioBaseService.eliminar(id_ct_municipio);
+        const { id_ct_municipio } =
+          this.validarDatosConEsquema<CtMunicipioIdParam>(
+            ctMunicipioIdParamSchema,
+            req.params
+          );
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctMunicipioBaseService.eliminar(
+          id_ct_municipio,
+          idUsuario,
+          idSesion
+        );
       },
-      "Municipio eliminada exitosamente"
+      "Municipio eliminado exitosamente"
     );
   };
 }

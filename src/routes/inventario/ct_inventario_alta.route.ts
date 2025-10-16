@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { CtInventarioAltaBaseController } from "../../controllers/inventario/ct_inventario_alta.controller";
 import { validarRequest } from "../../middleware/validacion";
+import { verificarAutenticacion } from "../../middleware/authMiddleware";
 import {
   crearCtInventarioAltaSchema,
   actualizarCtInventarioAltaSchema,
@@ -27,16 +28,18 @@ router.get(
   ctInventarioAltaController.obtenerInventarioAltaPorId
 );
 
-// 📦 Crear nueva entidad
+// 📦 Crear nueva entidad (requiere autenticación)
 router.post(
   "/",
+  verificarAutenticacion, // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({ body: crearCtInventarioAltaSchema }),
   ctInventarioAltaController.crearInventarioAlta
 );
 
-// 📦 Actualizar entidad existente
+// 📦 Actualizar entidad existente (requiere autenticación)
 router.put(
   "/:id_ct_inventario_alta",
+  verificarAutenticacion, // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({
     params: ctInventarioAltaIdParamSchema,
     body: actualizarCtInventarioAltaSchema,
@@ -44,9 +47,10 @@ router.put(
   ctInventarioAltaController.actualizarInventarioAlta
 );
 
-// 📦 Eliminar entidad
+// 📦 Eliminar entidad (requiere autenticación)
 router.delete(
   "/:id_ct_inventario_alta",
+  verificarAutenticacion, // 🔐 Middleware de autenticación OBLIGATORIO
   validarRequest({ params: ctInventarioAltaIdParamSchema }),
   ctInventarioAltaController.eliminarInventarioAlta
 );

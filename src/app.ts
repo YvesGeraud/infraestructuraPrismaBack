@@ -69,6 +69,36 @@ if (isDevelopment) {
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// 🛡️ MIDDLEWARE DE RESPALDO: Parsear JSON si viene sin Content-Type
+app.use((req, res, next) => {
+  if (
+    req.method !== "GET" &&
+    req.method !== "DELETE" &&
+    Object.keys(req.body).length === 0 &&
+    req.headers["content-length"] &&
+    parseInt(req.headers["content-length"]) > 0
+  ) {
+    let data = "";
+    req.on("data", (chunk) => {
+      data += chunk;
+    });
+    req.on("end", () => {
+      try {
+        req.body = JSON.parse(data);
+        console.log(
+          "⚠️  Body parseado sin Content-Type (agrega Content-Type: application/json):",
+          req.body
+        );
+      } catch (e) {
+        console.error("❌ No se pudo parsear body como JSON:", data);
+      }
+      next();
+    });
+  } else {
+    next();
+  }
+});
+
 // Servir archivos estáticos
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 

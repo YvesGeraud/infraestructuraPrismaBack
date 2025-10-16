@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../utils/bitacoraUtils";
 import { BaseController } from "./BaseController";
 import { DtBitacoraBaseService } from "../services/dt_bitacora.service";
 import {
@@ -16,14 +21,21 @@ export class DtBitacoraBaseController extends BaseController {
   /**
    * 📦 Crear nuevo registro de bitácora
    * @route POST /api/dt_bitacora
+   * 🔐 Requiere autenticación
    */
-  crearBitacora = async (req: Request, res: Response): Promise<void> => {
+  crearBitacora = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const bitacoraData: CrearDtBitacoraInput = req.body;
-        return await dtBitacoraBaseService.crear(bitacoraData);
+        return await dtBitacoraBaseService.crear(bitacoraData, idSesion);
       },
       "Registro de bitácora creado exitosamente"
     );
@@ -38,10 +50,11 @@ export class DtBitacoraBaseController extends BaseController {
       req,
       res,
       async () => {
-        const { id_dt_bitacora } = this.validarDatosConEsquema<DtBitacoraIdParam>(
-          dtBitacoraIdParamSchema,
-          req.params
-        );
+        const { id_dt_bitacora } =
+          this.validarDatosConEsquema<DtBitacoraIdParam>(
+            dtBitacoraIdParamSchema,
+            req.params
+          );
 
         return await dtBitacoraBaseService.obtenerPorId(id_dt_bitacora);
       },
@@ -86,42 +99,66 @@ export class DtBitacoraBaseController extends BaseController {
   /**
    * 📦 Actualizar registro de bitácora
    * @route PUT /api/dt_bitacora/:id_dt_bitacora
+   * 🔐 Requiere autenticación
    */
-  actualizarBitacora = async (req: Request, res: Response): Promise<void> => {
+  actualizarBitacora = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
       async () => {
-        const { id_dt_bitacora } = this.validarDatosConEsquema<DtBitacoraIdParam>(
-          dtBitacoraIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
+        const { id_dt_bitacora } =
+          this.validarDatosConEsquema<DtBitacoraIdParam>(
+            dtBitacoraIdParamSchema,
+            req.params
+          );
         const bitacoraData: ActualizarDtBitacoraInput = req.body;
 
-        return await dtBitacoraBaseService.actualizar(id_dt_bitacora, bitacoraData);
+        return await dtBitacoraBaseService.actualizar(
+          id_dt_bitacora,
+          bitacoraData,
+          idSesion
+        );
       },
       "Registro de bitácora actualizado exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar registro de bitácora
+   * 📦 Eliminar registro de bitácora (soft delete)
    * @route DELETE /api/dt_bitacora/:id_dt_bitacora
+   * 🔐 Requiere autenticación
    */
-  eliminarBitacora = async (req: Request, res: Response): Promise<void> => {
+  eliminarBitacora = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
       async () => {
-        const { id_dt_bitacora } = this.validarDatosConEsquema<DtBitacoraIdParam>(
-          dtBitacoraIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
 
-        await dtBitacoraBaseService.eliminar(id_dt_bitacora);
+        const { id_dt_bitacora } =
+          this.validarDatosConEsquema<DtBitacoraIdParam>(
+            dtBitacoraIdParamSchema,
+            req.params
+          );
+
+        await dtBitacoraBaseService.eliminar(
+          id_dt_bitacora,
+          idUsuario,
+          idSesion
+        );
       },
       "Registro de bitácora eliminado exitosamente"
     );
   };
 }
-

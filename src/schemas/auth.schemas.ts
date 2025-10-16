@@ -34,6 +34,7 @@ export const esquemaLogin = z.object({
 
 /**
  * Esquema para validar refresh token
+ * @deprecated Refresh tokens han sido eliminados del sistema
  */
 export const esquemaRefreshToken = z.object({
   refreshToken: z
@@ -77,17 +78,16 @@ export const esquemaRespuestaLogin = z.object({
       fecha_registro: z.date().nullable(),
     }),
 
-    // Tokens de autenticación
+    // Tokens de autenticación (sin refresh token)
     tokens: z.object({
       accessToken: z.string(),
-      refreshToken: z.string().uuid(),
       tipoToken: z.literal("Bearer"),
       expiraEn: z.number(), // Segundos hasta expiración
     }),
 
     // Información de la sesión
     sesion: z.object({
-      id_sesion: z.string().uuid(),
+      id_sesion: z.number(), // Int - ID de la sesión en BD
       jti: z.string().uuid(),
       fecha_expiracion: z.date(),
       ip_origen: z.string().nullable(),
@@ -104,6 +104,7 @@ export const esquemaRespuestaLogin = z.object({
 
 /**
  * Esquema para respuesta de refresh token
+ * @deprecated Refresh tokens han sido eliminados del sistema
  */
 export const esquemaRespuestaRefresh = z.object({
   exito: z.literal(true),
@@ -125,7 +126,6 @@ export const esquemaRespuestaLogout = z.object({
   mensaje: z.string(),
   datos: z.object({
     sesionesTerminadas: z.number(),
-    tokensRevocados: z.number(),
   }),
 });
 
@@ -147,7 +147,7 @@ export const esquemaUsuarioActual = z.object({
       fecha_modificacion: z.date().nullable(),
     }),
     sesionActual: z.object({
-      id_sesion: z.string().uuid(),
+      id_sesion: z.number(), // Int - ID de la sesión en BD
       jti: z.string().uuid(),
       fecha_creacion: z.date(),
       fecha_expiracion: z.date(),

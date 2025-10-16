@@ -59,9 +59,11 @@ export interface UsuarioAutenticado {
 
 /**
  * Extensión del Request para incluir información del usuario autenticado
+ * NOTA: En runtime, user siempre estará presente después del middleware verificarAutenticacion
+ * En TypeScript se marca como opcional para compatibilidad con tipos de Express Router
  */
 export interface RequestAutenticado extends Request {
-  user: UsuarioAutenticado;
+  user?: UsuarioAutenticado; // El middleware garantiza su presencia en runtime
 }
 
 // ===== MIDDLEWARE PRINCIPAL =====

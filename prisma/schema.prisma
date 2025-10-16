@@ -438,26 +438,6 @@ model ct_rate_limit {
   @@index([ventana_inicio])
 }
 
-model ct_refresh_token {
-  id_ct_refresh_token String     @id @db.VarChar(36)
-  id_ct_usuario       Int
-  token_hash          String     @unique @db.VarChar(255)
-  id_ct_sesion        String?    @db.VarChar(36)
-  fecha_creacion      DateTime   @default(now()) @db.DateTime(6)
-  fecha_expiracion    DateTime   @db.DateTime(6)
-  fecha_uso           DateTime?  @db.DateTime(6)
-  usado               Boolean    @default(false)
-  revocado            Boolean    @default(false)
-  motivo_revocacion   String?    @db.VarChar(100)
-  ct_usuario          ct_usuario @relation(fields: [id_ct_usuario], references: [id_ct_usuario], onDelete: Cascade)
-
-  @@index([fecha_expiracion])
-  @@index([id_ct_usuario])
-  @@index([revocado])
-  @@index([token_hash])
-  @@index([usado])
-}
-
 model ct_sesion {
   id_ct_sesion     Int        @id @default(autoincrement())
   id_ct_usuario    Int
@@ -479,18 +459,17 @@ model ct_sesion {
 }
 
 model ct_usuario {
-  id_ct_usuario      Int                @id @default(autoincrement())
-  usuario            String             @unique(map: "IDX_daaab6a989ac4c341e57f18bbe") @db.VarChar(100)
-  contrasena         String             @db.VarChar(255)
-  estado             Boolean            @default(true)
-  fecha_registro     DateTime?          @default(now()) @db.DateTime(6)
-  fecha_modificacion DateTime?          @db.DateTime(6)
-  uuid_usuario       String             @unique @db.VarChar(36)
-  email              String?            @unique @db.VarChar(255)
-  ultimo_login       DateTime?          @db.DateTime(6)
-  intentos_fallidos  Int                @default(0)
-  bloqueado_hasta    DateTime?          @db.DateTime(6)
-  ct_refresh_token   ct_refresh_token[]
+  id_ct_usuario      Int       @id @default(autoincrement())
+  usuario            String    @unique(map: "IDX_daaab6a989ac4c341e57f18bbe") @db.VarChar(100)
+  contrasena         String    @db.VarChar(255)
+  estado             Boolean   @default(true)
+  fecha_registro     DateTime? @default(now()) @db.DateTime(6)
+  fecha_modificacion DateTime? @db.DateTime(6)
+  uuid_usuario       String    @unique @db.VarChar(36)
+  email              String?   @unique @db.VarChar(255)
+  ultimo_login       DateTime? @db.DateTime(6)
+  intentos_fallidos  Int       @default(0)
+  bloqueado_hasta    DateTime? @db.DateTime(6)
   ct_sesion          ct_sesion[]
 }
 

@@ -475,28 +475,6 @@ CREATE TABLE `ct_rate_limit` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `ct_refresh_token` (
-    `id_ct_refresh_token` VARCHAR(36) NOT NULL,
-    `id_ct_usuario` INTEGER NOT NULL,
-    `token_hash` VARCHAR(255) NOT NULL,
-    `id_ct_sesion` VARCHAR(36) NULL,
-    `fecha_creacion` DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
-    `fecha_expiracion` DATETIME(6) NOT NULL,
-    `fecha_uso` DATETIME(6) NULL,
-    `usado` BOOLEAN NOT NULL DEFAULT false,
-    `revocado` BOOLEAN NOT NULL DEFAULT false,
-    `motivo_revocacion` VARCHAR(100) NULL,
-
-    UNIQUE INDEX `ct_refresh_token_token_hash_key`(`token_hash`),
-    INDEX `ct_refresh_token_fecha_expiracion_idx`(`fecha_expiracion`),
-    INDEX `ct_refresh_token_id_ct_usuario_idx`(`id_ct_usuario`),
-    INDEX `ct_refresh_token_revocado_idx`(`revocado`),
-    INDEX `ct_refresh_token_token_hash_idx`(`token_hash`),
-    INDEX `ct_refresh_token_usado_idx`(`usado`),
-    PRIMARY KEY (`id_ct_refresh_token`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `ct_sesion` (
     `id_ct_sesion` INTEGER NOT NULL AUTO_INCREMENT,
     `id_ct_usuario` INTEGER NOT NULL,
@@ -681,9 +659,6 @@ ALTER TABLE `ct_localidad` ADD CONSTRAINT `FK_ct_localidad_ct_municipio` FOREIGN
 
 -- AddForeignKey
 ALTER TABLE `ct_municipio` ADD CONSTRAINT `FK_ct_municipio_ct_entidad` FOREIGN KEY (`id_ct_entidad`) REFERENCES `ct_entidad`(`id_ct_entidad`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `ct_refresh_token` ADD CONSTRAINT `ct_refresh_token_id_ct_usuario_fkey` FOREIGN KEY (`id_ct_usuario`) REFERENCES `ct_usuario`(`id_ct_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ct_sesion` ADD CONSTRAINT `ct_sesion_id_ct_usuario_fkey` FOREIGN KEY (`id_ct_usuario`) REFERENCES `ct_usuario`(`id_ct_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;

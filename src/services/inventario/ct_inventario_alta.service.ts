@@ -47,13 +47,6 @@ export class CtInventarioAltaBaseService extends BaseService<
       };
     }
 
-    // Filtro de abreviatura
-    if (filters?.abreviatura) {
-      where.abreviatura = {
-        contains: filters.abreviatura,
-      };
-    }
-
     return where;
   }
 
@@ -68,7 +61,19 @@ export class CtInventarioAltaBaseService extends BaseService<
   // - crear() con validaciones ✅
   // - actualizar() con verificaciones ✅
   // - eliminar() con manejo de errores ✅
+
+  // ===========================================
+  // 📝 BITÁCORA AUTOMÁTICA ACTIVADA ✅
+  // ===========================================
+  // BaseService registrará automáticamente CREATE, UPDATE, DELETE
+  // en dt_bitacora usando los catálogos de acciones y tablas
+
+  protected registrarEnBitacora = true;
+  protected nombreTablaParaBitacora = "ct_inventario_alta"; // Nombre exacto de la tabla
 }
 
 // 🎉 TOTAL: ¡Solo 18 líneas para CRUD completo!
 // Sin BaseService serían ~150 líneas 😱
+
+// 📝 CON BITÁCORA: ¡Solo +2 líneas más! (CRUD + auditoría automática)
+// Sin BaseService con bitácora serían ~350+ líneas 🚀

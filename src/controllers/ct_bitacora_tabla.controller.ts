@@ -1,4 +1,9 @@
 import { Request, Response } from "express";
+import { RequestAutenticado } from "../middleware/authMiddleware";
+import {
+  obtenerIdSesionDesdeJwt,
+  obtenerIdUsuarioDesdeJwt,
+} from "../utils/bitacoraUtils";
 import { BaseController } from "./BaseController";
 import { CtBitacoraTablaBaseService } from "../services/ct_bitacora_tabla.service";
 import {
@@ -16,14 +21,24 @@ export class CtBitacoraTablaBaseController extends BaseController {
   /**
    * 📦 Crear nueva tabla de bitácora
    * @route POST /api/ct_bitacora_tabla
+   * 🔐 Requiere autenticación
    */
-  crearBitacoraTabla = async (req: Request, res: Response): Promise<void> => {
+  crearBitacoraTabla = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarCreacion(
       req,
       res,
       async () => {
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
         const bitacoraTablaData: CrearCtBitacoraTablaInput = req.body;
-        return await ctBitacoraTablaBaseService.crear(bitacoraTablaData);
+        return await ctBitacoraTablaBaseService.crear(
+          bitacoraTablaData,
+          idSesion
+        );
       },
       "Tabla de bitácora creada exitosamente"
     );
@@ -33,17 +48,23 @@ export class CtBitacoraTablaBaseController extends BaseController {
    * 📦 Obtener tabla de bitácora por ID
    * @route GET /api/ct_bitacora_tabla/:id_ct_bitacora_tabla
    */
-  obtenerBitacoraTablaPorId = async (req: Request, res: Response): Promise<void> => {
+  obtenerBitacoraTablaPorId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     await this.manejarOperacion(
       req,
       res,
       async () => {
-        const { id_ct_bitacora_tabla } = this.validarDatosConEsquema<CtBitacoraTablaIdParam>(
-          ctBitacoraTablaIdParamSchema,
-          req.params
-        );
+        const { id_ct_bitacora_tabla } =
+          this.validarDatosConEsquema<CtBitacoraTablaIdParam>(
+            ctBitacoraTablaIdParamSchema,
+            req.params
+          );
 
-        return await ctBitacoraTablaBaseService.obtenerPorId(id_ct_bitacora_tabla);
+        return await ctBitacoraTablaBaseService.obtenerPorId(
+          id_ct_bitacora_tabla
+        );
       },
       "Tabla de bitácora obtenida exitosamente"
     );
@@ -72,7 +93,10 @@ export class CtBitacoraTablaBaseController extends BaseController {
         const { pagina, limite, ...filters } = req.query as any;
         const pagination: PaginationInput = { pagina, limite };
 
-        return await ctBitacoraTablaBaseService.obtenerTodos(filters, pagination);
+        return await ctBitacoraTablaBaseService.obtenerTodos(
+          filters,
+          pagination
+        );
       },
       "Tablas de bitácora obtenidas exitosamente"
     );
@@ -81,42 +105,67 @@ export class CtBitacoraTablaBaseController extends BaseController {
   /**
    * 📦 Actualizar tabla de bitácora
    * @route PUT /api/ct_bitacora_tabla/:id_ct_bitacora_tabla
+   * 🔐 Requiere autenticación
    */
-  actualizarBitacoraTabla = async (req: Request, res: Response): Promise<void> => {
+  actualizarBitacoraTabla = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarActualizacion(
       req,
       res,
       async () => {
-        const { id_ct_bitacora_tabla } = this.validarDatosConEsquema<CtBitacoraTablaIdParam>(
-          ctBitacoraTablaIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+
+        const { id_ct_bitacora_tabla } =
+          this.validarDatosConEsquema<CtBitacoraTablaIdParam>(
+            ctBitacoraTablaIdParamSchema,
+            req.params
+          );
         const bitacoraTablaData: ActualizarCtBitacoraTablaInput = req.body;
 
-        return await ctBitacoraTablaBaseService.actualizar(id_ct_bitacora_tabla, bitacoraTablaData);
+        return await ctBitacoraTablaBaseService.actualizar(
+          id_ct_bitacora_tabla,
+          bitacoraTablaData,
+          idSesion
+        );
       },
       "Tabla de bitácora actualizada exitosamente"
     );
   };
 
   /**
-   * 📦 Eliminar tabla de bitácora
+   * 📦 Eliminar tabla de bitácora (soft delete)
    * @route DELETE /api/ct_bitacora_tabla/:id_ct_bitacora_tabla
+   * 🔐 Requiere autenticación
    */
-  eliminarBitacoraTabla = async (req: Request, res: Response): Promise<void> => {
+  eliminarBitacoraTabla = async (
+    req: RequestAutenticado,
+    res: Response
+  ): Promise<void> => {
     await this.manejarEliminacion(
       req,
       res,
       async () => {
-        const { id_ct_bitacora_tabla } = this.validarDatosConEsquema<CtBitacoraTablaIdParam>(
-          ctBitacoraTablaIdParamSchema,
-          req.params
-        );
+        // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
+        const idSesion = obtenerIdSesionDesdeJwt(req);
+        const idUsuario = obtenerIdUsuarioDesdeJwt(req);
 
-        await ctBitacoraTablaBaseService.eliminar(id_ct_bitacora_tabla);
+        const { id_ct_bitacora_tabla } =
+          this.validarDatosConEsquema<CtBitacoraTablaIdParam>(
+            ctBitacoraTablaIdParamSchema,
+            req.params
+          );
+
+        // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
+        await ctBitacoraTablaBaseService.eliminar(
+          id_ct_bitacora_tabla,
+          idUsuario,
+          idSesion
+        );
       },
       "Tabla de bitácora eliminada exitosamente"
     );
   };
 }
-
