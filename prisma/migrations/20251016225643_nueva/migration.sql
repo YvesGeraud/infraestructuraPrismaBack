@@ -437,6 +437,7 @@ CREATE TABLE `ct_localidad` (
     INDEX `estado`(`estado`),
     INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
     INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    UNIQUE INDEX `ct_localidad_nombre_ambito_id_ct_municipio_key`(`nombre`, `ambito`, `id_ct_municipio`),
     PRIMARY KEY (`id_ct_localidad`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

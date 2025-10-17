@@ -162,9 +162,9 @@ app.use((req, res, next) => {
 
   // Permitir GET sin autenticación (para consultas públicas)
   // Comenta esta línea si quieres que los GET también requieran JWT
-  if (req.method === "GET") {
+  /*if (req.method === "GET") {
     return next();
-  }
+  }*/
 
   // Para POST, PUT, DELETE, PATCH: Requiere JWT
   verificarAutenticacion(req, res, next);
