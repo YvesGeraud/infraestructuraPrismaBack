@@ -34,7 +34,7 @@ export class CtInventarioMarcaBaseController extends BaseController {
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
+        const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
 
         return await ctInventarioMarcaBaseService.crear(
           inventarioMarcaData,
@@ -48,7 +48,7 @@ const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
 
   /**
    * 📦 Obtener marca por ID
-   * @route GET /api/ct_inventario_marca/:id_ct_inventario_material
+   * @route GET /api/ct_inventario_marca/:id_ct_inventario_marca
    */
   obtenerInventarioMarcaPorId = async (
     req: Request,
@@ -58,14 +58,14 @@ const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
       req,
       res,
       async () => {
-        const { id_ct_inventario_material } =
+        const { id_ct_inventario_marca } =
           this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
             ctInventarioMarcaIdParamSchema,
             req.params
           );
 
         return await ctInventarioMarcaBaseService.obtenerPorId(
-          id_ct_inventario_material
+          id_ct_inventario_marca
         );
       },
       "Marca obtenida exitosamente"
@@ -104,7 +104,7 @@ const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
 
   /**
    * 📦 Actualizar marca
-   * @route PUT /api/ct_inventario_marca/:id_ct_inventario_material
+   * @route PUT /api/ct_inventario_marca/:id_ct_inventario_marca
    * 🔐 Requiere autenticación
    */
   actualizarInventarioMarca = async (
@@ -118,7 +118,7 @@ const inventarioMarcaData: CrearCtInventarioMarcaInput = req.body;
         // 🔐 Extraer id_sesion desde JWT (OBLIGATORIO para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-const { id_ct_inventario_material } =
+        const { id_ct_inventario_marca } =
           this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
             ctInventarioMarcaIdParamSchema,
             req.params
@@ -126,7 +126,7 @@ const { id_ct_inventario_material } =
         const inventarioMarcaData: ActualizarCtInventarioMarcaInput = req.body;
 
         return await ctInventarioMarcaBaseService.actualizar(
-          id_ct_inventario_material,
+          id_ct_inventario_marca,
           inventarioMarcaData,
           idSesion,
           idUsuario
@@ -138,7 +138,7 @@ const { id_ct_inventario_material } =
 
   /**
    * 📦 Eliminar marca (soft delete)
-   * @route DELETE /api/ct_inventario_marca/:id_ct_inventario_material
+   * @route DELETE /api/ct_inventario_marca/:id_ct_inventario_marca
    * 🔐 Requiere autenticación
    */
   eliminarInventarioMarca = async (
@@ -152,7 +152,7 @@ const { id_ct_inventario_material } =
         // 🔐 Extraer id_sesion e id_usuario desde JWT (OBLIGATORIOS para bitácora)
         const idSesion = obtenerIdSesionDesdeJwt(req);
         const idUsuario = obtenerIdUsuarioDesdeJwt(req);
-const { id_ct_inventario_material } =
+        const { id_ct_inventario_marca } =
           this.validarDatosConEsquema<CtInventarioMarcaIdParam>(
             ctInventarioMarcaIdParamSchema,
             req.params
@@ -160,7 +160,7 @@ const { id_ct_inventario_material } =
 
         // Ya no necesitamos obtener id_ct_usuario_up del body, viene del JWT
         await ctInventarioMarcaBaseService.eliminar(
-          id_ct_inventario_material,
+          id_ct_inventario_marca,
           idUsuario,
           idSesion
         );

@@ -22,7 +22,7 @@ router.get(
 
 // 📦 Obtener marca específica por ID
 router.get(
-  "/:id_ct_inventario_material",
+  "/:id_ct_inventario_marca",
   validarRequest({ params: ctInventarioMarcaIdParamSchema }),
   ctInventarioMarcaController.obtenerInventarioMarcaPorId
 );
@@ -36,7 +36,7 @@ router.post(
 
 // 📦 Actualizar marca existente
 router.put(
-  "/:id_ct_inventario_material",
+  "/:id_ct_inventario_marca",
   validarRequest({
     params: ctInventarioMarcaIdParamSchema,
     body: actualizarCtInventarioMarcaSchema,
@@ -46,7 +46,7 @@ router.put(
 
 // 📦 Eliminar marca
 router.delete(
-  "/:id_ct_inventario_material",
+  "/:id_ct_inventario_marca",
   validarRequest({ params: ctInventarioMarcaIdParamSchema }),
   ctInventarioMarcaController.eliminarInventarioMarca
 );

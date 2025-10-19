@@ -20,7 +20,8 @@ import {
 //? Esquema para crear un nuevo material
 export const crearCtInventarioMaterialSchema = z.object({
   nombre: esquemaTextoRequerido(2, 50),
-  estado: esquemaEstadoRequerido,});
+  estado: esquemaEstadoRequerido,
+});
 
 //? Esquema para actualizar un material
 export const actualizarCtInventarioMaterialSchema = z.object({
@@ -34,7 +35,7 @@ export const actualizarCtInventarioMaterialSchema = z.object({
 //! NOTA: Implementa soft delete - por defecto solo muestra registros activos
 export const ctInventarioMaterialFiltrosSchema = z.object({
   //? Filtros específicos
-  id_ct_inventario_marca: esquemaQueryId, // Nota: En Prisma se llama id_ct_inventario_marca
+  id_ct_inventario_material: esquemaQueryId,
   nombre: esquemaQueryTexto,
   estado: esquemaQueryBoolean,
   id_ct_usuario_in: esquemaQueryId,
@@ -48,21 +49,27 @@ export const ctInventarioMaterialFiltrosSchema = z.object({
   limite: esquemaLimiteQuery,
 });
 
-export type CrearCtInventarioMaterialInput = z.infer<typeof crearCtInventarioMaterialSchema>;
+export type CrearCtInventarioMaterialInput = z.infer<
+  typeof crearCtInventarioMaterialSchema
+>;
 export type ActualizarCtInventarioMaterialInput = z.infer<
   typeof actualizarCtInventarioMaterialSchema
 >;
 
-export type BuscarCtInventarioMaterialInput = z.infer<typeof ctInventarioMaterialFiltrosSchema>;
+export type BuscarCtInventarioMaterialInput = z.infer<
+  typeof ctInventarioMaterialFiltrosSchema
+>;
 
 //? Esquema para parámetros de URL (ID de material)
 export const ctInventarioMaterialIdParamSchema = z.object({
-  id_ct_inventario_marca: esquemaParamId, // Nota: En Prisma se llama id_ct_inventario_marca
+  id_ct_inventario_material: esquemaParamId,
 });
 
 //? Esquema para validar el body del DELETE - quién ejecuta la eliminación
 // Ya no se usa esquemaDeleteConUsuario - id_ct_usuario_up se obtiene del JWT
-export type CtInventarioMaterialIdParam = z.infer<typeof ctInventarioMaterialIdParamSchema>;
+export type CtInventarioMaterialIdParam = z.infer<
+  typeof ctInventarioMaterialIdParamSchema
+>;
 
 // Ya no se usa - DELETE no requiere body
 /*

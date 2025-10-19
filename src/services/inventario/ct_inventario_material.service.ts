@@ -22,7 +22,7 @@ export class CtInventarioMaterialBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_inventario_material",
-    defaultOrderBy: { id_ct_inventario_marca: "asc" as const }, // Nota: En Prisma se llama id_ct_inventario_marca
+    defaultOrderBy: { id_ct_inventario_material: "asc" as const },
     campoActivo: "estado",
   };
 
@@ -39,9 +39,9 @@ export class CtInventarioMaterialBaseService extends BaseService<
     const conditions: any[] = [];
 
     // Filtro por ID
-    if (filters?.id_ct_inventario_marca) { // Nota: En Prisma se llama id_ct_inventario_marca
+    if (filters?.id_ct_inventario_material) {
       conditions.push({
-        id_ct_inventario_marca: filters.id_ct_inventario_marca,
+        id_ct_inventario_material: filters.id_ct_inventario_material,
       });
     }
 
@@ -64,7 +64,7 @@ export class CtInventarioMaterialBaseService extends BaseService<
 
   // 🔧 Sobrescribir campo PK
   protected getPrimaryKeyField(): string {
-    return "id_ct_inventario_marca"; // Nota: En Prisma se llama id_ct_inventario_marca
+    return "id_ct_inventario_material";
   }
 
   // ===========================================

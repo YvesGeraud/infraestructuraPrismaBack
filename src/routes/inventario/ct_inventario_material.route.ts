@@ -22,7 +22,7 @@ router.get(
 
 // 📦 Obtener material específico por ID
 router.get(
-  "/:id_ct_inventario_marca",
+  "/:id_ct_inventario_material",
   validarRequest({ params: ctInventarioMaterialIdParamSchema }),
   ctInventarioMaterialController.obtenerInventarioMaterialPorId
 );
@@ -36,7 +36,7 @@ router.post(
 
 // 📦 Actualizar material existente
 router.put(
-  "/:id_ct_inventario_marca",
+  "/:id_ct_inventario_material",
   validarRequest({
     params: ctInventarioMaterialIdParamSchema,
     body: actualizarCtInventarioMaterialSchema,
@@ -46,7 +46,7 @@ router.put(
 
 // 📦 Eliminar material
 router.delete(
-  "/:id_ct_inventario_marca",
+  "/:id_ct_inventario_material",
   validarRequest({ params: ctInventarioMaterialIdParamSchema }),
   ctInventarioMaterialController.eliminarInventarioMaterial
 );
