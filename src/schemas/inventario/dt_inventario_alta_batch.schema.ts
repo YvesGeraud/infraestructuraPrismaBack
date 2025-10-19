@@ -25,23 +25,22 @@ import {
 
 //? ===== ESQUEMA PARA UN ARTÍCULO INDIVIDUAL =====
 export const articuloAltaSchema = z.object({
-  // Datos del artículo
-  id_rl_infraestructura_jerarquia: esquemaNumeroRequerido(1, 2147483647),
-  folio_antiguo: esquemaTextoOpcional(50),
-  folio: esquemaTextoRequerido(1, 50),
-  no_serie: esquemaTextoRequerido(1, 50), // Cambiado a texto según schema Prisma
-  observaciones: esquemaTextoRequerido(1, 50), // Cambiado a texto según schema Prisma
-  modelo: esquemaTextoRequerido(1, 50), // Cambiado a texto según schema Prisma
-  fecha_registro: esquemaFechaRequerida,
-  id_ct_inventario_subclase: esquemaNumeroRequerido(1, 2147483647),
-  id_ct_inventario_material: esquemaNumeroRequerido(1, 2147483647),
+  // Datos del artículo (solo los que envía el frontend)
+  no_serie: esquemaTextoRequerido(1, 50),
+  modelo: esquemaTextoRequerido(1, 50),
+  observaciones: esquemaTextoOpcional(65535), // Opcional según el frontend
+  id_ct_inventario_tipo_articulo: esquemaNumeroRequerido(1, 2147483647),
   id_ct_inventario_marca: esquemaNumeroRequerido(1, 2147483647),
+  id_ct_inventario_material: esquemaNumeroRequerido(1, 2147483647),
   id_ct_inventario_color: esquemaNumeroRequerido(1, 2147483647),
   id_ct_inventario_proveedor: esquemaNumeroRequerido(1, 2147483647),
   id_ct_inventario_estado_fisico: esquemaNumeroRequerido(1, 2147483647),
-  id_ct_inventario_tipo_articulo: esquemaNumeroRequerido(1, 2147483647),
-  cct: esquemaTextoOpcional(11),
-  estado: esquemaEstadoRequerido,
+
+  // Campos que se agregarán automáticamente en el backend:
+  // - id_rl_infraestructura_jerarquia: 1 (por defecto)
+  // - folio: generado automáticamente (INV-YYYY-0000000)
+  // - fecha_registro: fecha actual
+  // - estado: true (por defecto)
 });
 
 //? ===== ESQUEMA PARA DATOS DEL ARCHIVO PDF =====

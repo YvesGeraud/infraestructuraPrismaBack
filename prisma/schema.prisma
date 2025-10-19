@@ -312,21 +312,6 @@ model ct_inventario_estado_fisico {
 }
 
 model ct_inventario_marca {
-  id_ct_inventario_material Int                      @id @default(autoincrement())
-  nombre                    String                   @unique(map: "nombre") @db.VarChar(50)
-  estado                    Boolean?                 @default(true)
-  fecha_in                  DateTime                 @default(now()) @db.DateTime(0)
-  fecha_up                  DateTime?                @db.DateTime(0)
-  id_ct_usuario_in          Int
-  id_ct_usuario_up          Int?
-  dt_inventario_articulo    dt_inventario_articulo[]
-
-  @@index([estado], map: "estado")
-  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
-  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
-}
-
-model ct_inventario_material {
   id_ct_inventario_marca Int                      @id @default(autoincrement())
   nombre                 String                   @unique(map: "nombre") @db.VarChar(50)
   estado                 Boolean?                 @default(true)
@@ -335,6 +320,21 @@ model ct_inventario_material {
   id_ct_usuario_in       Int
   id_ct_usuario_up       Int?
   dt_inventario_articulo dt_inventario_articulo[]
+
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model ct_inventario_material {
+  id_ct_inventario_material Int                      @id @default(autoincrement())
+  nombre                    String                   @unique(map: "nombre") @db.VarChar(50)
+  estado                    Boolean?                 @default(true)
+  fecha_in                  DateTime                 @default(now()) @db.DateTime(0)
+  fecha_up                  DateTime?                @db.DateTime(0)
+  id_ct_usuario_in          Int
+  id_ct_usuario_up          Int?
+  dt_inventario_articulo    dt_inventario_articulo[]
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -595,8 +595,8 @@ model dt_inventario_articulo {
   id_ct_usuario_up                Int?
   ct_inventario_color             ct_inventario_color           @relation(fields: [id_ct_inventario_color], references: [id_ct_inventario_color], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_color")
   ct_inventario_estado_fisico     ct_inventario_estado_fisico   @relation(fields: [id_ct_inventario_estado_fisico], references: [id_ct_inventario_estado_fisico], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_estado_fisico")
-  ct_inventario_marca             ct_inventario_marca           @relation(fields: [id_ct_inventario_marca], references: [id_ct_inventario_material], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_marca")
-  ct_inventario_material          ct_inventario_material        @relation(fields: [id_ct_inventario_material], references: [id_ct_inventario_marca], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_material")
+  ct_inventario_marca             ct_inventario_marca           @relation(fields: [id_ct_inventario_marca], references: [id_ct_inventario_marca], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_marca")
+  ct_inventario_material          ct_inventario_material        @relation(fields: [id_ct_inventario_material], references: [id_ct_inventario_material], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_material")
   ct_inventario_proveedor         ct_inventario_proveedor       @relation(fields: [id_ct_inventario_proveedor], references: [id_ct_inventario_proveedor], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_proveedor")
   ct_inventario_subclase          ct_inventario_subclase        @relation(fields: [id_ct_inventario_subclase], references: [id_ct_inventario_subclase], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_subclase")
   ct_inventario_tipo_articulo     ct_inventario_tipo_articulo   @relation(fields: [id_ct_inventario_tipo_articulo], references: [id_ct_inventario_tipo_articulo], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_tipo_articulo")

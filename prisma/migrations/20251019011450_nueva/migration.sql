@@ -335,23 +335,6 @@ CREATE TABLE `ct_inventario_estado_fisico` (
 
 -- CreateTable
 CREATE TABLE `ct_inventario_marca` (
-    `id_ct_inventario_material` INTEGER NOT NULL AUTO_INCREMENT,
-    `nombre` VARCHAR(50) NOT NULL,
-    `estado` BOOLEAN NULL DEFAULT true,
-    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
-    `fecha_up` DATETIME(0) NULL,
-    `id_ct_usuario_in` INTEGER NOT NULL,
-    `id_ct_usuario_up` INTEGER NULL,
-
-    UNIQUE INDEX `nombre`(`nombre`),
-    INDEX `estado`(`estado`),
-    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
-    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
-    PRIMARY KEY (`id_ct_inventario_material`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `ct_inventario_material` (
     `id_ct_inventario_marca` INTEGER NOT NULL AUTO_INCREMENT,
     `nombre` VARCHAR(50) NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
@@ -365,6 +348,23 @@ CREATE TABLE `ct_inventario_material` (
     INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
     INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
     PRIMARY KEY (`id_ct_inventario_marca`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ct_inventario_material` (
+    `id_ct_inventario_material` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    UNIQUE INDEX `nombre`(`nombre`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    PRIMARY KEY (`id_ct_inventario_material`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -887,10 +887,10 @@ ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_c
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_estado_fisico` FOREIGN KEY (`id_ct_inventario_estado_fisico`) REFERENCES `ct_inventario_estado_fisico`(`id_ct_inventario_estado_fisico`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_marca` FOREIGN KEY (`id_ct_inventario_marca`) REFERENCES `ct_inventario_marca`(`id_ct_inventario_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_marca` FOREIGN KEY (`id_ct_inventario_marca`) REFERENCES `ct_inventario_marca`(`id_ct_inventario_marca`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_material` FOREIGN KEY (`id_ct_inventario_material`) REFERENCES `ct_inventario_material`(`id_ct_inventario_marca`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_material` FOREIGN KEY (`id_ct_inventario_material`) REFERENCES `ct_inventario_material`(`id_ct_inventario_material`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_proveedor` FOREIGN KEY (`id_ct_inventario_proveedor`) REFERENCES `ct_inventario_proveedor`(`id_ct_inventario_proveedor`) ON DELETE NO ACTION ON UPDATE NO ACTION;

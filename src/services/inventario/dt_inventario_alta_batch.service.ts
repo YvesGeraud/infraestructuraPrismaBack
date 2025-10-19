@@ -65,6 +65,9 @@ export class InventarioAltaBatchService extends BaseBatchService {
         });
 
         // 📝 Registrar alta en bitácora
+        console.log(
+          `📝 Registrando alta ID: ${altaCreada.id_dt_inventario_alta} en bitácora...`
+        );
         await this.registrarBitacora(
           "dt_inventario_alta",
           "Creación",
@@ -75,6 +78,7 @@ export class InventarioAltaBatchService extends BaseBatchService {
           sessionId,
           tx
         );
+        console.log(`✅ Bitácora de alta completada`);
 
         // 🔗 4. CREAR LAS RELACIONES ARTÍCULO-ALTA
         const relaciones = articulosCreados.map((articulo) => ({
@@ -100,7 +104,13 @@ export class InventarioAltaBatchService extends BaseBatchService {
         );
 
         // 📝 Registrar artículos en bitácora
+        console.log(
+          `📝 Registrando ${articulosCreados.length} artículos en bitácora...`
+        );
         for (const articulo of articulosCreados) {
+          console.log(
+            `   📝 Registrando artículo ID: ${articulo.id_dt_inventario_articulo}`
+          );
           await this.registrarBitacora(
             "dt_inventario_articulo",
             "Creación",
@@ -112,6 +122,7 @@ export class InventarioAltaBatchService extends BaseBatchService {
             tx
           );
         }
+        console.log(`✅ Bitácora de artículos completada`);
 
         // ✅ RETORNAR RESULTADO COMPLETO
         return {

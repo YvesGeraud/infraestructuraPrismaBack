@@ -286,10 +286,62 @@ export abstract class BaseBatchService {
   ): Promise<any[]> {
     try {
       const articulosCreados = await Promise.all(
-        articulos.map(async (articulo) => {
+        articulos.map(async (articulo, index) => {
+          // Generar folio automático: INV-YYYY-0000000
+          const año = new Date().getFullYear();
+          const folio = `INV-${año}-${String(index + 1).padStart(7, "0")}`;
+
           return await tx.dt_inventario_articulo.create({
             data: {
-              ...articulo,
+              // Campos del artículo del frontend
+              no_serie: articulo.no_serie,
+              modelo: articulo.modelo,
+              observaciones: articulo.observaciones || "",
+
+              // Relaciones usando connect
+              ct_inventario_tipo_articulo: {
+                connect: {
+                  id_ct_inventario_tipo_articulo:
+                    articulo.id_ct_inventario_tipo_articulo,
+                },
+              },
+              ct_inventario_marca: {
+                connect: {
+                  id_ct_inventario_marca: articulo.id_ct_inventario_marca,
+                },
+              },
+              ct_inventario_material: {
+                connect: {
+                  id_ct_inventario_material: articulo.id_ct_inventario_material,
+                },
+              },
+              ct_inventario_color: {
+                connect: {
+                  id_ct_inventario_color: articulo.id_ct_inventario_color,
+                },
+              },
+              ct_inventario_proveedor: {
+                connect: {
+                  id_ct_inventario_proveedor:
+                    articulo.id_ct_inventario_proveedor,
+                },
+              },
+              ct_inventario_estado_fisico: {
+                connect: {
+                  id_ct_inventario_estado_fisico:
+                    articulo.id_ct_inventario_estado_fisico,
+                },
+              },
+              ct_inventario_subclase: {
+                connect: { id_ct_inventario_subclase: 1 }, // Subclase por defecto
+              },
+              rl_infraestructura_jerarquia: {
+                connect: { id_rl_infraestructura_jerarquia: 1 }, // Ubicación por defecto
+              },
+              folio: folio, // Generado automáticamente
+              fecha_registro: new Date(), // Fecha actual
+              estado: true, // Activo por defecto
+              // Campos del sistema
               id_ct_usuario_in: userId,
               fecha_in: new Date(),
             },

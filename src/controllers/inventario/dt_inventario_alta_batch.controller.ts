@@ -35,6 +35,15 @@ export class InventarioAltaBatchController {
    */
   async crearAltaMasiva(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log("🎯 ===== CONTROLADOR ALTA MASIVA =====");
+      console.log("📦 req.file:", req.file ? "✅ EXISTE" : "❌ NO EXISTE");
+      console.log("📦 req.body:", req.body);
+      console.log(
+        "📦 req.body.data:",
+        req.body.data ? "✅ EXISTE" : "❌ NO EXISTE"
+      );
+      console.log("=====================================");
+
       // 🔍 1. VALIDAR QUE EXISTE EL ARCHIVO
       if (!req.file) {
         throw createError("Debe adjuntar un archivo PDF", 400);
@@ -70,8 +79,15 @@ export class InventarioAltaBatchController {
       const datosValidados = crearAltaMasivaSchema.parse(datosCompletos);
 
       // 🔐 7. OBTENER ID DEL USUARIO Y SESIÓN DEL JWT
-      const userId = (req as any).usuario?.id_ct_usuario;
-      const sessionId = (req as any).usuario?.id_ct_sesion || 1; // Obtener de la sesión activa
+      console.log("🔍 DEBUG AUTENTICACIÓN:");
+      console.log("   req.user:", (req as any).user);
+      console.log("   req.headers.authorization:", req.headers.authorization);
+
+      const userId = (req as any).user?.id_ct_usuario;
+      const sessionId = parseInt((req as any).user?.id_sesion /* || "1"*/); // Convertir a number
+
+      console.log("   userId:", userId);
+      console.log("   sessionId:", sessionId);
 
       if (!userId) {
         // Si falla, eliminar el archivo subido
@@ -107,7 +123,7 @@ export class InventarioAltaBatchController {
       // Error de validación de Zod
       if (error instanceof Error && error.name === "ZodError") {
         const zodError = error as any;
-        const errores = zodError.errors.map((e: any) => ({
+        const errores = (zodError.errors || []).map((e: any) => ({
           campo: e.path.join("."),
           mensaje: e.message,
         }));

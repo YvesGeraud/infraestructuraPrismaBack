@@ -66,12 +66,52 @@ if (isDevelopment) {
   app.use(morgan("combined"));
 }
 
-// Middleware para parsear JSON
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// 🛡️ MIDDLEWARE CRÍTICO: Detectar multipart/form-data ANTES de parsear
+app.use((req, res, next) => {
+  const contentType = req.headers["content-type"] || "";
+
+  console.log(`📨 [${req.method}] ${req.url}`);
+  console.log(`   Content-Type: ${contentType}`);
+
+  // Si es multipart/form-data, marcar la request y continuar SIN parsear
+  if (contentType.includes("multipart/form-data")) {
+    console.log(`   ✅ Detectado multipart/form-data - SALTANDO parsers JSON`);
+    (req as any).isMultipart = true;
+    return next();
+  }
+
+  console.log(`   📝 Aplicando parsers JSON/urlencoded`);
+  // Para otros tipos, aplicar los parsers
+  next();
+});
+
+// Middleware para parsear JSON (solo si NO es multipart)
+app.use((req, res, next) => {
+  if ((req as any).isMultipart) {
+    console.log(`   ⏭️  Saltando express.json() - isMultipart=true`);
+    return next();
+  }
+  console.log(`   📝 Aplicando express.json()`);
+  express.json({ limit: "10mb" })(req, res, next);
+});
+
+// Middleware para parsear urlencoded (solo si NO es multipart)
+app.use((req, res, next) => {
+  if ((req as any).isMultipart) {
+    console.log(`   ⏭️  Saltando express.urlencoded() - isMultipart=true`);
+    return next();
+  }
+  console.log(`   📝 Aplicando express.urlencoded()`);
+  express.urlencoded({ extended: true, limit: "10mb" })(req, res, next);
+});
 
 // 🛡️ MIDDLEWARE DE RESPALDO: Parsear JSON si viene sin Content-Type
 app.use((req, res, next) => {
+  // ✅ NO procesar si es multipart/form-data (para archivos)
+  if ((req as any).isMultipart) {
+    return next();
+  }
+
   if (
     req.method !== "GET" &&
     req.method !== "DELETE" &&
