@@ -50,8 +50,9 @@ export abstract class BaseBatchService {
    * @returns Metadatos del archivo
    */
   protected async procesarArchivoPdf(
-    file: Express.Multer.File,
-    subdirectorio: string
+    file: any, // Archivo de Multer
+    subdirectorio: string,
+    idAlta?: number
   ): Promise<ArchivoPdfMetadata> {
     try {
       // 🎯 Definir ruta de destino
@@ -67,13 +68,15 @@ export abstract class BaseBatchService {
         await fs.mkdir(uploadDir, { recursive: true });
       }
 
-      // 🔐 Generar nombre único para el archivo
-      const timestamp = Date.now();
+      // 🔐 Generar nombres únicos para el archivo
       const extension = path.extname(file.originalname);
-      const nombreSistema = `${timestamp}_${file.originalname.replace(
-        /[^a-zA-Z0-9.-]/g,
-        "_"
-      )}`;
+      const uuid = require("crypto").randomUUID();
+
+      // Si tenemos ID del alta, usarlo como nombre del archivo
+      const nombreSistema = idAlta
+        ? `${idAlta}_${uuid}${extension}`
+        : `${uuid}${extension}`;
+
       const rutaCompleta = path.join(uploadDir, nombreSistema);
 
       // 💾 Mover archivo a la ubicación final
@@ -223,6 +226,53 @@ export abstract class BaseBatchService {
   }
 
   /**
+   * 🔢 GENERAR FOLIO SECUENCIAL
+   *
+   * Genera folios secuenciales basados en el último folio del año actual
+   * Formato: INV-YYYY-0000001, INV-YYYY-0000002, etc.
+   *
+   * @param año - Año actual
+   * @param tx - Transacción de Prisma
+   * @returns Folio secuencial generado
+   */
+  protected async generarFolioSecuencial(
+    año: number,
+    tx: any
+  ): Promise<string> {
+    try {
+      // Buscar el último folio del año actual
+      const ultimoArticulo = await tx.dt_inventario_articulo.findFirst({
+        where: {
+          folio: {
+            startsWith: `INV-${año}-`,
+          },
+        },
+        orderBy: {
+          folio: "desc",
+        },
+      });
+
+      let siguienteNumero = 1;
+
+      if (ultimoArticulo && ultimoArticulo.folio) {
+        // Extraer el número del último folio: INV-2025-0000001 -> 1
+        const match = ultimoArticulo.folio.match(/INV-\d{4}-(\d{7})$/);
+        if (match) {
+          siguienteNumero = parseInt(match[1]) + 1;
+        }
+      }
+
+      // Generar el folio con padding de 7 dígitos
+      return `INV-${año}-${String(siguienteNumero).padStart(7, "0")}`;
+    } catch (error) {
+      logger.error("❌ Error generando folio secuencial:", error);
+      // Fallback: usar timestamp si falla
+      const timestamp = Date.now();
+      return `INV-${año}-${String(timestamp).slice(-7)}`;
+    }
+  }
+
+  /**
    * 🔗 CREAR RELACIONES EN BATCH
    *
    * Crea múltiples registros de relación de forma eficiente
@@ -285,11 +335,40 @@ export abstract class BaseBatchService {
     tx: any
   ): Promise<any[]> {
     try {
+      // 🔢 GENERAR FOLIOS SECUENCIALES GLOBALES
+      const año = new Date().getFullYear();
+
+      // Obtener el último folio del año actual
+      const ultimoArticulo = await tx.dt_inventario_articulo.findFirst({
+        where: {
+          folio: {
+            startsWith: `INV-${año}-`,
+          },
+        },
+        orderBy: {
+          folio: "desc",
+        },
+      });
+
+      let siguienteNumero = 1;
+      if (ultimoArticulo && ultimoArticulo.folio) {
+        const match = ultimoArticulo.folio.match(/INV-\d{4}-(\d{7})$/);
+        if (match) {
+          siguienteNumero = parseInt(match[1]) + 1;
+        }
+      }
+
+      logger.info(
+        `🔢 Folio base: ${siguienteNumero}, Artículos a crear: ${articulos.length}`
+      );
+
       const articulosCreados = await Promise.all(
         articulos.map(async (articulo, index) => {
-          // Generar folio automático: INV-YYYY-0000000
-          const año = new Date().getFullYear();
-          const folio = `INV-${año}-${String(index + 1).padStart(7, "0")}`;
+          // Generar folio secuencial para cada artículo
+          const folio = `INV-${año}-${String(siguienteNumero + index).padStart(
+            7,
+            "0"
+          )}`;
 
           return await tx.dt_inventario_articulo.create({
             data: {
@@ -332,9 +411,7 @@ export abstract class BaseBatchService {
                     articulo.id_ct_inventario_estado_fisico,
                 },
               },
-              ct_inventario_subclase: {
-                connect: { id_ct_inventario_subclase: 1 }, // Subclase por defecto
-              },
+              // ct_inventario_subclase removido - será eliminado del schema de Prisma
               rl_infraestructura_jerarquia: {
                 connect: { id_rl_infraestructura_jerarquia: 1 }, // Ubicación por defecto
               },

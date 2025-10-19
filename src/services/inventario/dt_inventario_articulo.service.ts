@@ -55,11 +55,6 @@ export class DtInventarioArticuloBaseService extends BaseService<
       includes.ct_inventario_proveedor = true;
     }
 
-    // Include individual de subclase
-    if (filters?.incluir_subclase) {
-      includes.ct_inventario_subclase = true;
-    }
-
     // Include individual de tipo de artículo
     if (filters?.incluir_tipo_articulo) {
       includes.ct_inventario_tipo_articulo = true;
@@ -77,11 +72,6 @@ export class DtInventarioArticuloBaseService extends BaseService<
       includes.ct_inventario_marca = true;
       includes.ct_inventario_material = true;
       includes.ct_inventario_proveedor = true;
-      includes.ct_inventario_subclase = {
-        include: {
-          ct_inventario_clase: true, // Incluir también la clase padre
-        },
-      };
       includes.ct_inventario_tipo_articulo = true;
       includes.rl_infraestructura_jerarquia = true;
     }
@@ -105,7 +95,8 @@ export class DtInventarioArticuloBaseService extends BaseService<
     // Filtro por jerarquía
     if (filters?.id_rl_infraestructura_jerarquia) {
       conditions.push({
-        id_rl_infraestructura_jerarquia: filters.id_rl_infraestructura_jerarquia,
+        id_rl_infraestructura_jerarquia:
+          filters.id_rl_infraestructura_jerarquia,
       });
     }
 
@@ -140,13 +131,6 @@ export class DtInventarioArticuloBaseService extends BaseService<
         cct: {
           contains: filters.cct,
         },
-      });
-    }
-
-    // Filtros por catálogos relacionados
-    if (filters?.id_ct_inventario_subclase) {
-      conditions.push({
-        id_ct_inventario_subclase: filters.id_ct_inventario_subclase,
       });
     }
 

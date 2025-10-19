@@ -93,12 +93,17 @@ export class InventarioAltaBatchService extends BaseBatchService {
           tx
         );
 
-        // 📄 5. REGISTRAR EL ARCHIVO PDF
+        // 📄 5. PROCESAR Y REGISTRAR EL ARCHIVO PDF
+        const archivoProcesado = await this.procesarArchivoPdfAlta(
+          data.archivo,
+          altaCreada.id_dt_inventario_alta
+        );
+
         const archivoCreado = await this.registrarArchivo(
           "dt_inventario_alta_archivo",
           altaCreada.id_dt_inventario_alta,
           "id_dt_inventario_alta",
-          data.archivo,
+          archivoProcesado,
           userId,
           tx
         );
@@ -134,7 +139,7 @@ export class InventarioAltaBatchService extends BaseBatchService {
             id_alta: altaCreada.id_dt_inventario_alta,
             total_articulos: articulosCreados.length,
             tipo_alta: catalogoAlta.nombre,
-            archivo_pdf: data.archivo.nombre_archivo,
+            archivo_pdf: data.archivo.originalname,
           },
         };
       });
@@ -180,9 +185,10 @@ export class InventarioAltaBatchService extends BaseBatchService {
    * @returns Metadatos del archivo
    */
   async procesarArchivoPdfAlta(
-    file: Express.Multer.File
+    file: any, // Archivo de Multer
+    idAlta?: number
   ): Promise<ArchivoPdfInput> {
-    return await this.procesarArchivoPdf(file, "altas");
+    return await this.procesarArchivoPdf(file, "altas", idAlta);
   }
 
   /**
@@ -209,7 +215,7 @@ export class InventarioAltaBatchService extends BaseBatchService {
                   ct_inventario_material: true,
                   ct_inventario_color: true,
                   ct_inventario_proveedor: true,
-                  ct_inventario_subclase: true,
+                  // ct_inventario_subclase removido
                 },
               },
             },

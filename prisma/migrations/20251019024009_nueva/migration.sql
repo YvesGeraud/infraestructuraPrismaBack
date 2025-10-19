@@ -614,7 +614,6 @@ CREATE TABLE `dt_inventario_articulo` (
     `observaciones` VARCHAR(50) NOT NULL,
     `modelo` VARCHAR(50) NOT NULL,
     `fecha_registro` DATETIME(0) NOT NULL,
-    `id_ct_inventario_subclase` INTEGER NOT NULL,
     `id_ct_inventario_material` INTEGER NOT NULL,
     `id_ct_inventario_marca` INTEGER NOT NULL,
     `id_ct_inventario_color` INTEGER NOT NULL,
@@ -633,7 +632,6 @@ CREATE TABLE `dt_inventario_articulo` (
     INDEX `FK_dt_inventario_articulo_ct_inventario_marca`(`id_ct_inventario_marca`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_material`(`id_ct_inventario_material`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_proveedor`(`id_ct_inventario_proveedor`),
-    INDEX `FK_dt_inventario_articulo_ct_inventario_subclase`(`id_ct_inventario_subclase`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_tipo_articulo`(`id_ct_inventario_tipo_articulo`),
     INDEX `FK_dt_inventario_articulo_rl_infraestructura_jerarquia`(`id_rl_infraestructura_jerarquia`),
     INDEX `estado`(`estado`),
@@ -894,9 +892,6 @@ ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_c
 
 -- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_proveedor` FOREIGN KEY (`id_ct_inventario_proveedor`) REFERENCES `ct_inventario_proveedor`(`id_ct_inventario_proveedor`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_subclase` FOREIGN KEY (`id_ct_inventario_subclase`) REFERENCES `ct_inventario_subclase`(`id_ct_inventario_subclase`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE `dt_inventario_articulo` ADD CONSTRAINT `FK_dt_inventario_articulo_ct_inventario_tipo_articulo` FOREIGN KEY (`id_ct_inventario_tipo_articulo`) REFERENCES `ct_inventario_tipo_articulo`(`id_ct_inventario_tipo_articulo`) ON DELETE NO ACTION ON UPDATE NO ACTION;

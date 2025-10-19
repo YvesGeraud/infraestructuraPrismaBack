@@ -65,14 +65,10 @@ export class InventarioAltaBatchController {
         throw createError("El campo 'data' debe ser un JSON válido", 400);
       }
 
-      // 📄 4. PROCESAR EL ARCHIVO PDF
-      const archivoMetadatos =
-        await inventarioAltaBatchService.procesarArchivoPdfAlta(req.file);
-
-      // ➕ 5. AGREGAR METADATOS DEL ARCHIVO A LOS DATOS
+      // ➕ 4. AGREGAR ARCHIVO SIN PROCESAR A LOS DATOS
       const datosCompletos = {
         ...datosAlta,
-        archivo: archivoMetadatos,
+        archivo: req.file, // Pasar el archivo sin procesar
       };
 
       // ✅ 6. VALIDAR DATOS CON ZOD
@@ -90,10 +86,6 @@ export class InventarioAltaBatchController {
       console.log("   sessionId:", sessionId);
 
       if (!userId) {
-        // Si falla, eliminar el archivo subido
-        await inventarioAltaBatchService.eliminarArchivoPdf(
-          archivoMetadatos.ruta_archivo
-        );
         throw createError("Usuario no autenticado", 401);
       }
 

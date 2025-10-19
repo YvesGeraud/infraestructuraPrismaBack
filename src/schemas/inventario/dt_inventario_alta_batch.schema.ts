@@ -28,7 +28,7 @@ export const articuloAltaSchema = z.object({
   // Datos del artículo (solo los que envía el frontend)
   no_serie: esquemaTextoRequerido(1, 50),
   modelo: esquemaTextoRequerido(1, 50),
-  observaciones: esquemaTextoOpcional(65535), // Opcional según el frontend
+  observaciones: z.string().max(65535).optional().nullable(), // Opcional según el frontend
   id_ct_inventario_tipo_articulo: esquemaNumeroRequerido(1, 2147483647),
   id_ct_inventario_marca: esquemaNumeroRequerido(1, 2147483647),
   id_ct_inventario_material: esquemaNumeroRequerido(1, 2147483647),
@@ -43,11 +43,24 @@ export const articuloAltaSchema = z.object({
   // - estado: true (por defecto)
 });
 
-//? ===== ESQUEMA PARA DATOS DEL ARCHIVO PDF =====
+//? ===== ESQUEMA PARA DATOS DEL ARCHIVO PDF PROCESADO =====
 export const archivoPdfSchema = z.object({
   nombre_archivo: esquemaTextoRequerido(1, 255), // Nombre original del archivo
   nombre_sistema: esquemaTextoRequerido(1, 255), // Nombre único generado por el sistema
   ruta_archivo: esquemaTextoRequerido(1, 500), // Ruta completa del archivo
+});
+
+//? ===== ESQUEMA PARA ARCHIVO MULTER (SIN PROCESAR) =====
+export const archivoMulterSchema = z.object({
+  fieldname: z.string(),
+  originalname: z.string(),
+  encoding: z.string(),
+  mimetype: z.string(),
+  destination: z.string().optional(),
+  filename: z.string().optional(),
+  path: z.string().optional(),
+  size: z.number(),
+  buffer: z.any(), // Buffer del archivo
 });
 
 //? ===== ESQUEMA PRINCIPAL PARA ALTA MASIVA =====
@@ -68,8 +81,8 @@ export const crearAltaMasivaSchema = z.object({
     .min(1, "Debe incluir al menos un artículo")
     .max(100, "No se pueden agregar más de 100 artículos a la vez"),
 
-  // Datos del archivo PDF
-  archivo: archivoPdfSchema,
+  // Archivo PDF sin procesar (Multer)
+  archivo: archivoMulterSchema,
 });
 
 //? ===== ESQUEMA PARA VALIDAR ARCHIVO MULTIPART =====
@@ -80,7 +93,7 @@ export const validarArchivoAltaSchema = z.object({
       (mime) => mime === "application/pdf",
       "Solo se permiten archivos PDF"
     ),
-  size: z.number().max(10 * 1024 * 1024, "El archivo no puede exceder 10MB"), // 10MB
+  size: z.number().max(5 * 1024 * 1024, "El archivo no puede exceder 5MB"), // 5MB
   originalname: z
     .string()
     .min(1, "El nombre del archivo es requerido")

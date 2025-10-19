@@ -357,17 +357,16 @@ model ct_inventario_proveedor {
 }
 
 model ct_inventario_subclase {
-  id_ct_inventario_subclase Int                      @id @default(autoincrement())
+  id_ct_inventario_subclase Int                 @id @default(autoincrement())
   id_ct_inventario_clase    Int
   no_subclase               Int
-  nombre                    String                   @db.VarChar(100)
-  estado                    Boolean?                 @default(true)
-  fecha_in                  DateTime                 @default(now()) @db.DateTime(0)
-  fecha_up                  DateTime?                @db.DateTime(0)
+  nombre                    String              @db.VarChar(100)
+  estado                    Boolean?            @default(true)
+  fecha_in                  DateTime            @default(now()) @db.DateTime(0)
+  fecha_up                  DateTime?           @db.DateTime(0)
   id_ct_usuario_in          Int
   id_ct_usuario_up          Int?
-  ct_inventario_clase       ct_inventario_clase      @relation(fields: [id_ct_inventario_clase], references: [id_ct_inventario_clase], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_inventario_subclase_ct_inventario_clase")
-  dt_inventario_articulo    dt_inventario_articulo[]
+  ct_inventario_clase       ct_inventario_clase @relation(fields: [id_ct_inventario_clase], references: [id_ct_inventario_clase], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_inventario_subclase_ct_inventario_clase")
 
   @@unique([nombre, no_subclase])
   @@index([id_ct_inventario_clase], map: "FK_ct_inventario_subclase_ct_inventario_clase")
@@ -580,7 +579,6 @@ model dt_inventario_articulo {
   observaciones                   String                        @db.VarChar(50)
   modelo                          String                        @db.VarChar(50)
   fecha_registro                  DateTime                      @db.DateTime(0)
-  id_ct_inventario_subclase       Int
   id_ct_inventario_material       Int
   id_ct_inventario_marca          Int
   id_ct_inventario_color          Int
@@ -598,7 +596,6 @@ model dt_inventario_articulo {
   ct_inventario_marca             ct_inventario_marca           @relation(fields: [id_ct_inventario_marca], references: [id_ct_inventario_marca], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_marca")
   ct_inventario_material          ct_inventario_material        @relation(fields: [id_ct_inventario_material], references: [id_ct_inventario_material], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_material")
   ct_inventario_proveedor         ct_inventario_proveedor       @relation(fields: [id_ct_inventario_proveedor], references: [id_ct_inventario_proveedor], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_proveedor")
-  ct_inventario_subclase          ct_inventario_subclase        @relation(fields: [id_ct_inventario_subclase], references: [id_ct_inventario_subclase], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_subclase")
   ct_inventario_tipo_articulo     ct_inventario_tipo_articulo   @relation(fields: [id_ct_inventario_tipo_articulo], references: [id_ct_inventario_tipo_articulo], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_ct_inventario_tipo_articulo")
   rl_infraestructura_jerarquia    rl_infraestructura_jerarquia? @relation(fields: [id_rl_infraestructura_jerarquia], references: [id_rl_infraestructura_jerarquia], onDelete: NoAction, onUpdate: NoAction, map: "FK_dt_inventario_articulo_rl_infraestructura_jerarquia")
   rl_inventario_alta_articulo     rl_inventario_alta_articulo[]
@@ -609,7 +606,6 @@ model dt_inventario_articulo {
   @@index([id_ct_inventario_marca], map: "FK_dt_inventario_articulo_ct_inventario_marca")
   @@index([id_ct_inventario_material], map: "FK_dt_inventario_articulo_ct_inventario_material")
   @@index([id_ct_inventario_proveedor], map: "FK_dt_inventario_articulo_ct_inventario_proveedor")
-  @@index([id_ct_inventario_subclase], map: "FK_dt_inventario_articulo_ct_inventario_subclase")
   @@index([id_ct_inventario_tipo_articulo], map: "FK_dt_inventario_articulo_ct_inventario_tipo_articulo")
   @@index([id_rl_infraestructura_jerarquia], map: "FK_dt_inventario_articulo_rl_infraestructura_jerarquia")
   @@index([estado], map: "estado")
