@@ -86,7 +86,7 @@ export abstract class BaseBatchService {
 
       // ✅ Retornar metadatos
       return {
-        nombre_archivo: file.originalname,
+        nombre_archivo: idAlta ? `${idAlta}.pdf` : file.originalname,
         nombre_sistema: nombreSistema,
         ruta_archivo: `upload/inventario/${subdirectorio}/${nombreSistema}`,
       };
