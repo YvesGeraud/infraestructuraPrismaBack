@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import logger from "../../config/logger";
+import { fileConfig } from "../../config/env";
 
 /**
  * 🎯 SERVICIO BASE PARA PROCESOS BATCH DE INVENTARIO
@@ -55,10 +56,9 @@ export abstract class BaseBatchService {
     idAlta?: number
   ): Promise<ArchivoPdfMetadata> {
     try {
-      // 🎯 Definir ruta de destino
+      // 🎯 Definir ruta de destino usando configuración del .env
       const uploadDir = path.join(
-        process.cwd(),
-        "upload",
+        fileConfig.uploadPath,
         "inventario",
         subdirectorio
       );
@@ -88,7 +88,7 @@ export abstract class BaseBatchService {
       return {
         nombre_archivo: idAlta ? `${idAlta}.pdf` : file.originalname,
         nombre_sistema: nombreSistema,
-        ruta_archivo: `upload/inventario/${subdirectorio}/${nombreSistema}`,
+        ruta_archivo: path.join("inventario", subdirectorio, nombreSistema),
       };
     } catch (error) {
       logger.error("❌ Error al procesar archivo PDF:", error);
@@ -108,7 +108,7 @@ export abstract class BaseBatchService {
    */
   public async eliminarArchivoPdf(rutaArchivo: string): Promise<void> {
     try {
-      const rutaCompleta = path.join(process.cwd(), rutaArchivo);
+      const rutaCompleta = path.join(fileConfig.uploadPath, rutaArchivo);
       if (existsSync(rutaCompleta)) {
         await fs.unlink(rutaCompleta);
         logger.info(`🗑️ Archivo PDF eliminado: ${rutaCompleta}`);
@@ -362,69 +362,76 @@ export abstract class BaseBatchService {
         `🔢 Folio base: ${siguienteNumero}, Artículos a crear: ${articulos.length}`
       );
 
-      const articulosCreados = await Promise.all(
-        articulos.map(async (articulo, index) => {
-          // Generar folio secuencial para cada artículo
-          const folio = `INV-${año}-${String(siguienteNumero + index).padStart(
-            7,
-            "0"
-          )}`;
+      // 🔄 CREAR ARTÍCULOS DE FORMA SECUENCIAL PARA EVITAR CONFLICTOS DE FOLIOS
+      const articulosCreados = [];
+      
+      for (let index = 0; index < articulos.length; index++) {
+        const articulo = articulos[index];
+        
+        // Generar folio secuencial para cada artículo
+        const folio = `INV-${año}-${String(siguienteNumero + index).padStart(
+          7,
+          "0"
+        )}`;
 
-          return await tx.dt_inventario_articulo.create({
-            data: {
-              // Campos del artículo del frontend
-              no_serie: articulo.no_serie,
-              modelo: articulo.modelo,
-              observaciones: articulo.observaciones || "",
+        logger.info(`🔢 Generando folio: ${folio} para artículo ${index + 1}/${articulos.length}`);
 
-              // Relaciones usando connect
-              ct_inventario_tipo_articulo: {
-                connect: {
-                  id_ct_inventario_tipo_articulo:
-                    articulo.id_ct_inventario_tipo_articulo,
-                },
+        const articuloCreado = await tx.dt_inventario_articulo.create({
+          data: {
+            // Campos del artículo del frontend
+            no_serie: articulo.no_serie,
+            modelo: articulo.modelo,
+            observaciones: articulo.observaciones || "",
+
+            // Relaciones usando connect
+            ct_inventario_tipo_articulo: {
+              connect: {
+                id_ct_inventario_tipo_articulo:
+                  articulo.id_ct_inventario_tipo_articulo,
               },
-              ct_inventario_marca: {
-                connect: {
-                  id_ct_inventario_marca: articulo.id_ct_inventario_marca,
-                },
-              },
-              ct_inventario_material: {
-                connect: {
-                  id_ct_inventario_material: articulo.id_ct_inventario_material,
-                },
-              },
-              ct_inventario_color: {
-                connect: {
-                  id_ct_inventario_color: articulo.id_ct_inventario_color,
-                },
-              },
-              ct_inventario_proveedor: {
-                connect: {
-                  id_ct_inventario_proveedor:
-                    articulo.id_ct_inventario_proveedor,
-                },
-              },
-              ct_inventario_estado_fisico: {
-                connect: {
-                  id_ct_inventario_estado_fisico:
-                    articulo.id_ct_inventario_estado_fisico,
-                },
-              },
-              // ct_inventario_subclase removido - será eliminado del schema de Prisma
-              rl_infraestructura_jerarquia: {
-                connect: { id_rl_infraestructura_jerarquia: 1 }, // Ubicación por defecto
-              },
-              folio: folio, // Generado automáticamente
-              fecha_registro: new Date(), // Fecha actual
-              estado: true, // Activo por defecto
-              // Campos del sistema
-              id_ct_usuario_in: userId,
-              fecha_in: new Date(),
             },
-          });
-        })
-      );
+            ct_inventario_marca: {
+              connect: {
+                id_ct_inventario_marca: articulo.id_ct_inventario_marca,
+              },
+            },
+            ct_inventario_material: {
+              connect: {
+                id_ct_inventario_material: articulo.id_ct_inventario_material,
+              },
+            },
+            ct_inventario_color: {
+              connect: {
+                id_ct_inventario_color: articulo.id_ct_inventario_color,
+              },
+            },
+            ct_inventario_proveedor: {
+              connect: {
+                id_ct_inventario_proveedor:
+                  articulo.id_ct_inventario_proveedor,
+              },
+            },
+            ct_inventario_estado_fisico: {
+              connect: {
+                id_ct_inventario_estado_fisico:
+                  articulo.id_ct_inventario_estado_fisico,
+              },
+            },
+            // ct_inventario_subclase removido - será eliminado del schema de Prisma
+            rl_infraestructura_jerarquia: {
+              connect: { id_rl_infraestructura_jerarquia: 1 }, // Ubicación por defecto
+            },
+            folio: folio, // Generado automáticamente
+            fecha_registro: new Date(), // Fecha actual
+            estado: true, // Activo por defecto
+            // Campos del sistema
+            id_ct_usuario_in: userId,
+            fecha_in: new Date(),
+          },
+        });
+
+        articulosCreados.push(articuloCreado);
+      }
 
       logger.info(`📦 ${articulosCreados.length} artículos creados`);
 

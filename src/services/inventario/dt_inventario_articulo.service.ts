@@ -22,7 +22,7 @@ export class DtInventarioArticuloBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "dt_inventario_articulo",
-    defaultOrderBy: { id_dt_inventario_articulo: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_dt_inventario_articulo: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 

@@ -576,7 +576,7 @@ model dt_inventario_articulo {
   folio_antiguo                   String?                       @db.VarChar(50)
   folio                           String?                       @default("") @db.VarChar(50)
   no_serie                        String                        @db.VarChar(50)
-  observaciones                   String                        @db.VarChar(50)
+  observaciones                   String?                       @db.VarChar(250)
   modelo                          String                        @db.VarChar(50)
   fecha_registro                  DateTime                      @db.DateTime(0)
   id_ct_inventario_material       Int
