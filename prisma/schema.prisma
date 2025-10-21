@@ -57,6 +57,14 @@ model ct_entidad {
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
 
+model ct_folios_control {
+  tipo_folio  String @db.VarChar(20)
+  anio        Int
+  consecutivo Int
+
+  @@id([tipo_folio, anio])
+}
+
 model ct_infraestructura_anexo {
   id_ct_infraestructura_anexo     Int                          @id @default(autoincrement())
   nombre                          String                       @unique(map: "nombre") @db.VarChar(255)

@@ -11,7 +11,7 @@ async function main() {
   // ===== 1. CREAR USUARIOS PRIMERO =====
   console.log("👥 Creando usuarios...");
   
-  const usuariosPrueba = [
+  /*const usuariosPrueba = [
     {
       usuario: "admin",
       contrasena: "123456",
@@ -420,7 +420,7 @@ async function main() {
       },
     }), 
     prisma.ct_infraestructura_tipo_escuela.upsert({
-      where: { id_ct_infraestructura_tipo_escuela: 18 /*Ya se que falta el 17 asi me lo dieron*/ },
+      where: { id_ct_infraestructura_tipo_escuela: 18 }, //Ya se que falta el 17 asi me lo dieron
       update: {},
       create: {
         id_ct_infraestructura_tipo_escuela: 18,
@@ -790,7 +790,7 @@ const Alta = await Promise.all([
   console.log("Usuario: sistemas | Contraseña: 123456");
   console.log("Usuario: infraestructura | Contraseña: 123456");
   console.log("Usuario: inventario | Contraseña: 123456");
-
+*/
 }
 
 main()
