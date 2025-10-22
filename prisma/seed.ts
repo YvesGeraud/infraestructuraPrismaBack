@@ -10,8 +10,8 @@ async function main() {
 
   // ===== 1. CREAR USUARIOS PRIMERO =====
   console.log("👥 Creando usuarios...");
-  
-  /*const usuariosPrueba = [
+
+  const usuariosPrueba = [
     {
       usuario: "admin",
       contrasena: "123456",
@@ -50,7 +50,7 @@ async function main() {
   ];
 
   const usuariosCreados: any[] = [];
-  
+
   for (const userData of usuariosPrueba) {
     // Verificar si el usuario ya existe
     const usuarioExistente = await prisma.ct_usuario.findUnique({
@@ -58,14 +58,16 @@ async function main() {
     });
 
     if (usuarioExistente) {
-      console.log(`   ⚠️  Usuario '${userData.usuario}' ya existe, saltando...`);
+      console.log(
+        `   ⚠️  Usuario '${userData.usuario}' ya existe, saltando...`
+      );
       usuariosCreados.push(usuarioExistente as any);
       continue;
     }
 
     // Hashear contraseña
     const contrasenaHasheada = await bcrypt.hash(userData.contrasena, 10);
-    
+
     // Crear usuario
     const nuevoUsuario = await prisma.ct_usuario.create({
       data: {
@@ -81,10 +83,12 @@ async function main() {
       },
     });
 
-    console.log(`   ✅ Usuario '${userData.usuario}' creado exitosamente (ID: ${nuevoUsuario.id_ct_usuario})`);
+    console.log(
+      `   ✅ Usuario '${userData.usuario}' creado exitosamente (ID: ${nuevoUsuario.id_ct_usuario})`
+    );
     usuariosCreados.push(nuevoUsuario);
   }
-
+  /*
   // ===== 2. CREAR ENTIDADES =====
   console.log("🌎 Creando entidades...");
 

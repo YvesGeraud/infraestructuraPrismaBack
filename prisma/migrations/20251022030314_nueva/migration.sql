@@ -54,11 +54,22 @@ CREATE TABLE `ct_entidad` (
 
 -- CreateTable
 CREATE TABLE `ct_folios_control` (
-    `tipo_folio` VARCHAR(20) NOT NULL,
+    `id_ct_folios_control` INTEGER NOT NULL AUTO_INCREMENT,
+    `sistema` VARCHAR(10) NOT NULL,
     `anio` INTEGER NOT NULL,
-    `consecutivo` INTEGER NOT NULL,
+    `ultimo_folio` INTEGER NOT NULL DEFAULT 0,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
 
-    PRIMARY KEY (`tipo_folio`, `anio`)
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
+    INDEX `idx_sistema_anio`(`sistema`, `anio`),
+    UNIQUE INDEX `sistema_anio`(`sistema`, `anio`),
+    PRIMARY KEY (`id_ct_folios_control`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -618,7 +629,7 @@ CREATE TABLE `dt_inventario_articulo` (
     `id_dt_inventario_articulo` INTEGER NOT NULL AUTO_INCREMENT,
     `id_rl_infraestructura_jerarquia` INTEGER NULL,
     `folio_antiguo` VARCHAR(50) NULL,
-    `folio` VARCHAR(50) NULL DEFAULT '',
+    `folio` VARCHAR(50) NOT NULL DEFAULT '',
     `no_serie` VARCHAR(50) NOT NULL,
     `observaciones` VARCHAR(250) NULL,
     `modelo` VARCHAR(50) NOT NULL,
@@ -636,6 +647,7 @@ CREATE TABLE `dt_inventario_articulo` (
     `id_ct_usuario_in` INTEGER NOT NULL,
     `id_ct_usuario_up` INTEGER NULL,
 
+    UNIQUE INDEX `folio`(`folio`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_color`(`id_ct_inventario_color`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_estado_fisico`(`id_ct_inventario_estado_fisico`),
     INDEX `FK_dt_inventario_articulo_ct_inventario_marca`(`id_ct_inventario_marca`),

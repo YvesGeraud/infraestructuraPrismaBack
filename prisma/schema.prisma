@@ -58,11 +58,21 @@ model ct_entidad {
 }
 
 model ct_folios_control {
-  tipo_folio  String @db.VarChar(20)
-  anio        Int
-  consecutivo Int
+  id_ct_folios_control Int       @id @default(autoincrement())
+  sistema              String    @db.VarChar(10)
+  anio                 Int
+  ultimo_folio         Int       @default(0)
+  estado               Boolean?  @default(true)
+  fecha_in             DateTime  @default(now()) @db.DateTime(0)
+  fecha_up             DateTime? @db.DateTime(0)
+  id_ct_usuario_in     Int
+  id_ct_usuario_up     Int?
 
-  @@id([tipo_folio, anio])
+  @@unique([sistema, anio], map: "sistema_anio")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+  @@index([sistema, anio], map: "idx_sistema_anio")
 }
 
 model ct_infraestructura_anexo {
@@ -582,7 +592,7 @@ model dt_inventario_articulo {
   id_dt_inventario_articulo       Int                           @id @default(autoincrement())
   id_rl_infraestructura_jerarquia Int?
   folio_antiguo                   String?                       @db.VarChar(50)
-  folio                           String?                       @default("") @db.VarChar(50)
+  folio                           String                        @unique(map: "folio") @default("") @db.VarChar(50)
   no_serie                        String                        @db.VarChar(50)
   observaciones                   String?                       @db.VarChar(250)
   modelo                          String                        @db.VarChar(50)

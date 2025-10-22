@@ -335,46 +335,37 @@ export abstract class BaseBatchService {
     tx: any
   ): Promise<any[]> {
     try {
-      // 🔢 GENERAR FOLIOS SECUENCIALES GLOBALES
-      const año = new Date().getFullYear();
-
-      // Obtener el último folio del año actual
-      const ultimoArticulo = await tx.dt_inventario_articulo.findFirst({
-        where: {
-          folio: {
-            startsWith: `INV-${año}-`,
-          },
-        },
-        orderBy: {
-          folio: "desc",
-        },
-      });
-
-      let siguienteNumero = 1;
-      if (ultimoArticulo && ultimoArticulo.folio) {
-        const match = ultimoArticulo.folio.match(/INV-\d{4}-(\d{7})$/);
-        if (match) {
-          siguienteNumero = parseInt(match[1]) + 1;
-        }
-      }
-
-      logger.info(
-        `🔢 Folio base: ${siguienteNumero}, Artículos a crear: ${articulos.length}`
+      // 🔢 GENERAR FOLIOS CONSECUTIVOS USANDO EL SERVICIO DE FOLIOS
+      // Importar dinámicamente para evitar dependencias circulares
+      const { default: foliosControlService } = await import(
+        "./ct_folios_control.service"
       );
 
-      // 🔄 CREAR ARTÍCULOS DE FORMA SECUENCIAL PARA EVITAR CONFLICTOS DE FOLIOS
+      // Generar todos los folios de una vez (batch)
+      const folios = await foliosControlService.generarFoliosBatch(
+        "INV",
+        articulos.length,
+        userId
+      );
+
+      logger.info(
+        `📋 Folios generados: ${folios.length} desde ${folios[0]} hasta ${
+          folios[folios.length - 1]
+        }`
+      );
+
+      // 🔄 CREAR ARTÍCULOS CON SUS FOLIOS ASIGNADOS
       const articulosCreados = [];
-      
+
       for (let index = 0; index < articulos.length; index++) {
         const articulo = articulos[index];
-        
-        // Generar folio secuencial para cada artículo
-        const folio = `INV-${año}-${String(siguienteNumero + index).padStart(
-          7,
-          "0"
-        )}`;
+        const folio = folios[index];
 
-        logger.info(`🔢 Generando folio: ${folio} para artículo ${index + 1}/${articulos.length}`);
+        logger.info(
+          `📦 Creando artículo ${index + 1}/${
+            articulos.length
+          } con folio: ${folio}`
+        );
 
         const articuloCreado = await tx.dt_inventario_articulo.create({
           data: {
@@ -407,8 +398,7 @@ export abstract class BaseBatchService {
             },
             ct_inventario_proveedor: {
               connect: {
-                id_ct_inventario_proveedor:
-                  articulo.id_ct_inventario_proveedor,
+                id_ct_inventario_proveedor: articulo.id_ct_inventario_proveedor,
               },
             },
             ct_inventario_estado_fisico: {
