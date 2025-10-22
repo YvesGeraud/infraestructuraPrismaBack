@@ -18,6 +18,7 @@ import inventarioTipoArticuloRoutes from "./inventario/ct_inventario_tipo_articu
 import dtInventarioArticuloRoutes from "./inventario/dt_inventario_articulo.route";
 import inventarioAltaBatchRoutes from "./inventario/dt_inventario_alta_batch.route";
 import inventarioBajaBatchRoutes from "./inventario/dt_inventario_baja_batch.route";
+import reporteInventarioRoutes from "./inventario/reporte-inventario.routes";
 
 //? INFRAESTRUCTURA
 import infraestructuraAnexoRoutes from "./infraestructura/ct_infraestructura_anexo.route";
@@ -61,6 +62,7 @@ router.use("/ct_inventario_tipo_articulo", inventarioTipoArticuloRoutes);
 router.use("/dt_inventario_articulo", dtInventarioArticuloRoutes);
 router.use("/inventario/alta/batch", inventarioAltaBatchRoutes); // 🚀 Alta masiva
 router.use("/inventario/baja/batch", inventarioBajaBatchRoutes); // 📉 Baja masiva
+router.use("/inventario/reporte", reporteInventarioRoutes); // 📊 Reporte de inventario
 
 //? INFRAESTRUCTURA
 router.use("/ct_infraestructura_anexo", infraestructuraAnexoRoutes);

@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
-import { ReportesService } from "../services/reportes.service";
+import {
+  ReportesService,
+  ConfiguracionReporte,
+} from "../services/reportes.service";
 import { CtLocalidadBaseService } from "../services/ct_localidad.service";
+import { ReporteInventarioService } from "../services/inventario/reporte-inventario.service";
 import {
   enviarRespuestaExitosa,
   enviarRespuestaError,
@@ -13,10 +17,12 @@ import {
 export class ReportesController {
   private reportesService: ReportesService;
   private ctLocalidadService: CtLocalidadBaseService;
+  private reporteInventarioService: ReporteInventarioService;
 
   constructor() {
     this.reportesService = new ReportesService();
     this.ctLocalidadService = new CtLocalidadBaseService();
+    this.reporteInventarioService = new ReporteInventarioService();
   }
 
   /**
@@ -408,6 +414,364 @@ export class ReportesController {
 
     return columnas;
   }
+
+  /**
+   * Genera reporte PDF de inventario por unidad
+   *
+   * @route GET /api/reportes/inventario/pdf
+   * @param {Request} req - Objeto de petición con filtros opcionales en query
+   * @param {Response} res - Objeto de respuesta
+   *
+   * @example
+   * GET /api/reportes/inventario/pdf?id_rl_infraestructura_jerarquia=1
+   *
+   * @returns PDF file download con nombre: inventario_reporte_{fecha}.pdf
+   */
+  generarReporteInventario = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      // Importar el servicio de reporte de inventario
+      const { default: reporteInventarioService } = await import(
+        "../services/inventario/reporte-inventario.service"
+      );
+
+      // Obtener los filtros de la query
+      const { id_rl_infraestructura_jerarquia, cct, incluirInactivos } =
+        req.query;
+
+      const filtros = {
+        id_rl_infraestructura_jerarquia: id_rl_infraestructura_jerarquia
+          ? parseInt(id_rl_infraestructura_jerarquia as string)
+          : undefined,
+        cct: cct as string,
+        incluirInactivos: incluirInactivos === "true",
+      };
+
+      // Generar el reporte de inventario
+      const resultado = await reporteInventarioService.generarReportePorUnidad(
+        filtros
+      );
+
+      if (!resultado.exito) {
+        enviarRespuestaError(res, resultado.mensaje, 400);
+        return;
+      }
+
+      const datosReporte = resultado.datos;
+
+      // Configurar el reporte PDF
+      const configuracionReporte: ConfiguracionReporte = {
+        titulo: "RESGUARDO DE INVENTARIO",
+        descripcion: `Reporte de inventario para ${datosReporte.departamento}`,
+        columnas: [
+          {
+            campo: "contador",
+            titulo: "#",
+            tipo: "numero",
+            ancho: "5%",
+          },
+          {
+            campo: "folio",
+            titulo: "FOLIO",
+            tipo: "texto",
+            ancho: "15%",
+          },
+          {
+            campo: "tipoArticulo",
+            titulo: "TIPO ARTÍCULO",
+            tipo: "texto",
+            ancho: "15%",
+          },
+          {
+            campo: "marca",
+            titulo: "MARCA",
+            tipo: "texto",
+            ancho: "10%",
+          },
+          {
+            campo: "modelo",
+            titulo: "MODELO",
+            tipo: "texto",
+            ancho: "10%",
+          },
+          {
+            campo: "serie",
+            titulo: "SERIE",
+            tipo: "texto",
+            ancho: "10%",
+          },
+          {
+            campo: "observaciones",
+            titulo: "OBSERVACIONES",
+            tipo: "texto",
+            ancho: "20%",
+          },
+          {
+            campo: "material",
+            titulo: "MATERIAL",
+            tipo: "texto",
+            ancho: "15%",
+          },
+        ],
+        formato: {
+          formato: "A4",
+          orientacion: "landscape",
+          margenes: {
+            superior: 40,
+            inferior: 40,
+            izquierdo: 40,
+            derecho: 40,
+          },
+          encabezado: {
+            mostrar: true,
+            titulo: "RESGUARDO DE INVENTARIO",
+            subtitulo: "UNA NUEVA HISTORIA",
+            logo: "./assets/logo-tlaxcala.png",
+          },
+          estilos: {
+            titulo: {
+              fuente: {
+                familia: "Arial",
+                tamanio: 16,
+                negrita: true,
+                color: "#2c3e50",
+              },
+            },
+            subtitulo: {
+              fuente: {
+                familia: "Arial",
+                tamanio: 12,
+                negrita: true,
+                color: "#34495e",
+              },
+            },
+            texto: {
+              fuente: {
+                familia: "Arial",
+                tamanio: 10,
+                color: "#2c3e50",
+              },
+            },
+            tabla: {
+              encabezado: {
+                fuente: {
+                  familia: "Arial",
+                  tamanio: 10,
+                  negrita: true,
+                  color: "#ffffff",
+                },
+                relleno: {
+                  tipo: "solid",
+                  color: "#2c3e50",
+                },
+              },
+              filas: {
+                fuente: {
+                  familia: "Arial",
+                  tamanio: 9,
+                  color: "#2c3e50",
+                },
+                alternado: true,
+                colorAlternado: "#f8f9fa",
+              },
+              bordes: {
+                color: "#2c3e50",
+                grosor: 1,
+              },
+            },
+          },
+          piePagina: {
+            mostrar: true,
+            texto: `AUTORIZO: MAXIMO OSCAR LUNA CAPILLA - JEFE DEL DEPARTAMENTO DE RECURSOS MATERIALES Y SERVICIOS\nRESGUARDANTE: ${datosReporte.nombre} - RESPONSABLE DE INVENTARIO\n\nEste documento es de carácter oficial y debe ser conservado según las disposiciones legales aplicables.`,
+            numeracion: true,
+          },
+        },
+        metadatos: {
+          direccion: datosReporte.direccion,
+          departamento: datosReporte.departamento,
+          subjefatura: datosReporte.subjefatura,
+          nombre: datosReporte.nombre,
+          cct: datosReporte.cct,
+          fecha: datosReporte.fecha,
+          totalArticulos: datosReporte.totalArticulos,
+        },
+      };
+
+      // Generar el PDF usando método híbrido inteligente
+      const resultadoPDF = await this.reportesService.generarReportePDFHibrido(
+        datosReporte.articulos.length,
+        () => Promise.resolve(datosReporte.articulos),
+        configuracionReporte
+      );
+
+      // Configurar headers para descarga
+      const fecha = new Date().toISOString().split("T")[0];
+      const nombreArchivo = `inventario_reporte_${fecha}.pdf`;
+
+      // Headers para evitar cache
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${nombreArchivo}"`
+      );
+
+      // Enviar el PDF
+      res.send(resultadoPDF);
+
+      console.log(`✅ Reporte de inventario PDF generado: ${nombreArchivo}`);
+    } catch (error: any) {
+      console.error("❌ Error generando reporte PDF de inventario:", error);
+      enviarRespuestaError(res, "Error interno al generar el reporte PDF", 500);
+    }
+  };
+
+  /**
+   * Genera reporte Excel de inventario por unidad
+   */
+  generarReporteInventarioExcel = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    try {
+      // Obtener parámetros de consulta
+      const { id_rl_infraestructura_jerarquia, cct, incluirInactivos } =
+        req.query;
+
+      // Validar parámetros
+      if (!id_rl_infraestructura_jerarquia && !cct) {
+        enviarRespuestaError(
+          res,
+          "Se requiere id_rl_infraestructura_jerarquia o cct",
+          400
+        );
+        return;
+      }
+
+      // Generar reporte usando el servicio
+      const datosReporte =
+        await this.reporteInventarioService.generarReportePorUnidad({
+          id_rl_infraestructura_jerarquia: id_rl_infraestructura_jerarquia
+            ? Number(id_rl_infraestructura_jerarquia)
+            : undefined,
+          cct: cct as string,
+          incluirInactivos: incluirInactivos === "true",
+        });
+
+      if (!datosReporte.exito || !datosReporte.datos) {
+        enviarRespuestaError(res, datosReporte.mensaje, 500);
+        return;
+      }
+
+      // Configurar el reporte Excel
+      const configuracionReporte: ConfiguracionReporte = {
+        titulo: "RESGUARDO DE INVENTARIO",
+        descripcion: `Reporte de inventario para ${datosReporte.datos.departamento}`,
+        columnas: [
+          {
+            campo: "contador",
+            titulo: "#",
+            tipo: "numero",
+            ancho: "5%",
+          },
+          {
+            campo: "folio",
+            titulo: "FOLIO",
+            tipo: "texto",
+            ancho: "15%",
+          },
+          {
+            campo: "tipoArticulo",
+            titulo: "TIPO ARTÍCULO",
+            tipo: "texto",
+            ancho: "15%",
+          },
+          {
+            campo: "marca",
+            titulo: "MARCA",
+            tipo: "texto",
+            ancho: "10%",
+          },
+          {
+            campo: "modelo",
+            titulo: "MODELO",
+            tipo: "texto",
+            ancho: "10%",
+          },
+          {
+            campo: "serie",
+            titulo: "SERIE",
+            tipo: "texto",
+            ancho: "10%",
+          },
+          {
+            campo: "observaciones",
+            titulo: "OBSERVACIONES",
+            tipo: "texto",
+            ancho: "20%",
+          },
+          {
+            campo: "material",
+            titulo: "MATERIAL",
+            tipo: "texto",
+            ancho: "15%",
+          },
+        ],
+        metadatos: {
+          direccion: datosReporte.datos.direccion,
+          departamento: datosReporte.datos.departamento,
+          subjefatura: datosReporte.datos.subjefatura,
+          nombre: datosReporte.datos.nombre,
+          cct: datosReporte.datos.cct,
+          fecha: datosReporte.datos.fecha,
+          totalArticulos: datosReporte.datos.totalArticulos,
+        },
+      };
+
+      // Generar el Excel usando método híbrido inteligente
+      const resultadoExcel =
+        await this.reportesService.generarReporteExcelHibrido(
+          datosReporte.datos.articulos.length,
+          () => Promise.resolve(datosReporte.datos!.articulos),
+          configuracionReporte
+        );
+
+      // Configurar headers para descarga
+      const fecha = new Date().toISOString().split("T")[0];
+      const nombreArchivo = `inventario_reporte_${fecha}.xlsx`;
+
+      // Headers para evitar cache
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${nombreArchivo}"`
+      );
+
+      // Enviar el Excel
+      res.send(resultadoExcel);
+
+      console.log(`✅ Reporte de inventario Excel generado: ${nombreArchivo}`);
+    } catch (error: any) {
+      console.error("❌ Error generando reporte Excel de inventario:", error);
+      enviarRespuestaError(
+        res,
+        "Error interno al generar el reporte Excel",
+        500
+      );
+    }
+  };
 }
 
 export const reportesController = new ReportesController();

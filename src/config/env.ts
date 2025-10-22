@@ -211,6 +211,8 @@ export const corsConfig = {
     "Origin",
     "X-Request-ID",
     "X-API-Key",
+    "Cache-Control",
+    "Pragma",
   ],
   exposedHeaders: [
     "X-Total-Count",

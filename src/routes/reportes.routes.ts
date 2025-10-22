@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { reportesController } from "../controllers/reportes.controller";
 import { validarRequest } from "../middleware/validacion";
+import { verificarAutenticacion } from "../middleware/authMiddleware";
 import {
   reporteLocalidadesFiltrosSchema,
   reporteGenericoSchema,
@@ -8,6 +9,47 @@ import {
 } from "../schemas/reportes.schema";
 
 const router = Router();
+
+// Aplicar middleware de autenticación a todas las rutas de reportes EXCEPTO inventario PDF
+// router.use(verificarAutenticacion);
+
+// ========== RUTAS DE REPORTES DE INVENTARIO ==========
+
+/**
+ * @route GET /api/reportes/inventario/pdf
+ * @description Genera reporte PDF de inventario por unidad
+ * @query {number} id_rl_infraestructura_jerarquia - ID de la unidad (opcional)
+ * @query {string} cct - CCT de la unidad (opcional)
+ * @query {boolean} incluirInactivos - Incluir artículos inactivos (opcional)
+ * @returns {file} PDF - Archivo PDF descargable con formato oficial
+ *
+ * @example
+ * GET /api/reportes/inventario/pdf?id_rl_infraestructura_jerarquia=1
+ * GET /api/reportes/inventario/pdf?cct=29PPR0103C
+ * Descarga: inventario_reporte_2025-10-20.pdf
+ */
+router.get("/inventario/pdf", reportesController.generarReporteInventario);
+
+/**
+ * @route GET /api/reportes/inventario/excel
+ * @description Genera reporte Excel de inventario por unidad
+ * @query {number} id_rl_infraestructura_jerarquia - ID de la unidad (opcional)
+ * @query {string} cct - CCT de la unidad (opcional)
+ * @query {boolean} incluirInactivos - Incluir artículos inactivos (opcional)
+ * @returns {file} Excel - Archivo Excel descargable con formato oficial
+ *
+ * @example
+ * GET /api/reportes/inventario/excel?id_rl_infraestructura_jerarquia=1
+ * GET /api/reportes/inventario/excel?cct=29PPR0103C
+ * Descarga: inventario_reporte_2025-10-20.xlsx
+ */
+router.get(
+  "/inventario/excel",
+  reportesController.generarReporteInventarioExcel
+);
+
+// Aplicar middleware de autenticación a todas las rutas EXCEPTO inventario PDF
+router.use(verificarAutenticacion);
 
 // ========== RUTAS DE REPORTES DE LOCALIDADES ==========
 
