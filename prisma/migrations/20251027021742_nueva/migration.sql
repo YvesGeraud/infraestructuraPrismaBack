@@ -444,8 +444,9 @@ CREATE TABLE `ct_inventario_tipo_articulo` (
 -- CreateTable
 CREATE TABLE `ct_localidad` (
     `id_ct_localidad` INTEGER NOT NULL AUTO_INCREMENT,
+    `codigo_postal` INTEGER NOT NULL DEFAULT 0,
     `nombre` VARCHAR(150) NOT NULL,
-    `ambito` CHAR(1) NOT NULL,
+    `ambito` VARCHAR(50) NOT NULL DEFAULT '',
     `id_ct_municipio` INTEGER NOT NULL,
     `estado` BOOLEAN NULL DEFAULT true,
     `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
@@ -457,7 +458,6 @@ CREATE TABLE `ct_localidad` (
     INDEX `estado`(`estado`),
     INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
     INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
-    UNIQUE INDEX `ct_localidad_nombre_ambito_id_ct_municipio_key`(`nombre`, `ambito`, `id_ct_municipio`),
     PRIMARY KEY (`id_ct_localidad`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -569,8 +569,6 @@ CREATE TABLE `dt_infraestructura_ubicacion` (
     `numero_exterior` INTEGER NULL,
     `numero_interior` INTEGER NULL,
     `id_ct_localidad` INTEGER NOT NULL,
-    `colonia` VARCHAR(255) NOT NULL,
-    `codigo_postal` INTEGER NOT NULL,
     `latitud` FLOAT NULL,
     `longitud` FLOAT NULL,
     `estado` BOOLEAN NULL DEFAULT true,

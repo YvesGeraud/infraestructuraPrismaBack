@@ -69,6 +69,12 @@ export class CtLocalidadBaseService extends BaseService<
       });
     }
 
+    if (filters?.codigo_postal) {
+      conditions.push({
+        codigo_postal: filters.codigo_postal,
+      });
+    }
+
     // Filtro de municipio
     if (filters?.ambito) {
       conditions.push({

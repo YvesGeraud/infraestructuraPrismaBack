@@ -410,8 +410,9 @@ model ct_inventario_tipo_articulo {
 
 model ct_localidad {
   id_ct_localidad              Int                            @id @default(autoincrement())
+  codigo_postal                Int                            @default(0)
   nombre                       String                         @db.VarChar(150)
-  ambito                       String                         @db.Char(1)
+  ambito                       String                         @default("") @db.VarChar(50)
   id_ct_municipio              Int
   estado                       Boolean?                       @default(true)
   fecha_in                     DateTime                       @default(now()) @db.DateTime(0)
@@ -421,7 +422,6 @@ model ct_localidad {
   ct_municipio                 ct_municipio                   @relation(fields: [id_ct_municipio], references: [id_ct_municipio], onDelete: NoAction, onUpdate: NoAction, map: "FK_ct_localidad_ct_municipio")
   dt_infraestructura_ubicacion dt_infraestructura_ubicacion[]
 
-  @@unique([nombre, ambito, id_ct_municipio])
   @@index([id_ct_municipio], map: "ct_localidad_id_ct_municipio_fkey")
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -526,8 +526,6 @@ model dt_infraestructura_ubicacion {
   numero_exterior                 Int?
   numero_interior                 Int?
   id_ct_localidad                 Int
-  colonia                         String                            @db.VarChar(255)
-  codigo_postal                   Int
   latitud                         Float?                            @db.Float
   longitud                        Float?                            @db.Float
   estado                          Boolean?                          @default(true)

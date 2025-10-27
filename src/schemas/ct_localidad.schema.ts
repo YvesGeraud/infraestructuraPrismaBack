@@ -26,6 +26,7 @@ import {
 //? Esquema para crear una nueva capitulo
 export const crearCtLocalidadSchema = z.object({
   nombre: esquemaTextoRequerido(2, 100),
+  codigo_postal: esquemaNumeroRequerido(1, 100000),
   ambito: esquemaTextoRequerido(1, 1),
   id_ct_municipio: esquemaNumeroRequerido(1, 100000),
   estado: esquemaEstadoRequerido,
@@ -34,6 +35,7 @@ export const crearCtLocalidadSchema = z.object({
 //? Esquema para actualizar una capitulo
 export const actualizarCtLocalidadSchema = z.object({
   nombre: esquemaTextoOpcional(100),
+  codigo_postal: esquemaNumeroOpcional(1, 100000),
   ambito: esquemaTextoOpcional(1),
   id_ct_municipio: esquemaQueryId,
   estado: esquemaEstadoOpcional,
@@ -46,6 +48,7 @@ export const ctLocalidadFiltrosSchema = z.object({
   //? Filtros específicos
   id_ct_localidad: esquemaQueryId,
   nombre: esquemaQueryTexto,
+  codigo_postal: esquemaQueryNumeroOpcional,
   ambito: esquemaQueryTexto,
   id_ct_municipio: esquemaQueryId,
   estado: esquemaQueryBoolean,
