@@ -11,7 +11,7 @@ async function main() {
   // ===== 1. CREAR USUARIOS PRIMERO =====
   console.log("👥 Creando usuarios...");
 
-  const usuariosPrueba = [
+  /*const usuariosPrueba = [
     {
       usuario: "admin",
       contrasena: "123456",

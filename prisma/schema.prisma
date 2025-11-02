@@ -523,6 +523,7 @@ model dt_bitacora {
 model dt_infraestructura_ubicacion {
   id_dt_infraestructura_ubicacion Int                               @id @default(autoincrement())
   calle                           String                            @db.VarChar(255)
+  cct                             String                            @db.VarChar(11)
   numero_exterior                 Int?
   numero_interior                 Int?
   id_ct_localidad                 Int
