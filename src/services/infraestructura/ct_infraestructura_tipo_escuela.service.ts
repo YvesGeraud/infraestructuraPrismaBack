@@ -22,12 +22,14 @@ export class CtInfraestructuraTipoEscuelaBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_infraestructura_tipo_escuela",
-    defaultOrderBy: { id_ct_infraestructura_tipo_escuela: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_ct_infraestructura_tipo_escuela: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
   // 🔗 Includes condicionales basados en filtros
-  protected configurarIncludes(filters?: BuscarCtInfraestructuraTipoEscuelaInput) {
+  protected configurarIncludes(
+    filters?: BuscarCtInfraestructuraTipoEscuelaInput
+  ) {
     const includes: any = {};
 
     // Include de escuelas
@@ -40,14 +42,17 @@ export class CtInfraestructuraTipoEscuelaBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para tipos de escuela
-  protected construirWhereClause(filters?: BuscarCtInfraestructuraTipoEscuelaInput) {
+  protected construirWhereClause(
+    filters?: BuscarCtInfraestructuraTipoEscuelaInput
+  ) {
     const where: any = {};
     const conditions: any[] = [];
 
     // Filtro por ID
     if (filters?.id_ct_infraestructura_tipo_escuela) {
       conditions.push({
-        id_ct_infraestructura_tipo_escuela: filters.id_ct_infraestructura_tipo_escuela,
+        id_ct_infraestructura_tipo_escuela:
+          filters.id_ct_infraestructura_tipo_escuela,
       });
     }
 

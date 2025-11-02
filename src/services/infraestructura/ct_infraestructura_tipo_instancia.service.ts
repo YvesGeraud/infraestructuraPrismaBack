@@ -22,12 +22,14 @@ export class CtInfraestructuraTipoInstanciaBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_infraestructura_tipo_instancia",
-    defaultOrderBy: { id_ct_infraestructura_tipo_instancia: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_ct_infraestructura_tipo_instancia: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
   // 🔗 Includes condicionales basados en filtros
-  protected configurarIncludes(filters?: BuscarCtInfraestructuraTipoInstanciaInput) {
+  protected configurarIncludes(
+    filters?: BuscarCtInfraestructuraTipoInstanciaInput
+  ) {
     const includes: any = {};
 
     // Include de jerarquías
@@ -40,14 +42,17 @@ export class CtInfraestructuraTipoInstanciaBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para tipos de instancia
-  protected construirWhereClause(filters?: BuscarCtInfraestructuraTipoInstanciaInput) {
+  protected construirWhereClause(
+    filters?: BuscarCtInfraestructuraTipoInstanciaInput
+  ) {
     const where: any = {};
     const conditions: any[] = [];
 
     // Filtro por ID
     if (filters?.id_ct_infraestructura_tipo_instancia) {
       conditions.push({
-        id_ct_infraestructura_tipo_instancia: filters.id_ct_infraestructura_tipo_instancia,
+        id_ct_infraestructura_tipo_instancia:
+          filters.id_ct_infraestructura_tipo_instancia,
       });
     }
 

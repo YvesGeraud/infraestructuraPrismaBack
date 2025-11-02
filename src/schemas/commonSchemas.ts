@@ -152,12 +152,27 @@ export const esquemaQueryBoolean = z
 
 export const esquemaQueryTexto = z.string().optional();
 
-export const esquemaQueryNumeroRequerido = z.number().int().positive();
+//? Esquemas para números en query parameters (transforman string a number)
+export const esquemaQueryNumeroRequerido = z
+  .string()
+  .transform((val) => {
+    const num = parseInt(val, 10);
+    if (isNaN(num) || num <= 0) {
+      throw new Error("Debe ser un número positivo");
+    }
+    return num;
+  })
+  .pipe(z.number().int().positive());
+
 export const esquemaQueryNumeroOpcional = z
-  .number()
-  .int()
-  .positive()
-  .optional();
+  .string()
+  .optional()
+  .transform((val) => {
+    if (val === undefined || val === null || val === "") return undefined;
+    const num = parseInt(val, 10);
+    return isNaN(num) || num <= 0 ? undefined : num;
+  })
+  .pipe(z.number().int().positive().optional());
 
 //? Esquemas para paginación mejorados
 export const esquemaPaginaQuery = z

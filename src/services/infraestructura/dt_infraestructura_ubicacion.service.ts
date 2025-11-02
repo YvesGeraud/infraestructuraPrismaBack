@@ -22,12 +22,14 @@ export class DtInfraestructuraUbicacionBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "dt_infraestructura_ubicacion",
-    defaultOrderBy: { id_dt_infraestructura_ubicacion: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_dt_infraestructura_ubicacion: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
   // 🔗 Includes condicionales basados en filtros
-  protected configurarIncludes(filters?: BuscarDtInfraestructuraUbicacionInput) {
+  protected configurarIncludes(
+    filters?: BuscarDtInfraestructuraUbicacionInput
+  ) {
     const includes: any = {};
 
     // Include individual de localidad
@@ -51,14 +53,17 @@ export class DtInfraestructuraUbicacionBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para ubicaciones
-  protected construirWhereClause(filters?: BuscarDtInfraestructuraUbicacionInput) {
+  protected construirWhereClause(
+    filters?: BuscarDtInfraestructuraUbicacionInput
+  ) {
     const where: any = {};
     const conditions: any[] = [];
 
     // Filtro por ID
     if (filters?.id_dt_infraestructura_ubicacion) {
       conditions.push({
-        id_dt_infraestructura_ubicacion: filters.id_dt_infraestructura_ubicacion,
+        id_dt_infraestructura_ubicacion:
+          filters.id_dt_infraestructura_ubicacion,
       });
     }
 

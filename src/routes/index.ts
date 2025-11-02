@@ -32,6 +32,9 @@ import infraestructuraSostenimientoRoutes from "./infraestructura/ct_infraestruc
 import infraestructuraTipoEscuelaRoutes from "./infraestructura/ct_infraestructura_tipo_escuela.route";
 import infraestructuraTipoInstanciaRoutes from "./infraestructura/ct_infraestructura_tipo_instancia.route";
 import dtInfraestructuraUbicacionRoutes from "./infraestructura/dt_infraestructura_ubicacion.route";
+import rlInfraestructuraJerarquiaBatchRoutes from "./infraestructura/rl_infraestructura_jerarquia_batch.route";
+import rlInfraestructuraJerarquiaRoutes from "./infraestructura/rl_infraestructura_jerarquia.route";
+import instanciaBusquedaRoutes from "./infraestructura/instancia-busqueda.route";
 
 //? GENERAL
 import entidadRoutes from "./ct_entidad.route";
@@ -88,6 +91,12 @@ router.use(
   infraestructuraTipoInstanciaRoutes
 );
 router.use("/dt_infraestructura_ubicacion", dtInfraestructuraUbicacionRoutes);
+router.use("/rl_infraestructura_jerarquia", rlInfraestructuraJerarquiaRoutes); // 🏗️ CRUD de jerarquía
+router.use(
+  "/infraestructura/jerarquia/batch",
+  rlInfraestructuraJerarquiaBatchRoutes
+); // 🏗️ Batch de jerarquía
+router.use("/infraestructura/instancias", instanciaBusquedaRoutes); // 🔍 Búsqueda unificada
 
 //? GENERAL
 router.use("/ct_entidad", entidadRoutes);

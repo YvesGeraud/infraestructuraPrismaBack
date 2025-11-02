@@ -22,12 +22,14 @@ export class CtInfraestructuraDireccionBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_infraestructura_direccion",
-    defaultOrderBy: { id_ct_infraestructura_direccion: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_ct_infraestructura_direccion: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
   // 🔗 Includes condicionales basados en filtros
-  protected configurarIncludes(filters?: BuscarCtInfraestructuraDireccionInput) {
+  protected configurarIncludes(
+    filters?: BuscarCtInfraestructuraDireccionInput
+  ) {
     const includes: any = {};
 
     // Include de ubicación
@@ -40,14 +42,17 @@ export class CtInfraestructuraDireccionBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para direcciones
-  protected construirWhereClause(filters?: BuscarCtInfraestructuraDireccionInput) {
+  protected construirWhereClause(
+    filters?: BuscarCtInfraestructuraDireccionInput
+  ) {
     const where: any = {};
     const conditions: any[] = [];
 
     // Filtro por ID
     if (filters?.id_ct_infraestructura_direccion) {
       conditions.push({
-        id_ct_infraestructura_direccion: filters.id_ct_infraestructura_direccion,
+        id_ct_infraestructura_direccion:
+          filters.id_ct_infraestructura_direccion,
       });
     }
 
@@ -72,7 +77,8 @@ export class CtInfraestructuraDireccionBaseService extends BaseService<
     // Filtro por ubicación
     if (filters?.id_dt_infraestructura_ubicacion) {
       conditions.push({
-        id_dt_infraestructura_ubicacion: filters.id_dt_infraestructura_ubicacion,
+        id_dt_infraestructura_ubicacion:
+          filters.id_dt_infraestructura_ubicacion,
       });
     }
 

@@ -22,7 +22,7 @@ export class CtInfraestructuraEscuelaBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_infraestructura_escuela",
-    defaultOrderBy: { id_ct_infraestructura_escuela: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_ct_infraestructura_escuela: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
@@ -57,7 +57,9 @@ export class CtInfraestructuraEscuelaBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para escuelas
-  protected construirWhereClause(filters?: BuscarCtInfraestructuraEscuelaInput) {
+  protected construirWhereClause(
+    filters?: BuscarCtInfraestructuraEscuelaInput
+  ) {
     const where: any = {};
     const conditions: any[] = [];
 
@@ -110,7 +112,8 @@ export class CtInfraestructuraEscuelaBaseService extends BaseService<
     // Filtro por ubicación
     if (filters?.id_dt_infraestructura_ubicacion) {
       conditions.push({
-        id_dt_infraestructura_ubicacion: filters.id_dt_infraestructura_ubicacion,
+        id_dt_infraestructura_ubicacion:
+          filters.id_dt_infraestructura_ubicacion,
       });
     }
 

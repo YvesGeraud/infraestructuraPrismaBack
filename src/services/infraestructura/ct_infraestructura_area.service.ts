@@ -22,7 +22,7 @@ export class CtInfraestructuraAreaBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_infraestructura_area",
-    defaultOrderBy: { id_ct_infraestructura_area: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_ct_infraestructura_area: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
@@ -72,7 +72,8 @@ export class CtInfraestructuraAreaBaseService extends BaseService<
     // Filtro por ubicación
     if (filters?.id_dt_infraestructura_ubicacion) {
       conditions.push({
-        id_dt_infraestructura_ubicacion: filters.id_dt_infraestructura_ubicacion,
+        id_dt_infraestructura_ubicacion:
+          filters.id_dt_infraestructura_ubicacion,
       });
     }
 

@@ -22,12 +22,14 @@ export class CtInfraestructuraSostenimientoBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "ct_infraestructura_sostenimiento",
-    defaultOrderBy: { id_ct_infraestructura_sostenimiento: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_ct_infraestructura_sostenimiento: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
   // 🔗 Includes condicionales basados en filtros
-  protected configurarIncludes(filters?: BuscarCtInfraestructuraSostenimientoInput) {
+  protected configurarIncludes(
+    filters?: BuscarCtInfraestructuraSostenimientoInput
+  ) {
     const includes: any = {};
 
     // Include de escuelas
@@ -40,14 +42,17 @@ export class CtInfraestructuraSostenimientoBaseService extends BaseService<
   }
 
   // 🔍 Filtros específicos para sostenimientos
-  protected construirWhereClause(filters?: BuscarCtInfraestructuraSostenimientoInput) {
+  protected construirWhereClause(
+    filters?: BuscarCtInfraestructuraSostenimientoInput
+  ) {
     const where: any = {};
     const conditions: any[] = [];
 
     // Filtro por ID
     if (filters?.id_ct_infraestructura_sostenimiento) {
       conditions.push({
-        id_ct_infraestructura_sostenimiento: filters.id_ct_infraestructura_sostenimiento,
+        id_ct_infraestructura_sostenimiento:
+          filters.id_ct_infraestructura_sostenimiento,
       });
     }
 
