@@ -6,13 +6,78 @@
 import { PrismaClient } from "@prisma/client";
 import { createError } from "../../middleware/errorHandler";
 import logger from "../../config/logger";
-import {
-  CrearJerarquiaBatchInput,
-  JerarquiaItemInput,
-} from "../../schemas/infraestructura/rl_infraestructura_jerarquia_batch.schema";
+import { CrearJerarquiaBatchInput } from "../../schemas/infraestructura/rl_infraestructura_jerarquia_batch.schema";
 import { ResultadoBatch } from "../inventario/base-batch.service";
 
 const prisma = new PrismaClient();
+
+/**
+ * 🔧 CONFIGURACIÓN DE MAPEO DE MODELOS
+ * Mapeo estático de tipos de instancia a modelos de Prisma para optimizar búsquedas
+ */
+interface ModeloConfig {
+  modelo: string;
+  campoId: string;
+}
+
+const MAPEO_MODELOS = new Map<string, ModeloConfig>([
+  [
+    "direccion",
+    {
+      modelo: "ct_infraestructura_direccion",
+      campoId: "id_ct_infraestructura_direccion",
+    },
+  ],
+  [
+    "departamento",
+    {
+      modelo: "ct_infraestructura_departamento",
+      campoId: "id_ct_infraestructura_departamento",
+    },
+  ],
+  [
+    "area",
+    {
+      modelo: "ct_infraestructura_area",
+      campoId: "id_ct_infraestructura_area",
+    },
+  ],
+  [
+    "jefesector",
+    {
+      modelo: "ct_infraestructura_jefe_sector",
+      campoId: "id_ct_infraestructura_jefe_sector",
+    },
+  ],
+  [
+    "jefedesector",
+    {
+      modelo: "ct_infraestructura_jefe_sector",
+      campoId: "id_ct_infraestructura_jefe_sector",
+    },
+  ],
+  [
+    "supervisor",
+    {
+      modelo: "ct_infraestructura_supervisor",
+      campoId: "id_ct_infraestructura_supervisor",
+    },
+  ],
+  [
+    "escuela",
+    {
+      modelo: "ct_infraestructura_escuela",
+      campoId: "id_ct_infraestructura_escuela",
+    },
+  ],
+  [
+    "anexo",
+    {
+      modelo: "ct_infraestructura_anexo",
+      campoId: "id_ct_infraestructura_anexo",
+    },
+  ],
+]);
 
 /**
  * 🎯 SERVICIO BATCH PARA JERARQUÍA DE INFRAESTRUCTURA
@@ -97,13 +162,44 @@ export class RlInfraestructuraJerarquiaBatchService {
   }
 
   /**
+   * 🔧 NORMALIZAR NOMBRE DE TIPO
+   * Normaliza el nombre del tipo de instancia para comparación flexible
+   * Ejemplos: "JEFE DE SECTOR" → "jefedesector", "DIRECCIÓN" → "direccion"
+   */
+  private normalizarNombreTipo(nombre: string): string {
+    return nombre
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
+      .replace(/\s+/g, "") // Eliminar espacios
+      .replace(/[_-]/g, ""); // Eliminar guiones bajos y guiones
+  }
+
+  /**
+   * 🔍 OBTENER CONFIGURACIÓN DE MODELO
+   * Obtiene la configuración del modelo Prisma para un tipo de instancia normalizado
+   */
+  private obtenerConfiguracionModelo(
+    nombreNormalizado: string
+  ): ModeloConfig | null {
+    // Búsqueda directa
+    let config = MAPEO_MODELOS.get(nombreNormalizado);
+    if (config) return config;
+
+    // Búsqueda parcial (optimizada)
+    for (const [key, value] of MAPEO_MODELOS.entries()) {
+      if (nombreNormalizado.includes(key) || key.includes(nombreNormalizado)) {
+        return value;
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * 🔍 VALIDAR INSTANCIA POR TIPO
-   *
    * Verifica que la instancia exista en la tabla correspondiente según su tipo
-   *
-   * @param idInstancia - ID de la instancia
-   * @param idTipoInstancia - ID del tipo de instancia
-   * @param tx - Transacción de Prisma (opcional)
    */
   private async validarInstancia(
     idInstancia: number,
@@ -111,54 +207,54 @@ export class RlInfraestructuraJerarquiaBatchService {
     tx?: any
   ): Promise<void> {
     const client = tx || this.prisma;
-
-    // Obtener el tipo de instancia para saber qué tabla validar
     const tipoInstancia = await this.validarTipoInstancia(idTipoInstancia, tx);
+    const nombreNormalizado = this.normalizarNombreTipo(tipoInstancia.nombre);
+    const modeloConfig = this.obtenerConfiguracionModelo(nombreNormalizado);
 
-    // Mapeo de tipos de instancia a tablas
-    const tablasPorTipo: Record<string, string> = {
-      Dirección: "ct_infraestructura_direccion",
-      Departamento: "ct_infraestructura_departamento",
-      Área: "ct_infraestructura_area",
-      "Jefe de sector": "ct_infraestructura_jefe_sector",
-      Supervisor: "ct_infraestructura_supervisor",
-      Escuela: "ct_infraestructura_escuela",
-      Anexo: "ct_infraestructura_anexo",
-    };
+    if (!modeloConfig) {
+      throw createError(
+        `Tipo de instancia "${tipoInstancia.nombre}" no tiene tabla correspondiente. Tipos válidos: Dirección, Departamento, Área, Jefe de Sector, Supervisor, Escuela, Anexo`,
+        400
+      );
+    }
 
-    const nombreTabla =
-      tablasPorTipo[tipoInstancia.nombre] ||
-      `ct_infraestructura_${tipoInstancia.nombre.toLowerCase()}`;
+    // Obtener modelo de Prisma
+    const modelo = (client as any)[modeloConfig.modelo];
+    if (!modelo || typeof modelo.findUnique !== "function") {
+      throw createError(
+        `El modelo "${modeloConfig.modelo}" no está disponible en Prisma`,
+        500
+      );
+    }
 
-    // Verificar que la instancia exista en la tabla correspondiente
+    // Validar instancia
     try {
-      // @ts-ignore - Prisma dinámico
-      const instancia = await client[nombreTabla].findUnique({
-        where: {
-          [`id_${nombreTabla.replace("ct_infraestructura_", "")}`]: idInstancia,
-          estado: true,
-        },
+      const instancia = await modelo.findUnique({
+        where: { [modeloConfig.campoId]: idInstancia },
+        select: { [modeloConfig.campoId]: true, estado: true },
       });
 
       if (!instancia) {
         throw createError(
-          `La instancia con ID ${idInstancia} de tipo "${tipoInstancia.nombre}" no existe o está inactiva`,
+          `La instancia con ID ${idInstancia} de tipo "${tipoInstancia.nombre}" no existe`,
+          404
+        );
+      }
+
+      if (instancia.estado === false || instancia.estado === null) {
+        throw createError(
+          `La instancia con ID ${idInstancia} de tipo "${tipoInstancia.nombre}" está inactiva`,
           404
         );
       }
     } catch (error: any) {
-      // Si el error es de Prisma (tabla no encontrada), lanzar error específico
+      if (error.statusCode) throw error;
       if (error.code === "P2001" || error.code === "P2025") {
         throw createError(
-          `No se pudo validar la instancia. Tipo "${tipoInstancia.nombre}" no tiene tabla correspondiente configurada`,
+          `No se pudo validar la instancia. Tipo "${tipoInstancia.nombre}" no tiene tabla correspondiente`,
           500
         );
       }
-      // Si es nuestro error personalizado, re-lanzarlo
-      if (error.statusCode) {
-        throw error;
-      }
-      // Error desconocido
       throw createError(`Error al validar la instancia: ${error.message}`, 500);
     }
   }
@@ -185,102 +281,74 @@ export class RlInfraestructuraJerarquiaBatchService {
 
       const resultado = await this.prisma.$transaction(
         async (tx) => {
-          // 📋 PASO 1: VALIDAR TODOS LOS TIPOS DE INSTANCIA
-          logger.info("🔍 Validando tipos de instancia...");
-
+          // 📋 VALIDACIONES EN PARALELO (optimizado)
           const tiposUnicos = [
             ...new Set(
               data.jerarquias.map((j) => j.id_ct_infraestructura_tipo_instancia)
             ),
           ];
-
-          for (const idTipo of tiposUnicos) {
-            await this.validarTipoInstancia(idTipo, tx);
-          }
-
-          logger.info(`✅ ${tiposUnicos.length} tipos de instancia válidos`);
-
-          // 📋 PASO 2: VALIDAR TODAS LAS DEPENDENCIAS
-          logger.info("🔍 Validando dependencias...");
-
           const dependenciasUnicas = [
             ...new Set(
               data.jerarquias
                 .map((j) => j.id_dependencia)
-                .filter((d) => d !== null && d !== undefined)
+                .filter((d): d is number => d !== null && d !== undefined)
             ),
           ];
 
-          for (const idDep of dependenciasUnicas) {
-            await this.validarDependencia(idDep, tx);
-          }
+          // Validar tipos, dependencias e instancias en paralelo
+          await Promise.all([
+            ...tiposUnicos.map((idTipo) =>
+              this.validarTipoInstancia(idTipo, tx)
+            ),
+            ...dependenciasUnicas.map((idDep) =>
+              this.validarDependencia(idDep, tx)
+            ),
+            ...data.jerarquias.map((j) =>
+              this.validarInstancia(
+                j.id_instancia,
+                j.id_ct_infraestructura_tipo_instancia,
+                tx
+              )
+            ),
+          ]);
 
-          logger.info(`✅ ${dependenciasUnicas.length} dependencias válidas`);
-
-          // 📋 PASO 3: VALIDAR TODAS LAS INSTANCIAS
-          logger.info("🔍 Validando instancias...");
+          // 📋 CREAR JERARQUÍAS EN ORDEN SECUENCIAL
+          // Crear secuencialmente para resolver dependencias dentro del batch
+          const jerarquiasCreadas: any[] = [];
+          const mapaJerarquiasCreadas = new Map<string, number>(); // Key: "id_instancia-id_tipo"
 
           for (const jerarquia of data.jerarquias) {
-            await this.validarInstancia(
-              jerarquia.id_instancia,
-              jerarquia.id_ct_infraestructura_tipo_instancia,
-              tx
+            const datosCreacion: any = {
+              id_instancia: jerarquia.id_instancia,
+              id_ct_infraestructura_tipo_instancia:
+                jerarquia.id_ct_infraestructura_tipo_instancia,
+              estado: true,
+              id_ct_usuario_in: userId,
+              fecha_in: new Date(),
+            };
+
+            // Incluir id_dependencia solo si existe (ya validado)
+            if (
+              jerarquia.id_dependencia !== null &&
+              jerarquia.id_dependencia !== undefined
+            ) {
+              datosCreacion.id_dependencia = jerarquia.id_dependencia;
+            }
+
+            const jerarquiaCreada =
+              await tx.rl_infraestructura_jerarquia.create({
+                data: datosCreacion,
+                include: { ct_infraestructura_tipo_instancia: true },
+              });
+
+            // Registrar para posibles dependencias futuras
+            const claveMapa = `${jerarquia.id_instancia}-${jerarquia.id_ct_infraestructura_tipo_instancia}`;
+            mapaJerarquiasCreadas.set(
+              claveMapa,
+              jerarquiaCreada.id_rl_infraestructura_jerarquia
             );
+            jerarquiasCreadas.push(jerarquiaCreada);
           }
-
-          logger.info(`✅ ${data.jerarquias.length} instancias válidas`);
-
-          // 📋 PASO 4: CREAR TODAS LAS JERARQUÍAS
-          logger.info("📝 Creando registros de jerarquía...");
-
-          const jerarquiasCreadas = await Promise.all(
-            data.jerarquias.map(async (jerarquia, index) => {
-              // Preparar datos, manejando id_dependencia nullable
-              const datosCreacion: any = {
-                id_instancia: jerarquia.id_instancia,
-                id_ct_infraestructura_tipo_instancia:
-                  jerarquia.id_ct_infraestructura_tipo_instancia,
-                estado: true,
-                id_ct_usuario_in: userId,
-                fecha_in: new Date(),
-              };
-
-              // Solo incluir id_dependencia si no es null
-              if (
-                jerarquia.id_dependencia !== null &&
-                jerarquia.id_dependencia !== undefined
-              ) {
-                datosCreacion.id_dependencia = jerarquia.id_dependencia;
-              }
-
-              const jerarquiaCreada =
-                await tx.rl_infraestructura_jerarquia.create({
-                  data: datosCreacion,
-                  include: {
-                    ct_infraestructura_tipo_instancia: true,
-                  },
-                });
-
-              logger.info(
-                `✅ Jerarquía ${index + 1}/${
-                  data.jerarquias.length
-                } creada: ID ${jerarquiaCreada.id_rl_infraestructura_jerarquia}`
-              );
-
-              return jerarquiaCreada;
-            })
-          );
-
-          logger.info(
-            `🎉 ${jerarquiasCreadas.length} jerarquías creadas exitosamente`
-          );
-
-          // 📝 PASO 5: REGISTRAR EN BITÁCORA
-          // TODO: Implementar registro en bitácora cuando se configure la tabla
-          // Por ahora solo loggeamos
-          logger.info(
-            `📝 Proceso batch completado por usuario ${userId}, sesión ${sessionId}`
-          );
 
           return {
             success: true,

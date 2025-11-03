@@ -101,6 +101,24 @@ export const esquemaRespuestaLogin = z.object({
       ip_origen: z.string().nullable(),
       dispositivo: z.string().nullable(),
     }),
+
+    // Información de rol (opcional)
+    rol: z
+      .object({
+        id_ct_rol: z.number(),
+        nombre: z.string(),
+        descripcion: z.string(),
+      })
+      .nullable(),
+
+    // Información de jerarquía asignada (opcional)
+    jerarquia: z
+      .object({
+        id_rl_infraestructura_jerarquia: z.number(),
+        id_instancia: z.number(),
+        tipo_instancia: z.string(),
+      })
+      .nullable(),
   }),
   meta: z
     .object({
@@ -167,6 +185,23 @@ export const esquemaUsuarioActual = z.object({
       sesionesActivas: z.number(),
       ultimaActividad: z.date().nullable(),
     }),
+    // 🔐 INFORMACIÓN DE ROL Y JERARQUÍA
+    rol: z
+      .object({
+        id_ct_rol: z.number(),
+        nombre: z.string(),
+        descripcion: z.string(),
+      })
+      .nullable()
+      .optional(),
+    jerarquia: z
+      .object({
+        id_rl_infraestructura_jerarquia: z.number(),
+        id_instancia: z.number(),
+        tipo_instancia: z.string(),
+      })
+      .nullable()
+      .optional(),
   }),
 });
 

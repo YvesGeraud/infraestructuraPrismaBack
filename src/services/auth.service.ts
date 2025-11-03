@@ -37,8 +37,10 @@ import {
   RespuestaLogout,
   UsuarioActual,
 } from "../schemas/auth.schemas";
+import { RlUsuarioRolJerarquiaBaseService } from "./rl_usuario_rol_jerarquia.service";
 
 const prisma = new PrismaClient();
+const rlUsuarioRolJerarquiaService = new RlUsuarioRolJerarquiaBaseService();
 
 // ===== INTERFACES =====
 
@@ -170,7 +172,13 @@ export class AuthService {
         },
       });
 
-      // 6. 📊 PREPARAR RESPUESTA
+      // 6. 🔍 OBTENER ROL Y JERARQUÍA DEL USUARIO
+      const relacionRolJerarquia =
+        await rlUsuarioRolJerarquiaService.obtenerRolYJerarquiaPorUsuario(
+          usuario.id_ct_usuario
+        );
+
+      // 7. 📊 PREPARAR RESPUESTA
       const respuesta: RespuestaLogin = {
         exito: true,
         mensaje: "Inicio de sesión exitoso",
@@ -195,10 +203,28 @@ export class AuthService {
             ip_origen: infoDispositivo.ip,
             dispositivo: infoDispositivo.dispositivo || null,
           },
+          rol: relacionRolJerarquia
+            ? {
+                id_ct_rol: relacionRolJerarquia.ct_rol.id_ct_rol,
+                nombre: relacionRolJerarquia.ct_rol.nombre,
+                descripcion: relacionRolJerarquia.ct_rol.descripcion,
+              }
+            : null,
+          jerarquia: relacionRolJerarquia?.rl_infraestructura_jerarquia
+            ? {
+                id_rl_infraestructura_jerarquia:
+                  relacionRolJerarquia.rl_infraestructura_jerarquia.id_rl_infraestructura_jerarquia,
+                id_instancia:
+                  relacionRolJerarquia.rl_infraestructura_jerarquia.id_instancia,
+                tipo_instancia:
+                  relacionRolJerarquia.rl_infraestructura_jerarquia
+                    .ct_infraestructura_tipo_instancia.nombre,
+              }
+            : null,
         },
         meta: {
           tiempoRespuesta: Date.now(),
-          version: "3.0.0", // Sin refresh tokens, solo JWT con sesiones
+          version: "3.1.0", // Incluye información de rol y jerarquía
         },
       };
 
@@ -427,7 +453,7 @@ export class AuthService {
   /**
    * 👤 OBTENER USUARIO ACTUAL
    *
-   * Retorna información del usuario autenticado y su sesión actual
+   * Retorna información del usuario autenticado, su sesión actual, rol y jerarquía
    */
   static async obtenerUsuarioActual(jti: string): Promise<UsuarioActual> {
     try {
@@ -457,6 +483,12 @@ export class AuthService {
         );
       }
 
+      // 🔐 OBTENER ROL Y JERARQUÍA DEL USUARIO
+      const relacionRolJerarquia =
+        await rlUsuarioRolJerarquiaService.obtenerRolYJerarquiaPorUsuario(
+          sesion.id_ct_usuario
+        );
+
       // Contar sesiones activas del usuario
       const sesionesActivas = await prisma.ct_sesion.count({
         where: {
@@ -483,6 +515,25 @@ export class AuthService {
             sesionesActivas,
             ultimaActividad: sesion.fecha_ultimo_uso,
           },
+          // 🔐 INCLUIR ROL Y JERARQUÍA
+          rol: relacionRolJerarquia
+            ? {
+                id_ct_rol: relacionRolJerarquia.ct_rol.id_ct_rol,
+                nombre: relacionRolJerarquia.ct_rol.nombre,
+                descripcion: relacionRolJerarquia.ct_rol.descripcion,
+              }
+            : null,
+          jerarquia: relacionRolJerarquia?.rl_infraestructura_jerarquia
+            ? {
+                id_rl_infraestructura_jerarquia:
+                  relacionRolJerarquia.rl_infraestructura_jerarquia.id_rl_infraestructura_jerarquia,
+                id_instancia:
+                  relacionRolJerarquia.rl_infraestructura_jerarquia.id_instancia,
+                tipo_instancia:
+                  relacionRolJerarquia.rl_infraestructura_jerarquia
+                    .ct_infraestructura_tipo_instancia.nombre,
+              }
+            : null,
         },
       };
 

@@ -23,7 +23,7 @@ export class RlInfraestructuraJerarquiaBaseService extends BaseService<
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "rl_infraestructura_jerarquia",
-    defaultOrderBy: { id_rl_infraestructura_jerarquia: "desc" as const }, // Más recientes primero
+    defaultOrderBy: { id_rl_infraestructura_jerarquia: "asc" as const }, // Más recientes primero
     campoActivo: "estado",
   };
 
@@ -168,6 +168,9 @@ export class RlInfraestructuraJerarquiaBaseService extends BaseService<
    *
    * Obtiene recursivamente todas las dependencias de una jerarquía con los nombres de las instancias
    * para mostrar la cadena completa: Dirección → Departamento → Área → etc.
+   *
+   * IMPORTANTE: La función recorre desde la jerarquía actual hacia arriba (hacia las dependencias)
+   * y construye la cadena en orden inverso para mostrarla correctamente.
    */
   async obtenerCadenaCompletaDependencias(idJerarquia: number) {
     const { prisma } = await import("../../config/database");
@@ -180,6 +183,8 @@ export class RlInfraestructuraJerarquiaBaseService extends BaseService<
     }> = [];
 
     // Función recursiva para obtener la cadena completa
+    // IMPORTANTE: Primero obtenemos recursivamente las dependencias, luego agregamos la actual
+    // Esto asegura que el orden sea: [Dependencia más lejana, ..., Dependencia más cercana, Actual]
     const obtenerDependenciaRecursiva = async (
       idJerarquiaActual: number,
       nivel: number = 0
@@ -192,10 +197,16 @@ export class RlInfraestructuraJerarquiaBaseService extends BaseService<
       });
 
       if (!jerarquia) {
+        logger.warn(`No se encontró jerarquía con ID ${idJerarquiaActual}`);
         return;
       }
 
-      // Obtener el nombre de la instancia según su tipo
+      // PRIMERO: Continuar recursivamente si tiene dependencia (obtener niveles superiores primero)
+      if (jerarquia.id_dependencia) {
+        await obtenerDependenciaRecursiva(jerarquia.id_dependencia, nivel - 1);
+      }
+
+      // SEGUNDO: Obtener el nombre de la instancia según su tipo
       let nombreInstancia = "Desconocido";
       try {
         switch (jerarquia.id_ct_infraestructura_tipo_instancia) {
@@ -253,31 +264,40 @@ export class RlInfraestructuraJerarquiaBaseService extends BaseService<
             });
             nombreInstancia = anexo?.nombre || "Desconocido";
             break;
+          default:
+            logger.warn(
+              `Tipo de instancia desconocido: ${jerarquia.id_ct_infraestructura_tipo_instancia} para jerarquía ${idJerarquiaActual}`
+            );
+            nombreInstancia = "Tipo desconocido";
         }
       } catch (error) {
-        logger.warn(
+        logger.error(
           `Error al obtener nombre de instancia para jerarquía ${idJerarquiaActual}:`,
           error
         );
       }
 
-      // Agregar a la cadena (orden: desde la dependencia más lejana hasta la actual)
-      cadena.unshift({
+      // TERCERO: Agregar a la cadena (usando push para orden correcto: raíz → actual)
+      // Como primero procesamos dependencias recursivamente, luego agregamos la actual,
+      // el orden final será correcto usando push
+      cadena.push({
         id_rl_infraestructura_jerarquia:
           jerarquia.id_rl_infraestructura_jerarquia,
         id_instancia: jerarquia.id_instancia,
         nombre_instancia: nombreInstancia,
         tipo_instancia: jerarquia.ct_infraestructura_tipo_instancia.nombre,
-        nivel,
+        nivel: Math.abs(nivel), // Nivel absoluto para mostrar
       });
-
-      // Continuar recursivamente si tiene dependencia
-      if (jerarquia.id_dependencia) {
-        await obtenerDependenciaRecursiva(jerarquia.id_dependencia, nivel + 1);
-      }
     };
 
-    await obtenerDependenciaRecursiva(idJerarquia);
+    // Iniciar recursión desde la jerarquía actual (nivel 0, se decrementa hacia arriba)
+    await obtenerDependenciaRecursiva(idJerarquia, 0);
+
+    // La cadena ahora está en orden correcto: [Raíz, ..., Actual]
+    logger.info(
+      `Cadena de dependencias obtenida para jerarquía ${idJerarquia}: ${cadena.length} niveles`
+    );
+
     return cadena;
   }
 

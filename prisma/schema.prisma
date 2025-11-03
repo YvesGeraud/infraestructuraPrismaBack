@@ -460,6 +460,20 @@ model ct_rate_limit {
   @@index([ventana_inicio])
 }
 
+model ct_rol {
+  id_ct_rol                Int                        @id @default(autoincrement())
+  nombre                   String                     @default("") @db.VarChar(50)
+  descripcion              String                     @default("") @db.VarChar(255)
+  estado                   Boolean?                   @default(true)
+  fecha_in                 DateTime                   @default(now()) @db.DateTime(0)
+  fecha_up                 DateTime?                  @db.DateTime(0)
+  id_ct_usuario_in         Int
+  id_ct_usuario_up         Int?
+  rl_usuario_rol_jerarquia rl_usuario_rol_jerarquia[]
+
+  @@index([estado], map: "estado")
+}
+
 model ct_sesion {
   id_ct_sesion     Int        @id @default(autoincrement())
   id_ct_usuario    Int
@@ -481,19 +495,20 @@ model ct_sesion {
 }
 
 model ct_usuario {
-  id_ct_usuario      Int         @id @default(autoincrement())
-  usuario            String      @unique(map: "IDX_daaab6a989ac4c341e57f18bbe") @db.VarChar(100)
-  contrasena         String      @db.VarChar(255)
-  estado             Boolean     @default(true)
-  fecha_registro     DateTime?   @default(now()) @db.DateTime(6)
-  fecha_modificacion DateTime?   @db.DateTime(6)
-  uuid_usuario       String      @unique @db.VarChar(36)
-  email              String?     @unique @db.VarChar(255)
-  primer_login       Boolean?    @default(false)
-  ultimo_login       DateTime?   @db.DateTime(6)
-  intentos_fallidos  Int         @default(0)
-  bloqueado_hasta    DateTime?   @db.DateTime(6)
-  ct_sesion          ct_sesion[]
+  id_ct_usuario            Int                        @id @default(autoincrement())
+  usuario                  String                     @unique(map: "IDX_daaab6a989ac4c341e57f18bbe") @db.VarChar(100)
+  contrasena               String                     @db.VarChar(255)
+  estado                   Boolean                    @default(true)
+  fecha_registro           DateTime?                  @default(now()) @db.DateTime(6)
+  fecha_modificacion       DateTime?                  @db.DateTime(6)
+  uuid_usuario             String                     @unique @db.VarChar(36)
+  email                    String?                    @unique @db.VarChar(255)
+  primer_login             Boolean?                   @default(false)
+  ultimo_login             DateTime?                  @db.DateTime(6)
+  intentos_fallidos        Int                        @default(0)
+  bloqueado_hasta          DateTime?                  @db.DateTime(6)
+  ct_sesion                ct_sesion[]
+  rl_usuario_rol_jerarquia rl_usuario_rol_jerarquia[]
 }
 
 model dt_bitacora {
@@ -764,6 +779,7 @@ model rl_infraestructura_jerarquia {
   id_ct_usuario_up                     Int?
   dt_inventario_articulo               dt_inventario_articulo[]
   ct_infraestructura_tipo_instancia    ct_infraestructura_tipo_instancia @relation(fields: [id_ct_infraestructura_tipo_instancia], references: [id_ct_infraestructura_tipo_instancia], onDelete: NoAction, onUpdate: NoAction, map: "FK_rl_infraestructura_jerarquia_ct_infraestructura_tipo")
+  rl_usuario_rol_jerarquia             rl_usuario_rol_jerarquia[]
 
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
@@ -809,4 +825,25 @@ model rl_inventario_baja_articulo {
   @@index([estado], map: "estado")
   @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
   @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
+}
+
+model rl_usuario_rol_jerarquia {
+  id_rl_usuario_rol_jerarquia     Int                           @id @default(autoincrement())
+  id_ct_usuario                   Int
+  id_externo                      Int
+  id_ct_rol                       Int
+  id_rl_infraestructura_jerarquia Int?
+  estado                          Boolean?                      @default(true)
+  fecha_in                        DateTime                      @default(now()) @db.DateTime(0)
+  fecha_up                        DateTime?                     @db.DateTime(0)
+  id_ct_usuario_in                Int
+  id_ct_usuario_up                Int?
+  ct_rol                          ct_rol                        @relation(fields: [id_ct_rol], references: [id_ct_rol], onDelete: NoAction, onUpdate: NoAction, map: "FK__ct_rol")
+  ct_usuario                      ct_usuario                    @relation(fields: [id_ct_usuario], references: [id_ct_usuario], onDelete: NoAction, onUpdate: NoAction, map: "FK__ct_usuario")
+  rl_infraestructura_jerarquia    rl_infraestructura_jerarquia? @relation(fields: [id_rl_infraestructura_jerarquia], references: [id_rl_infraestructura_jerarquia], onDelete: NoAction, onUpdate: NoAction, map: "FK__rl_infraestructura_jerarquia")
+
+  @@index([id_ct_rol], map: "FK__ct_rol")
+  @@index([id_rl_infraestructura_jerarquia], map: "FK__rl_infraestructura_jerarquia")
+  @@index([estado], map: "estado")
+  @@index([id_ct_usuario], map: "id_ct_usuario")
 }
