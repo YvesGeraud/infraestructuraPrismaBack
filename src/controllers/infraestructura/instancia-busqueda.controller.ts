@@ -53,14 +53,18 @@ export class InstanciaBusquedaController {
           ? queryParams.incluir_jerarquia
           : true; // Default
 
+      // tipo_instancia_id ya viene transformado a number por el schema (o undefined si no viene)
+      const tipoInstanciaId = queryParams.tipo_instancia_id;
+
       logger.info(
-        `🔍 Búsqueda unificada: "${q}" (página: ${pagina}, límite: ${limite}, incluirJerarquia: ${incluirJerarquia})`
+        `🔍 Búsqueda unificada: "${q}" (página: ${pagina}, límite: ${limite}, incluirJerarquia: ${incluirJerarquia}, tipoInstanciaId: ${tipoInstanciaId || "todos"})`
       );
 
       const resultado = await instanciaBusquedaService.buscarPorCctONombre(q, {
         pagina,
         limite,
         incluirJerarquia,
+        tipoInstanciaId,
       });
 
       return enviarRespuestaExitosa(res, {

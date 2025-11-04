@@ -496,6 +496,21 @@ CREATE TABLE `ct_rate_limit` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `ct_rol` (
+    `id_ct_rol` INTEGER NOT NULL AUTO_INCREMENT,
+    `nombre` VARCHAR(50) NOT NULL DEFAULT '',
+    `descripcion` VARCHAR(255) NOT NULL DEFAULT '',
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    INDEX `estado`(`estado`),
+    PRIMARY KEY (`id_ct_rol`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `ct_sesion` (
     `id_ct_sesion` INTEGER NOT NULL AUTO_INCREMENT,
     `id_ct_usuario` INTEGER NOT NULL,
@@ -566,6 +581,7 @@ CREATE TABLE `dt_bitacora` (
 CREATE TABLE `dt_infraestructura_ubicacion` (
     `id_dt_infraestructura_ubicacion` INTEGER NOT NULL AUTO_INCREMENT,
     `calle` VARCHAR(255) NOT NULL,
+    `cct` VARCHAR(11) NOT NULL,
     `numero_exterior` INTEGER NULL,
     `numero_interior` INTEGER NULL,
     `id_ct_localidad` INTEGER NOT NULL,
@@ -843,6 +859,26 @@ CREATE TABLE `rl_inventario_baja_articulo` (
     PRIMARY KEY (`id_rl_inventario_baja_articulo`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `rl_usuario_rol_jerarquia` (
+    `id_rl_usuario_rol_jerarquia` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_ct_usuario` INTEGER NOT NULL,
+    `id_externo` INTEGER NOT NULL,
+    `id_ct_rol` INTEGER NOT NULL,
+    `id_rl_infraestructura_jerarquia` INTEGER NULL,
+    `estado` BOOLEAN NULL DEFAULT true,
+    `fecha_in` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `fecha_up` DATETIME(0) NULL,
+    `id_ct_usuario_in` INTEGER NOT NULL,
+    `id_ct_usuario_up` INTEGER NULL,
+
+    INDEX `FK__ct_rol`(`id_ct_rol`),
+    INDEX `FK__rl_infraestructura_jerarquia`(`id_rl_infraestructura_jerarquia`),
+    INDEX `estado`(`estado`),
+    INDEX `id_ct_usuario`(`id_ct_usuario`),
+    PRIMARY KEY (`id_rl_usuario_rol_jerarquia`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `ct_infraestructura_anexo` ADD CONSTRAINT `FK_ct_infraestructura_anexo_dt_infraestructura_ubicacion` FOREIGN KEY (`id_dt_infraestructura_ubicacion`) REFERENCES `dt_infraestructura_ubicacion`(`id_dt_infraestructura_ubicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
@@ -938,3 +974,12 @@ ALTER TABLE `rl_inventario_baja_articulo` ADD CONSTRAINT `FK_rl_inventario_baja_
 
 -- AddForeignKey
 ALTER TABLE `rl_inventario_baja_articulo` ADD CONSTRAINT `FK_rl_inventario_baja_articulo_dt_inventario_baja` FOREIGN KEY (`id_dt_inventario_baja`) REFERENCES `dt_inventario_baja`(`id_dt_inventario_baja`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `rl_usuario_rol_jerarquia` ADD CONSTRAINT `FK__ct_rol` FOREIGN KEY (`id_ct_rol`) REFERENCES `ct_rol`(`id_ct_rol`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `rl_usuario_rol_jerarquia` ADD CONSTRAINT `FK__ct_usuario` FOREIGN KEY (`id_ct_usuario`) REFERENCES `ct_usuario`(`id_ct_usuario`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+-- AddForeignKey
+ALTER TABLE `rl_usuario_rol_jerarquia` ADD CONSTRAINT `FK__rl_infraestructura_jerarquia` FOREIGN KEY (`id_rl_infraestructura_jerarquia`) REFERENCES `rl_infraestructura_jerarquia`(`id_rl_infraestructura_jerarquia`) ON DELETE NO ACTION ON UPDATE NO ACTION;

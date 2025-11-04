@@ -1,13 +1,28 @@
 /**
- * @fileoverview Servicio para búsqueda unificada de instancias de infraestructura
+ * @fileoverview Servicio de búsqueda unificada de instancias de infraestructura
  * Busca por CCT o nombre en todas las tablas: dirección, departamento, área, jefe_sector, supervisor, escuela, anexo
+ * 
+ * NOTA: Este servicio no extiende de BaseService porque su funcionalidad es especializada
+ * (búsqueda unificada en múltiples tablas), pero mantiene la misma estructura y patrones.
  */
 
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../config/database";
 import { createError } from "../../middleware/errorHandler";
 import logger from "../../config/logger";
 
-const prisma = new PrismaClient();
+//TODO ===== SERVICIO DE BÚSQUEDA UNIFICADA DE INSTANCIAS DE INFRAESTRUCTURA =====
+
+/**
+ * 🎯 INTERFACES ESPECIALIZADAS PARA BÚSQUEDA UNIFICADA
+ * 
+ * NOTA: Estos servicios especializados requieren interfaces personalizadas porque:
+ * - Combina datos de múltiples tablas (direcciones, departamentos, áreas, etc.)
+ * - Agrega información adicional (jerarquía, municipio, total_articulos)
+ * - No puede usar directamente los tipos de Prisma ya que el resultado es una agregación
+ * 
+ * Los servicios normales (que extienden BaseService) usan tipos de Prisma directamente
+ * desde @prisma/client, pero este servicio necesita estas interfaces personalizadas.
+ */
 
 /**
  * 🎯 INTERFAZ PARA RESULTADO DE BÚSQUEDA
@@ -53,25 +68,28 @@ export interface BusquedaInstanciasRespuesta {
 
 /**
  * 🎯 SERVICIO DE BÚSQUEDA UNIFICADA DE INSTANCIAS
+ * 
+ * Este servicio proporciona búsqueda unificada en múltiples tablas de instancias
+ * de infraestructura (direcciones, departamentos, áreas, etc.)
  */
 export class InstanciaBusquedaService {
-  protected prisma = prisma;
 
   /**
    * 🔍 BUSCAR INSTANCIA POR CCT O NOMBRE CON PAGINACIÓN
    *
-   * Busca en todas las tablas de instancias:
-   * - ct_infraestructura_direccion
-   * - ct_infraestructura_departamento
-   * - ct_infraestructura_area
-   * - ct_infraestructura_jefe_sector
-   * - ct_infraestructura_supervisor
-   * - ct_infraestructura_escuela
-   * - ct_infraestructura_anexo
+   * Busca en todas las tablas de instancias de infraestructura:
+   * - ct_infraestructura_direccion (tipoId: 1)
+   * - ct_infraestructura_departamento (tipoId: 2)
+   * - ct_infraestructura_area (tipoId: 3)
+   * - ct_infraestructura_jefe_sector (tipoId: 4)
+   * - ct_infraestructura_supervisor (tipoId: 5)
+   * - ct_infraestructura_escuela (tipoId: 6)
+   * - ct_infraestructura_anexo (tipoId: 7)
    *
-   * @param busqueda - CCT o nombre a buscar
+   * @param busqueda - CCT o nombre a buscar (mínimo 2 caracteres)
    * @param opciones - Opciones de búsqueda (paginación, jerarquía, etc.)
    * @returns Respuesta paginada con instancias encontradas
+   * @throws {Error} Si el término de búsqueda es inválido o hay error en la consulta
    */
   async buscarPorCctONombre(
     busqueda: string,
@@ -79,31 +97,35 @@ export class InstanciaBusquedaService {
       pagina?: number;
       limite?: number;
       incluirJerarquia?: boolean;
+      tipoInstanciaId?: number; // Filtro opcional por tipo de instancia
     } = {}
   ): Promise<BusquedaInstanciasRespuesta> {
     try {
-      // Validar término de búsqueda
-      if (!busqueda || busqueda.trim().length < 2) {
-        throw createError(
-          "El término de búsqueda debe tener al menos 2 caracteres",
-          400
-        );
-      }
-
       // Configurar paginación con valores por defecto
       const pagina = opciones.pagina || 1;
       const limite = Math.min(opciones.limite || 10, 100); // Máximo 100 registros
       const incluirJerarquia = opciones.incluirJerarquia ?? true;
+      const tipoInstanciaId = opciones.tipoInstanciaId;
 
       // Validar página
       if (pagina < 1) {
         throw createError("La página debe ser mayor o igual a 1", 400);
       }
 
+      // Si el término es "*", buscar todos los registros (sin filtro de búsqueda)
       const termino = busqueda.trim();
+      const esBuscarTodos = termino === "*" || termino === "";
+      
+      // Validar término de búsqueda (mínimo 1 carácter, excepto cuando se busca todos)
+      if (!esBuscarTodos && (!termino || termino.length < 1)) {
+        throw createError(
+          "El término de búsqueda debe tener al menos 1 carácter",
+          400
+        );
+      }
       const resultados: InstanciaEncontrada[] = [];
 
-      // Obtener todos los tipos de instancia
+      // Obtener todos los tipos de instancia para construir el mapa de nombres
       const tiposInstancia =
         await prisma.ct_infraestructura_tipo_instancia.findMany({
           where: { estado: true },
@@ -113,83 +135,79 @@ export class InstanciaBusquedaService {
         tiposInstancia.map((t) => [t.id_ct_infraestructura_tipo_instancia, t])
       );
 
-      // Mapeo de tipos de instancia a tablas y campos
+      // 🎯 Mapeo directo de tablas a IDs de tipos de instancia del catálogo
+      // Los IDs son fijos según el catálogo ct_infraestructura_tipo_instancia:
+      // 1 = DIRECCIÓN, 2 = DEPARTAMENTO, 3 = AREA, 4 = JEFE DE SECTOR,
+      // 5 = SUPERVISOR, 6 = ESCUELA, 7 = ANEXO
       const tablasInstancias = [
         {
           tabla: "ct_infraestructura_direccion",
           idCampo: "id_ct_infraestructura_direccion",
-          tipoId:
-            tiposInstancia.find(
-              (t) =>
-                t.nombre.toLowerCase().includes("dirección") ||
-                t.nombre.toLowerCase().includes("direccion")
-            )?.id_ct_infraestructura_tipo_instancia || 1,
+          tipoId: 1, // DIRECCIÓN
         },
         {
           tabla: "ct_infraestructura_departamento",
           idCampo: "id_ct_infraestructura_departamento",
-          tipoId:
-            tiposInstancia.find((t) =>
-              t.nombre.toLowerCase().includes("departamento")
-            )?.id_ct_infraestructura_tipo_instancia || 2,
+          tipoId: 2, // DEPARTAMENTO
         },
         {
           tabla: "ct_infraestructura_area",
           idCampo: "id_ct_infraestructura_area",
-          tipoId:
-            tiposInstancia.find(
-              (t) =>
-                t.nombre.toLowerCase().includes("área") ||
-                t.nombre.toLowerCase().includes("area")
-            )?.id_ct_infraestructura_tipo_instancia || 3,
+          tipoId: 3, // AREA
         },
         {
           tabla: "ct_infraestructura_jefe_sector",
           idCampo: "id_ct_infraestructura_jefe_sector",
-          tipoId:
-            tiposInstancia.find(
-              (t) =>
-                t.nombre.toLowerCase().includes("jefe") &&
-                t.nombre.toLowerCase().includes("sector")
-            )?.id_ct_infraestructura_tipo_instancia || 4,
+          tipoId: 4, // JEFE DE SECTOR
         },
         {
           tabla: "ct_infraestructura_supervisor",
           idCampo: "id_ct_infraestructura_supervisor",
-          tipoId:
-            tiposInstancia.find((t) =>
-              t.nombre.toLowerCase().includes("supervisor")
-            )?.id_ct_infraestructura_tipo_instancia || 5,
+          tipoId: 5, // SUPERVISOR
         },
         {
           tabla: "ct_infraestructura_escuela",
           idCampo: "id_ct_infraestructura_escuela",
-          tipoId:
-            tiposInstancia.find((t) =>
-              t.nombre.toLowerCase().includes("escuela")
-            )?.id_ct_infraestructura_tipo_instancia || 6,
+          tipoId: 6, // ESCUELA
         },
         {
           tabla: "ct_infraestructura_anexo",
           idCampo: "id_ct_infraestructura_anexo",
-          tipoId:
-            tiposInstancia.find((t) => t.nombre.toLowerCase().includes("anexo"))
-              ?.id_ct_infraestructura_tipo_instancia || 7,
+          tipoId: 7, // ANEXO
         },
       ];
 
+      // Si se especifica un tipo de instancia, filtrar solo esa tabla
+      const tablasABuscar = tipoInstanciaId
+        ? tablasInstancias.filter((t) => t.tipoId === tipoInstanciaId)
+        : tablasInstancias;
+
+      if (tipoInstanciaId && tablasABuscar.length === 0) {
+        throw createError(
+          `Tipo de instancia con ID ${tipoInstanciaId} no válido`,
+          400
+        );
+      }
+
       // Buscar en cada tabla
-      for (const configTabla of tablasInstancias) {
+      for (const configTabla of tablasABuscar) {
         try {
+          // Construir condición where según si se busca todos o un término específico
+          const whereCondition: any = {
+            estado: true,
+          };
+
+          if (!esBuscarTodos) {
+            // Si no es buscar todos, aplicar filtro de búsqueda
+            whereCondition.OR = [
+              { cct: { contains: termino } },
+              { nombre: { contains: termino } },
+            ];
+          }
+
           // @ts-ignore - Prisma dinámico
           const instancias = await prisma[configTabla.tabla].findMany({
-            where: {
-              estado: true,
-              OR: [
-                { cct: { contains: termino } },
-                { nombre: { contains: termino } },
-              ],
-            },
+            where: whereCondition,
             include: {
               dt_infraestructura_ubicacion: {
                 include: {
@@ -329,5 +347,6 @@ export class InstanciaBusquedaService {
   }
 }
 
-// Exportar instancia única
-export default new InstanciaBusquedaService();
+// Exportar instancia única (patrón singleton)
+const instanciaBusquedaService = new InstanciaBusquedaService();
+export default instanciaBusquedaService;

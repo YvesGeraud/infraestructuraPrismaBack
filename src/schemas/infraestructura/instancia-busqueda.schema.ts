@@ -20,6 +20,14 @@ export const instanciaBusquedaQuerySchema = paginationSchema.extend({
       if (val === undefined || val === null || val === "") return true; // Default: incluir jerarquía
       return val === "true" || val === "1";
     }),
+  tipo_instancia_id: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (val === undefined || val === null || val === "") return undefined;
+      const parsed = parseInt(val, 10);
+      return isNaN(parsed) ? undefined : parsed;
+    }),
 });
 
 /**
