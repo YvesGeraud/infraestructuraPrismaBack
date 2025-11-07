@@ -6,7 +6,7 @@ stages:
 dependences_dev:
   stage: dependences
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /dev/
+    - if: $CI_COMMIT_BRANCH == "dev2"
   tags:
     - dev
   cache:
@@ -21,7 +21,7 @@ dependences_dev:
 build_dev:
   stage: build
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /dev/
+    - if: $CI_COMMIT_BRANCH == "dev2"
   tags:
     - dev
   cache:
@@ -34,6 +34,7 @@ build_dev:
       paths:
         - dist
   script:
+    - npx prisma generate
     - npx tsc
     - cp -f .env dist/
 
@@ -43,7 +44,7 @@ publish_dev:
     FOLDER: "infraestructura2"
   stage: publish
   rules:
-    - if: $CI_COMMIT_BRANCH =~ /dev/
+    - if: $CI_COMMIT_BRANCH == "dev2"
   tags:
     - dev
   cache:
@@ -61,127 +62,5 @@ publish_dev:
     - rm -rf $DEPLOY/$FOLDER/*
     - cp -rf $CI_PROJECT_DIR/node_modules/ $DEPLOY/$FOLDER/
     - cp -r $CI_PROJECT_DIR/dist/. $DEPLOY/$FOLDER/
-    - mkdir -p $DEPLOY/$FOLDER/tmp/
-    - touch $DEPLOY/$FOLDER/tmp/restart.txt
-
-dependences_uat:
-  stage: dependences
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /uat/
-  tags:
-    - uat
-  cache:
-    key:
-      files:
-        - package.json
-    paths:
-      - node_modules
-  script:
-    - npm install
-
-build_uat:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /uat/
-  tags:
-    - uat
-  cache:
-    - key:
-        files:
-          - package.json
-      paths:
-        - node_modules
-    - key: cache-$CI_COMMIT_REF_SLUG
-      paths:
-        - dist
-  script:
-    - npx tsc
-    - cp -f .env dist/
-
-publish_uat:
-  variables:
-    DEPLOY: "/var/www/api-uat"
-    FOLDER: "infraestructura2"
-  stage: publish
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /uat/
-  tags:
-    - uat
-  cache:
-    - key:
-        files:
-          - package.json
-      paths:
-        - node_modules
-    - key: cache-$CI_COMMIT_REF_SLUG
-      paths:
-        - dist
-  script:
-    - echo "Desplegando a uat"
-    - mkdir -p $DEPLOY/$FOLDER/
-    - rm -rf $DEPLOY/$FOLDER/*
-    - cp -rf $CI_PROJECT_DIR/node_modules/ $DEPLOY/$FOLDER/
-    - cp -r $CI_PROJECT_DIR/dist/. $DEPLOY/$FOLDER/
-    - mkdir -p $DEPLOY/$FOLDER/tmp/
-    - touch $DEPLOY/$FOLDER/tmp/restart.txt
-
-dependences_prod:
-  stage: dependences
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /main/
-  tags:
-    - prod-apps
-  cache:
-    key:
-      files:
-        - package.json
-    paths:
-      - node_modules
-  script:
-    - npm install
-
-build_prod:
-  stage: build
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /main/
-  tags:
-    - prod-apps
-  cache:
-    - key:
-        files:
-          - package.json
-      paths:
-        - node_modules
-    - key: cache-$CI_COMMIT_REF_SLUG
-      paths:
-        - dist
-  script:
-    - npx tsc
-    - cp -f .env dist/
-
-publish_prod:
-  variables:
-    DEPLOY: "/var/www"
-    FOLDER: "api-infraestructura2"
-  stage: publish
-  rules:
-    - if: $CI_COMMIT_BRANCH =~ /main/
-  tags:
-    - prod-apps
-  cache:
-    - key:
-        files:
-          - package.json
-      paths:
-        - node_modules
-    - key: cache-$CI_COMMIT_REF_SLUG
-      paths:
-        - dist
-  script:
-    - echo "Desplegando infraestructura2 a prod"
-    - mkdir -p $DEPLOY/$FOLDER/
-    - rm -rf $DEPLOY/$FOLDER/*
-    - cp -rf $CI_PROJECT_DIR/node_modules/ $DEPLOY/$FOLDER/
-    - cp -rf $CI_PROJECT_DIR/dist/. $DEPLOY/$FOLDER/
     - mkdir -p $DEPLOY/$FOLDER/tmp/
     - touch $DEPLOY/$FOLDER/tmp/restart.txt
