@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { RequestAutenticado } from "../../middleware/authMiddleware";
 import {
   obtenerIdSesionDesdeJwt,
@@ -13,6 +13,11 @@ import {
   DtInventarioArticuloIdParam,
 } from "../../schemas/inventario/dt_inventario_articulo.schema";
 import { PaginationInput } from "../../schemas/commonSchemas";
+import path from "path";
+import { existsSync } from "fs";
+import { fileConfig } from "../../config/env";
+import { createError } from "../../middleware/errorHandler";
+import { enviarRespuestaError } from "../../utils/responseUtils";
 
 //TODO ===== CONTROLADOR PARA DT_INVENTARIO_ARTICULO CON BASE SERVICE =====
 const dtInventarioArticuloBaseService = new DtInventarioArticuloBaseService();
@@ -60,6 +65,91 @@ const inventarioArticuloData: CrearDtInventarioArticuloInput = req.body;
       },
       "Artículo de inventario obtenido exitosamente"
     );
+  };
+
+  obtenerPdfInventarioArticulo = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    await this.manejarOperacion(
+      req,
+      res,
+      async () => {
+        const { id_dt_inventario_articulo } =
+          this.validarDatosConEsquema<DtInventarioArticuloIdParam>(
+            dtInventarioArticuloIdParamSchema,
+            req.params
+          );
+
+        return await dtInventarioArticuloBaseService.obtenerArchivoPdfPorArticulo(
+          id_dt_inventario_articulo
+        );
+      },
+      "Archivo PDF obtenido exitosamente"
+    );
+  };
+
+  descargarPdfInventarioArticulo = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { id_dt_inventario_articulo } =
+        this.validarDatosConEsquema<DtInventarioArticuloIdParam>(
+          dtInventarioArticuloIdParamSchema,
+          req.params
+        );
+
+      const archivo =
+        await dtInventarioArticuloBaseService.obtenerArchivoPdfPorArticulo(
+          id_dt_inventario_articulo
+        );
+
+      if (!archivo) {
+        enviarRespuestaError(res, "Archivo PDF no encontrado", 404);
+        return;
+      }
+
+      const rutaRelativa = (archivo.ruta_relativa || archivo.ruta_archivo || "").replace(
+        /\\/g,
+        "/"
+      );
+
+      if (!rutaRelativa) {
+        enviarRespuestaError(res, "Archivo PDF no encontrado", 404);
+        return;
+      }
+
+      const rutaSinUploads = rutaRelativa.startsWith("uploads/")
+        ? rutaRelativa.replace(/^uploads\//, "")
+        : rutaRelativa;
+
+      const rutaBaseUploads = path.isAbsolute(fileConfig.uploadPath)
+        ? fileConfig.uploadPath
+        : path.resolve(process.cwd(), fileConfig.uploadPath);
+
+      const rutaAbsoluta = path.join(rutaBaseUploads, rutaSinUploads);
+
+      if (!existsSync(rutaAbsoluta)) {
+        enviarRespuestaError(res, "Archivo PDF no encontrado", 404);
+        return;
+      }
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${archivo.nombre_archivo || archivo.nombre_sistema}"`
+      );
+
+      res.sendFile(rutaAbsoluta, (err) => {
+        if (err) {
+          next(createError("Error al enviar el archivo PDF", 500));
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
   };
 
   /**

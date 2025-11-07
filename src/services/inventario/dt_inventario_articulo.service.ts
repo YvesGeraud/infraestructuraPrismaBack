@@ -5,6 +5,7 @@
 
 import { BaseService } from "../BaseService";
 import { dt_inventario_articulo } from "@prisma/client";
+import { prisma } from "../../config/database";
 import {
   CrearDtInventarioArticuloInput,
   ActualizarDtInventarioArticuloInput,
@@ -19,6 +20,78 @@ export class DtInventarioArticuloBaseService extends BaseService<
   ActualizarDtInventarioArticuloInput,
   BuscarDtInventarioArticuloInput
 > {
+  public async obtenerArchivoPdfPorArticulo(
+    idArticulo: number
+  ): Promise<
+    | {
+        id_dt_inventario_alta: number;
+        id_dt_inventario_alta_archivo: number;
+        nombre_archivo: string;
+        nombre_sistema: string;
+        ruta_archivo: string;
+        ruta_relativa: string;
+      }
+    | null
+  > {
+    const relacionAlta = await prisma.rl_inventario_alta_articulo.findFirst({
+      where: {
+        id_dt_inventario_articulo: idArticulo,
+        estado: true,
+        dt_inventario_alta: {
+          estado: true,
+        },
+      },
+      orderBy: {
+        dt_inventario_alta: {
+          fecha_in: "desc",
+        },
+      },
+      include: {
+        dt_inventario_alta: {
+          include: {
+            dt_inventario_alta_archivo: {
+              where: {
+                estado: true,
+              },
+              orderBy: {
+                fecha_in: "desc",
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+
+    if (!relacionAlta) {
+      return null;
+    }
+
+    const archivo = relacionAlta.dt_inventario_alta.dt_inventario_alta_archivo[0];
+
+    if (!archivo) {
+      return null;
+    }
+
+    const rutaOriginal = archivo.ruta_archivo.replace(/\\/g, "/");
+    console.log(rutaOriginal);
+    const rutaConUploads = rutaOriginal.startsWith("uploads/")
+      ? rutaOriginal
+      : `uploads/${rutaOriginal}`;
+
+    return {
+      id_dt_inventario_alta: relacionAlta.id_dt_inventario_alta,
+      id_dt_inventario_alta_archivo:
+        archivo.id_dt_inventario_alta_archivo,
+      nombre_archivo: archivo.nombre_archivo,
+      nombre_sistema: archivo.nombre_sistema,
+      ruta_archivo: rutaConUploads,
+      ruta_relativa: rutaOriginal.startsWith("uploads/")
+        ? rutaOriginal.replace(/^uploads\//, "")
+        : rutaOriginal,
+    };
+  }
+
   // 🔧 Configuración específica del modelo
   protected config = {
     tableName: "dt_inventario_articulo",

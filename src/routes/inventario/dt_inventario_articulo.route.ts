@@ -27,6 +27,20 @@ router.get(
   dtInventarioArticuloController.obtenerInventarioArticuloPorId
 );
 
+// 📄 Obtener PDF asociado a un artículo de inventario
+router.get(
+  "/:id_dt_inventario_articulo/pdf",
+  validarRequest({ params: dtInventarioArticuloIdParamSchema }),
+  dtInventarioArticuloController.obtenerPdfInventarioArticulo
+);
+
+// 📄 Descargar PDF asociado (contenido protegido con JWT)
+router.get(
+  "/:id_dt_inventario_articulo/pdf/archivo",
+  validarRequest({ params: dtInventarioArticuloIdParamSchema }),
+  dtInventarioArticuloController.descargarPdfInventarioArticulo
+);
+
 // 📦 Crear nuevo artículo de inventario
 router.post(
   "/",
