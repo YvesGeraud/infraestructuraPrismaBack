@@ -62,7 +62,7 @@ interface RateLimitResult {
 const CONFIGURACIONES_RATE_LIMIT: Record<string, RateLimitConfig> = {
   AUTH_LOGIN: {
     ventanaMinutos: 15,
-    maxIntentos: 5,
+    maxIntentos: 5000,
     tiempoBloqueoMinutos: 15,
     mensaje: "Demasiados intentos de login. Intenta de nuevo en 15 minutos",
     endpoint: "auth_login",

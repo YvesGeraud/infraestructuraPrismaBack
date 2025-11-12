@@ -846,4 +846,6 @@ model rl_usuario_rol_jerarquia {
   @@index([id_rl_infraestructura_jerarquia], map: "FK__rl_infraestructura_jerarquia")
   @@index([estado], map: "estado")
   @@index([id_ct_usuario], map: "id_ct_usuario")
+  @@index([id_ct_usuario_in], map: "id_ct_usuario_in")
+  @@index([id_ct_usuario_up], map: "id_ct_usuario_up")
 }
