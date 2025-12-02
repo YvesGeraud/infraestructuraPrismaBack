@@ -1,24 +1,40 @@
-#? Por si quiren trabajar con Docker si no, no copien este archivo
+FROM node:lts-alpine
 
-FROM node:18
+# Variables de entorno
+ENV NODE_ENV=production
 
-#! Crear carpeta de trabajo
+# Directorio de trabajo
 WORKDIR /usr/src/app
 
-#! Copiar package.json y package-lock.json
+# Copiar archivos de dependencias
 COPY package*.json ./
+COPY prisma ./prisma/
 
-#! Instalar dependencias
-RUN npm install
+# Instalar TODAS las dependencias (necesarias para compilar TypeScript)
+# Usar npm ci para instalación limpia y determinística
+RUN npm ci --include=dev
 
-#! Copiar el resto del código
+# Generar cliente de Prisma
+RUN npx prisma generate
+
+# Copiar código fuente
 COPY . .
 
-#! Instalar ts-node-dev y typescript de forma global (opcional pero se recomienda)
-RUN npm install -g ts-node-dev typescript
+# Compilar TypeScript a JavaScript
+RUN npm run build
 
-#! Exponer el puerto
+# Eliminar devDependencies después de compilar (reduce tamaño)
+RUN npm prune --production --no-audit
+
+# Crear directorios necesarios
+RUN mkdir -p uploads logs
+
+# Exponer puerto
 EXPOSE 3000
 
-#! Ejecutar el comando de desarrollo
-CMD ["npm", "run", "dev"]
+# Cambiar permisos
+RUN chown -R node:node /usr/src/app
+USER node
+
+# Iniciar aplicación
+CMD ["node", "dist/app.js"]

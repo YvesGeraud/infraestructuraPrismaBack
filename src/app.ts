@@ -4,10 +4,12 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import dotenvExpand from "dotenv-expand";
 import path from "path";
 
-// Configuración de variables de entorno
-dotenv.config();
+// Configuración de variables de entorno con expansión (permite ${VARIABLE})
+const myEnv = dotenv.config();
+dotenvExpand.expand(myEnv);
 
 // Importaciones de configuración
 import {

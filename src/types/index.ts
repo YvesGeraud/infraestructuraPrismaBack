@@ -93,6 +93,10 @@ export interface ArchivoInfo {
 }
 
 // ===== EXTENSIONES DE EXPRESS =====
+// Importar tipos necesarios
+import "express";
+import "multer";
+
 declare global {
   namespace Express {
     interface Request {
@@ -108,8 +112,13 @@ declare global {
        */
       usuario?: PayloadJwt;
 
+      // Multer define estos tipos en el namespace Express.Multer
+      // Solo necesitamos declarar las propiedades personalizadas
       archivo?: Express.Multer.File & ArchivoInfo;
       archivos?: (Express.Multer.File & ArchivoInfo)[];
     }
   }
 }
+
+// Re-exportar tipos de Express para uso en el proyecto
+export type { Request, Response, NextFunction } from "express";

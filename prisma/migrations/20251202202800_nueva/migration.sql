@@ -876,6 +876,8 @@ CREATE TABLE `rl_usuario_rol_jerarquia` (
     INDEX `FK__rl_infraestructura_jerarquia`(`id_rl_infraestructura_jerarquia`),
     INDEX `estado`(`estado`),
     INDEX `id_ct_usuario`(`id_ct_usuario`),
+    INDEX `id_ct_usuario_in`(`id_ct_usuario_in`),
+    INDEX `id_ct_usuario_up`(`id_ct_usuario_up`),
     PRIMARY KEY (`id_rl_usuario_rol_jerarquia`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

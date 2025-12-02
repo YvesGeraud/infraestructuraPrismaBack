@@ -1,5 +1,6 @@
 import { z } from "zod";
 import dotenv from "dotenv";
+import dotenvExpand from "dotenv-expand";
 import path from "path";
 
 // Determinar el entorno y cargar el archivo .env correspondiente
@@ -8,7 +9,9 @@ const envArchivo =
     ? ".env.production"
     : ".env.development";
 
-dotenv.config({ path: path.resolve(process.cwd(), envArchivo) });
+// Cargar .env y expandir variables (permite ${VARIABLE} en el .env)
+const myEnv = dotenv.config({ path: path.resolve(process.cwd(), envArchivo) });
+dotenvExpand.expand(myEnv);
 
 // ===== CONSTRUIR DATABASE_URL AUTOMÁTICAMENTE =====
 // Construir DATABASE_URL a partir de variables separadas para que Prisma la use
